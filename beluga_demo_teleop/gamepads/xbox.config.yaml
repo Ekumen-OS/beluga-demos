@@ -1,0 +1,13 @@
+teleop_twist_joy_node:
+  ros__parameters:
+    require_enable_button: false
+    enable_button: -1 # disabled
+    enable_turbo_button: -1 # disabled
+    axis_linear:
+      x: 1
+    scale_linear:
+      x: 0.75
+    axis_angular:
+      yaw: 0
+    scale_angular:
+      yaw: 1.0

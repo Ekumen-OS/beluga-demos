@@ -1,0 +1,238 @@
+<?xml version='1.0' ?>
+<sdf version="1.6">
+    <model name="large_crate">
+        <static>false</static>
+        <link name="link">
+            <inertial>
+                <pose>0 0 0.25 0 0 0</pose>
+                <mass>8</mass>
+                <inertia>
+                    <ixx>0.36485966</ixx>
+                    <ixy>0.0</ixy>
+                    <ixz>0.0</ixz>
+                    <iyy>0.93845015</iyy>
+                    <iyz>0.0</iyz>
+                    <izz>0.98351090</izz>
+                </inertia>
+            </inertial>
+            <visual name="visual">
+                <geometry>
+                    <mesh>
+                        <uri>meshes/LargeCrate.dae</uri>
+                    </mesh>
+                </geometry>
+                <material>
+                    <diffuse>1.0 1.0 1.0</diffuse>
+                    <specular>1.0 1.0 1.0</specular>
+                    <pbr>
+                        <metal>
+                            <albedo_map>materials/textures/Crate_Albedo.jpg</albedo_map>
+                            <normal_map>materials/textures/Crate_Normal.jpg</normal_map>
+                            <roughness_map>materials/textures/Crate_Roughness.jpg</roughness_map>
+                        </metal>
+                    </pbr>
+                </material>
+            </visual>
+            <collision name="Box007">
+                <pose>0.0 0.0 0.245134 0.0 0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.719255 0.483863 0.490267</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box008">
+                <pose>0.0 0.0 0.389035 0.0 0.0 0.0</pose>
+                <geometry>
+                    <box>
+                        <size>0.757419 0.526001 0.0499125</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box009">
+                <pose>0.246876 0.255699 0.378817 1.5708 0.0 3.14159</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box010">
+                <pose>-0.246876 0.255699 0.378817 1.5708 0.0 3.14159</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box011">
+                <pose>0.0 0.255699 0.378817 1.5708 0.0 3.14159</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box012">
+                <pose>-0.372553 0.13 0.378817 1.5708 0.0 -1.5708</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box013">
+                <pose>-0.372553 -0.13 0.378817 1.5708 0.0 -1.5708</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box014">
+                <pose>0.372553 -0.13 0.378817 1.5708 0.0 1.5708</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box015">
+                <pose>0.372553 0.13 0.378817 1.5708 0.0 1.5708</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box016">
+                <pose>0.246876 -0.255699 0.378817 1.5708 0.0 -2.38419e-07</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box017">
+                <pose>-0.246876 -0.255699 0.378817 1.5708 0.0 -2.38419e-07</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box018">
+                <pose>0.0 -0.255699 0.378817 1.5708 0.0 -2.38419e-07</pose>
+                <geometry>
+                    <box>
+                        <size>0.0560224 0.105551 0.0312474</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box019">
+                <pose>0.0 -0.264152 0.384558 1.5708 0.0 3.14159</pose>
+                <geometry>
+                    <box>
+                        <size>0.662 0.028538 0.0406942</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box020">
+                <pose>-0.357901 0.179912 0.320486 1.5708 0.0 -1.5708</pose>
+                <geometry>
+                    <box>
+                        <size>0.0398966 0.0969873 0.0447377</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box021">
+                <pose>-0.357901 -0.179912 0.320486 1.5708 0.0 -1.5708</pose>
+                <geometry>
+                    <box>
+                        <size>0.0398966 0.0969873 0.0447377</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box022">
+                <pose>-0.520994 0.0 0.286826 1.5708 0.0 -1.5708</pose>
+                <geometry>
+                    <box>
+                        <size>0.266316 0.0316343 0.0433154</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box023">
+                <pose>-0.501567 0.151505 0.286826 1.5708 0.0 -2.26893</pose>
+                <geometry>
+                    <box>
+                        <size>0.0810202 0.0316343 0.039417</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box024">
+                <pose>-0.430842 0.179853 0.286826 1.5708 0.0 3.14159</pose>
+                <geometry>
+                    <box>
+                        <size>0.120291 0.0316343 0.0301304</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box025">
+                <pose>-0.430842 -0.179853 0.286826 1.5708 0.0 -6.51683e-07</pose>
+                <geometry>
+                    <box>
+                        <size>0.120291 0.0316343 0.0301304</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box026">
+                <pose>-0.501567 -0.151505 0.286826 1.5708 0.0 -0.872665</pose>
+                <geometry>
+                    <box>
+                        <size>0.0810202 0.0316343 0.039417</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box027">
+                <pose>0.520994 0.0 0.286826 1.5708 0.0 1.5708</pose>
+                <geometry>
+                    <box>
+                        <size>0.266316 0.0316343 0.0433154</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box028">
+                <pose>0.501568 0.151505 0.286826 1.5708 0.0 2.26893</pose>
+                <geometry>
+                    <box>
+                        <size>0.0810202 0.0316343 0.039417</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box029">
+                <pose>0.501568 -0.151505 0.286826 1.5708 0.0 0.872665</pose>
+                <geometry>
+                    <box>
+                        <size>0.0810202 0.0316343 0.039417</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box030">
+                <pose>0.430842 -0.179853 0.286826 1.5708 0.0 -6.51683e-07</pose>
+                <geometry>
+                    <box>
+                        <size>0.120291 0.0316343 0.0301304</size>
+                    </box>
+                </geometry>
+            </collision>
+            <collision name="Box031">
+                <pose>0.430842 0.179853 0.286826 1.5708 0.0 3.14159</pose>
+                <geometry>
+                    <box>
+                        <size>0.120291 0.0316343 0.0301304</size>
+                    </box>
+                </geometry>
+            </collision>
+        </link>
+    </model>
+</sdf>

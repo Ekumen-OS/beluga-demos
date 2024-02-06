@@ -1,0 +1,27 @@
+alias beluga_demo_build='cd ~/ws \
+  && colcon build --symlink-install \
+  && source install/setup.bash'
+
+alias beluga_demo_launch_beluga_ros_hallway_beam='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_bringup demo_beluga_ros_hallway_beam.launch.py'
+
+alias beluga_demo_launch_beluga_ros_hallway_likelihood='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_bringup demo_beluga_ros_hallway_likelihood.launch.py'
+
+alias beluga_demo_launch_beluga_ros_office_beam='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_bringup demo_beluga_ros_office_beam.launch.py'
+
+alias beluga_demo_launch_beluga_ros_office_likelihood='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_bringup demo_beluga_ros_office_likelihood.launch.py'
+
+alias beluga_demo_launch_custom_localization_landmark_pose='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_bringup demo_custom_localization_landmark_pose.launch.py'
+
+alias beluga_demo_launch_custom_localization_landmark_bearing='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_bringup demo_custom_localization_landmark_bearing.launch.py'
