@@ -1,0 +1,14 @@
+chair
+coffeetable
+deskchair
+fireextinguisher
+large crate
+officechairblack
+officechairblue
+officechairgrey
+refrigerator
+sofa
+trashbin
+dining%20table
+office%20chair
+office%20desk
