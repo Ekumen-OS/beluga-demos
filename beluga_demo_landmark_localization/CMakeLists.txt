@@ -87,6 +87,4 @@ install(
   RUNTIME DESTINATION bin)
 install(TARGETS beluga_bmcl_demo_component DESTINATION lib/${PROJECT_NAME})
 
-install(DIRECTORY params DESTINATION share/${PROJECT_NAME})
-
 ament_package()
