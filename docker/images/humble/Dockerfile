@@ -125,6 +125,13 @@ RUN sudo apt-get update \
 COPY --chown=$USER:$GROUP docker/files/DOTaliases /home/$USER/.bash_aliases
 
 RUN bash -c "echo '. /opt/ros/humble/setup.bash' >> /home/$USER/.bashrc"
+
+# Fix to gazebo crashing when loading simulation. It's unclear why this fixes it,
+# and why it happens (the same repo version a couple of months ago didn't have this issue,
+# so the change is in gazebo or ros). See
+# https://answers.ros.org/question/358847/cannot-launch-gzclient-on-a-launch-file-results-in-shared_ptr-assertion-error/
+RUN bash -c "echo '. /usr/share/gazebo/setup.sh' >> /home/$USER/.bashrc"
+
 RUN bash -c "echo 'ros2 daemon start' >> /home/$USER/.bashrc"
 
 ENV WITHIN_DEV 1
