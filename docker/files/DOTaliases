@@ -1,5 +1,5 @@
 alias beluga_demo_build='cd ~/ws \
-  && colcon build --symlink-install \
+  && colcon build --executor sequential --symlink-install \
   && source install/setup.bash'
 
 alias beluga_ros_hallway_beam_demo='cd ~/ws \

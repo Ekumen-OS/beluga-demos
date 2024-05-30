@@ -90,7 +90,7 @@ The `beluga_demo_build` alias command is a wrapper around the `colcon` build too
 
 ```bash
 cd ~/ws
-colcon build --symlink-install
+colcon build --executor sequential --symlink-install
 source install/setup.bash
 ```
 
