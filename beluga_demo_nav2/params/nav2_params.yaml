@@ -65,7 +65,7 @@ amcl:
     z_short: 0.05
     # Weight used to combine the probability of getting max range readings.
     z_max: 0.05
-    # Standard deviation of a gaussian centered arounds obstacles.
+    # Standard deviation of a gaussian centered around obstacles.
     sigma_hit: 0.2
     # Whether to broadcast map to odom transform or not.
     tf_broadcast: true

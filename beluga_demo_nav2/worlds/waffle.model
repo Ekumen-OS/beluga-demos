@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <sdf version="1.6">
-    <model name="turtlebot3_waffle"> 
+    <model name="turtlebot3_waffle">
       <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
 
       <link name="base_footprint"/>
@@ -238,7 +238,7 @@
           </inertia>
           <mass>0.1</mass>
         </inertial>
-      
+
         <collision name="wheel_right_collision">
           <pose>0.0 -0.144 0.023 -1.57 0 0</pose>
           <geometry>
