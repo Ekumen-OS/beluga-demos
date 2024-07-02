@@ -12,6 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""
+This script is the entry point for executing beluga_amcl integrated with nav2.
+
+Additionally, in this script, you can find the execution of Gazebo and RViz2
+for simulation, visualization, and the execution of localization and navigation
+commands.
+"""
+
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -19,14 +27,10 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
-    GroupAction,
     IncludeLaunchDescription,
 )
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node
-from launch_ros.descriptions import ParameterFile
-from nav2_common.launch import RewrittenYaml
 
 
 def generate_launch_description():
@@ -36,61 +40,42 @@ def generate_launch_description():
 
     # Create the launch configuration variables
     params_file = LaunchConfiguration('params_file')
+    headless = LaunchConfiguration('headless')
 
-    # Create our own temporary YAML files that include substitutions
-    param_substitutions = {
-        'use_sim_time': 'True',
-        'yaml_filename': os.path.join(
-            bringup_dir, 'maps', 'turtlebot3_world.yaml'
-        ),  # noqa: E501
-    }
-
-    configured_params = ParameterFile(
-        RewrittenYaml(
-            source_file=params_file,
-            param_rewrites=param_substitutions,
-            convert_types=True,
-        ),
-        allow_substs=True,
-    )
-
+    # Declare the launch arguments
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value=os.path.join(bringup_dir, 'params', 'nav2_params.yaml'),
+        default_value=os.path.join(
+            bringup_dir, 'params', 'beluga_nav2_params.yaml'
+        ),  # noqa: E501
         description='Full path to the ROS2 parameters'
         'file to use for all launched nodes',
     )
 
-    # Specify the actions
-    bringup_cmd_group = GroupAction(
-        [
-            Node(
-                name='nav2_container',
-                package='rclcpp_components',
-                executable='component_container_isolated',
-                parameters=[configured_params, {'autostart': True}],
-                arguments=['--ros-args', '--log-level', 'info'],
-                output='screen',
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    os.path.join(launch_dir, 'localization_launch.py')
-                ),
-                launch_arguments={
-                    'params_file': params_file,
-                    'container_name': 'nav2_container',
-                }.items(),
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    os.path.join(launch_dir, 'navigation_launch.py')
-                ),
-                launch_arguments={
-                    'params_file': params_file,
-                    'container_name': 'nav2_container',
-                }.items(),
-            ),
-        ]
+    declare_simulator_cmd = DeclareLaunchArgument(
+        'headless',
+        default_value='False',
+        description='Whether to execute gzclient',
+    )
+
+    beluga_nav2_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_dir, 'beluga_nav2_launch.py')
+        ),  # noqa: E501
+        launch_arguments={'params_file': params_file}.items(),
+    )
+
+    gazebo_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_dir, 'gazebo_launch.py')
+        ),  # noqa: E501
+        launch_arguments={'headless': headless}.items(),
+    )
+
+    rviz_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(launch_dir, 'rviz_launch.py')
+        )  # noqa: E501
     )
 
     # Create the launch description and populate
@@ -98,8 +83,11 @@ def generate_launch_description():
 
     # Declare the launch options
     ld.add_action(declare_params_file_cmd)
+    ld.add_action(declare_simulator_cmd)
 
-    # Add the actions to launch all of the navigation nodes
-    ld.add_action(bringup_cmd_group)
+    # Add the actions to launch all the programs
+    ld.add_action(beluga_nav2_cmd)
+    ld.add_action(gazebo_cmd)
+    ld.add_action(rviz_cmd)
 
     return ld

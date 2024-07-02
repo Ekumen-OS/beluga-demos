@@ -25,7 +25,7 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     # Get the launch directory
-    bringup_dir = get_package_share_directory('nav2_bringup')
+    bringup_dir = get_package_share_directory('beluga_demo_nav2')
 
     # Launch rviz
     start_rviz_cmd = Node(
@@ -33,7 +33,7 @@ def generate_launch_description():
         executable='rviz2',
         arguments=[
             '-d',
-            os.path.join(bringup_dir, 'rviz', 'nav2_default_view.rviz'),
+            os.path.join(bringup_dir, 'rviz', 'view.rviz'),
         ],  # noqa: E501
         output='screen',
     )

@@ -12,13 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""
-This is all-in-one launch script intended for use by nav2 developers.
-
-Specifically this one is adapted and simplified to simulate turtlebot3
-using beluga_amcl.
-"""
-
 import os
 
 from ament_index_python.packages import get_package_share_directory
@@ -27,22 +20,16 @@ from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument,
     SetEnvironmentVariable,
-    IncludeLaunchDescription,
     ExecuteProcess,
 )
 from launch.conditions import IfCondition
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
     # Get the launch directory
-    bringup_dir = get_package_share_directory('beluga_demo_nav2')
-    launch_dir = os.path.join(bringup_dir, 'launch')
-
-    # Create the launch configuration variables
-    params_file = LaunchConfiguration('params_file')
+    nav2_bringup_dir = get_package_share_directory('nav2_bringup')
 
     # Launch configuration variables specific to simulation
     headless = LaunchConfiguration('headless')
@@ -65,16 +52,9 @@ def generate_launch_description():
     )
 
     # Declare the launch arguments
-    declare_params_file_cmd = DeclareLaunchArgument(
-        'params_file',
-        default_value=os.path.join(bringup_dir, 'params', 'nav2_params.yaml'),
-        description='Full path to the ROS2 parameters'
-        'file to use for all launched nodes',
-    )
-
     declare_simulator_cmd = DeclareLaunchArgument(
         'headless',
-        default_value='True',
+        default_value='False',
         description='Whether to execute gzclient',  # noqa: E502
     )
 
@@ -86,31 +66,15 @@ def generate_launch_description():
             'libgazebo_ros_init.so',
             '-s',
             'libgazebo_ros_factory.so',
-            os.path.join(bringup_dir, 'worlds', 'world_only.model'),
+            os.path.join(nav2_bringup_dir, 'worlds', 'world_only.model'),
         ],
-        cwd=[launch_dir],
         output='screen',
     )
 
     start_gazebo_client_cmd = ExecuteProcess(
         condition=IfCondition(PythonExpression(['not ', headless])),
         cmd=['gzclient'],
-        cwd=[launch_dir],
         output='screen',
-    )
-
-    urdf = os.path.join(bringup_dir, 'urdf', 'turtlebot3_waffle.urdf')
-    with open(urdf, 'r') as infp:
-        robot_description = infp.read()
-
-    start_robot_state_publisher_cmd = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='screen',
-        parameters=[
-            {'use_sim_time': True, 'robot_description': robot_description}
-        ],  # noqa: E502
     )
 
     start_gazebo_spawner_cmd = Node(
@@ -121,7 +85,7 @@ def generate_launch_description():
             '-entity',
             'turtlebot3_waffle',
             '-file',
-            os.path.join(bringup_dir, 'worlds', 'waffle.model'),
+            os.path.join(nav2_bringup_dir, 'worlds', 'waffle.model'),
             '-x',
             pose['x'],
             '-y',
@@ -137,19 +101,6 @@ def generate_launch_description():
         ],
     )
 
-    rviz_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_dir, 'rviz_launch.py')
-        )  # noqa: E501
-    )
-
-    bringup_cmd = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_dir, 'bringup_launch.py')
-        ),  # noqa: E501
-        launch_arguments={'params_file': params_file}.items(),
-    )
-
     # Create the launch description and populate
     ld = LaunchDescription()
 
@@ -157,17 +108,11 @@ def generate_launch_description():
     ld.add_action(gazebo_model_path_envvar)
 
     # Declare the launch options
-    ld.add_action(declare_params_file_cmd)
     ld.add_action(declare_simulator_cmd)
 
-    # Add any conditioned actions
+    # Add actions to launch gazebo
     ld.add_action(start_gazebo_server_cmd)
     ld.add_action(start_gazebo_client_cmd)
     ld.add_action(start_gazebo_spawner_cmd)
-
-    # Add the actions to launch all of the navigation nodes
-    ld.add_action(start_robot_state_publisher_cmd)
-    ld.add_action(rviz_cmd)
-    ld.add_action(bringup_cmd)
 
     return ld
