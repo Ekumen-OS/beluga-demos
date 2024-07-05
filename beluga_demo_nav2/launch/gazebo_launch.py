@@ -44,7 +44,7 @@ def generate_launch_description():
 
     gazebo_model_path_envvar = SetEnvironmentVariable(
         'GAZEBO_MODEL_PATH',
-        '$GAZEBO_MODEL_PATH:/opt/ros/humble/share/turtlebot3_gazebo/models',
+        ['$GAZEBO_MODEL_PATH:/opt/ros/', os.getenv('ROS_DISTRO'), '/share/turtlebot3_gazebo/models'],
     )
 
     # Declare the launch arguments
