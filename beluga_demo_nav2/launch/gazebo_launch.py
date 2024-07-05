@@ -42,13 +42,9 @@ def generate_launch_description():
         'Y': LaunchConfiguration('yaw', default='0.00'),
     }
 
-    # TODO(alon): The path of this environment variable is used only by
-    # this docker. In general the real path should be:
-    # $GAZEBO_MODEL_PATH:/opt/ros/<ros2-distro>/share/turtlebot3_gazebo/models
     gazebo_model_path_envvar = SetEnvironmentVariable(
         'GAZEBO_MODEL_PATH',
-        '$GAZEBO_MODEL_PATH:/home/developer/ws/src/external-deps/'
-        'turtlebot3_simulations/turtlebot3_gazebo/models',
+        '$GAZEBO_MODEL_PATH:/opt/ros/humble/share/turtlebot3_gazebo/models',
     )
 
     # Declare the launch arguments
