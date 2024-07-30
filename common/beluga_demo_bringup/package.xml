@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>beluga_demo_bringup</name>
+  <version>2.0.0</version>
+  <description>Launch infrastructure common to all Beluga demos</description>
+  <maintainer email="glpuga@ekumenlabs.com">Gerardo Puga</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>beluga_demo_description</depend>
+  <depend>beluga_demo_gazebo</depend>
+  <depend>beluga_demo_rviz2</depend>
+  <depend>beluga_demo_teleop</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

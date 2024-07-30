@@ -10,7 +10,7 @@ repositories:
   beluga:
     type: git
     url: https://github.com/Ekumen-OS/beluga.git
-    version: be0e09192217de4c53ecbadafaf5028405a249bc # glpuga/reduce_landmark_model_sensibility
+    version: main
   apriltag_ros:
     type: git
     url: https://github.com/Adlink-ROS/apriltag_ros.git
