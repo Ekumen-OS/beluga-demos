@@ -155,8 +155,8 @@ private:
     auto params = beluga::BearingModelParam{};
     params.sigma_bearing = 0.025;
     params.sensor_pose_in_robot = Sophus::SE3d{
-        Sophus::SO3d{}, // FIX THIS HERE AND IN SPOTLIGTH DETECTOR TODO
-        Eigen::Vector3d{0.076, 0.000, 0.103} //
+        Sophus::SO3d{},
+        Eigen::Vector3d{0.076, 0.000, 0.103}
     };
     return params;
   }

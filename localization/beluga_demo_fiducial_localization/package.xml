@@ -7,7 +7,6 @@
   <description>Demo of fiducial based localization using Beluga and pose estimates.</description>
 
   <maintainer email="glpuga@ekumenlabs.com">Gerardo Puga</maintainer>
-  <maintainer email="ivanpauno@ekumenlabs.com">Ivan Paunovic</maintainer>
   <maintainer email="nespinosa@ekumenlabs.com">Nahuel Espinosa</maintainer>
 
   <license>Apache License 2.0</license>

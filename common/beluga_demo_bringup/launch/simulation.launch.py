@@ -12,59 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from launch import LaunchDescription
+from launch import LaunchDescription, LaunchDescriptionSource
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 
 
+def bringup_launch_description_source(package_name: str) -> LaunchDescriptionSource:
+    return PythonLaunchDescriptionSource(
+        PathJoinSubstitution(
+            [
+                FindPackageShare(package_name),
+                "launch",
+                "bringup.launch.py",
+            ]
+        ),
+    )
+
+
 def generate_launch_description():
     return LaunchDescription(
         [
             IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    PathJoinSubstitution(
-                        [
-                            FindPackageShare("beluga_demo_gazebo"),
-                            "launch",
-                            "bringup.launch.py",
-                        ]
-                    ),
-                ),
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    PathJoinSubstitution(
-                        [
-                            FindPackageShare("beluga_demo_description"),
-                            "launch",
-                            "bringup.launch.py",
-                        ]
-                    ),
-                ),
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    PathJoinSubstitution(
-                        [
-                            FindPackageShare("beluga_demo_rviz2"),
-                            "launch",
-                            "bringup.launch.py",
-                        ]
-                    ),
-                ),
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    PathJoinSubstitution(
-                        [
-                            FindPackageShare("beluga_demo_teleop"),
-                            "launch",
-                            "bringup.launch.py",
-                        ]
-                    ),
-                ),
-            ),
+                bringup_launch_description_source(f"beluga_demo_{component}")
+            ) for component in ("gazebo", "description", "rviz2", "teleop")
         ]
     )

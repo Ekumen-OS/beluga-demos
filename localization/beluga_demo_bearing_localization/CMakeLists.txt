@@ -24,6 +24,7 @@ find_package(tf2 REQUIRED)
 find_package(tf2_eigen REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(message_filters REQUIRED)
+find_package(beluga_april_tag_adapter_msgs REQUIRED)
 find_package(beluga_feature_map_server_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
@@ -35,7 +36,8 @@ target_link_libraries(beluga_bmcl_demo_component
   PUBLIC beluga::beluga beluga_ros::beluga_ros)
 ament_target_dependencies(
   beluga_bmcl_demo_component
-  PUBLIC beluga_feature_map_server_msgs
+  PUBLIC beluga_april_tag_adapter_msgs
+         beluga_feature_map_server_msgs
          geometry_msgs
          visualization_msgs
          message_filters
