@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>beluga_demo_bearing_localization</name>
+  <version>2.0.0</version>
+
+  <description>Demo of fiducial based localization using Beluga and bearing estimates.</description>
+
+  <maintainer email="glpuga@ekumenlabs.com">Gerardo Puga</maintainer>
+  <maintainer email="nespinosa@ekumenlabs.com">Nahuel Espinosa</maintainer>
+
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>rclcpp_components</depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>nav2_msgs</depend>
+  <depend>tf2_geometry_msgs</depend>
+
+  <depend>beluga</depend>
+  <depend>beluga_ros</depend>
+  <depend>beluga_april_tag_adapter_msgs</depend>
+  <depend>beluga_feature_map_server</depend>
+  <depend>beluga_feature_map_server_msgs</depend>
+
+  <depend>beluga_demo_bringup</depend>
+  <depend>beluga_demo_spotlight_detector</depend>
+
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_eigen</depend>
+  <depend>message_filters</depend>
+
+  <test_depend>launch</test_depend>
+  <test_depend>launch_testing</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

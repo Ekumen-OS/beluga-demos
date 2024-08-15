@@ -1,27 +1,31 @@
-alias beluga_demo_build='cd ~/ws \
+alias demo_build='cd ~/ws \
   && colcon build --symlink-install \
   && source install/setup.bash'
 
-alias beluga_ros_hallway_beam_demo='cd ~/ws \
+alias lidar_beam_model_hallway_demo='cd ~/ws \
   && source install/setup.bash \
-  && ros2 launch beluga_demo_bringup demo_beluga_ros_hallway_beam.launch.py'
+  && ros2 launch beluga_demo_lidar_localization demo_hallway_beam_localization.launch.py'
 
-alias beluga_ros_hallway_likelihood_demo='cd ~/ws \
+alias lidar_likelihood_model_hallway_demo='cd ~/ws \
   && source install/setup.bash \
-  && ros2 launch beluga_demo_bringup demo_beluga_ros_hallway_likelihood.launch.py'
+  && ros2 launch beluga_demo_lidar_localization demo_hallway_likelihood_localization.launch.py'
 
-alias beluga_ros_office_beam_demo='cd ~/ws \
+alias lidar_beam_model_office_demo='cd ~/ws \
   && source install/setup.bash \
-  && ros2 launch beluga_demo_bringup demo_beluga_ros_office_beam.launch.py'
+  && ros2 launch beluga_demo_lidar_localization demo_office_beam_localization.launch.py'
 
-alias beluga_ros_office_likelihood_demo='cd ~/ws \
+alias lidar_likelihood_model_office_demo='cd ~/ws \
   && source install/setup.bash \
-  && ros2 launch beluga_demo_bringup demo_beluga_ros_office_likelihood.launch.py'
+  && ros2 launch beluga_demo_lidar_localization demo_office_likelihood_localization.launch.py'
 
-alias custom_landmark_localization_using_apriltags='cd ~/ws \
+alias apriltags_localization_demo='cd ~/ws \
   && source install/setup.bash \
-  && ros2 launch beluga_demo_bringup demo_custom_localization_landmark_pose.launch.py'
+  && ros2 launch beluga_demo_fiducial_localization demo_apriltags_based_localization.launch.py'
 
-alias custom_landmark_localization_using_light_beacons='cd ~/ws \
+alias light_beacons_localization_demo='cd ~/ws \
   && source install/setup.bash \
-  && ros2 launch beluga_demo_bringup demo_custom_localization_landmark_bearing.launch.py'
+  && ros2 launch beluga_demo_bearing_localization demo_light_beacons_based_localization.launch.py'
+
+alias nav2_integration_demo='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_nav2_integration demo_office_navigation.launch.py'
