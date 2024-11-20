@@ -29,3 +29,8 @@ alias light_beacons_localization_demo='cd ~/ws \
 alias nav2_integration_demo='cd ~/ws \
   && source install/setup.bash \
   && ros2 launch beluga_demo_nav2_integration demo_office_navigation.launch.py'
+
+alias amcl3_localization_demo='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_amcl3_localization demo_botanic_garden_amcl3_localization.launch.py'
+
