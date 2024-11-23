@@ -66,10 +66,31 @@ while [[ "$1" != "" ]]; do
     esac
 done
 
+DOCKER_EXTRA_ARGS=""
+BASE_PATH="$(cd .. && pwd)"
+
+if [ "${ROSDISTRO}" == "humble" ]; then
+    DOCKER_EXTRA_ARGS="${DOCKER_EXTRA_ARGS} -v /home/developer/ws/src/beluga_demo/localization/beluga_demo_amcl3_localization"
+fi
+
+if [ "${ROSDISTRO}" == "jazzy" ]; then
+    EXCLUDE_FOLDERS=("common" 
+                     "integration" 
+                     "misc" 
+                     "localization/beluga_demo_bearing_localization" 
+                     "localization/beluga_demo_fiducial_localization" 
+                     "localization/beluga_demo_lidar_localization"
+    )
+
+    for dir in ${EXCLUDE_FOLDERS[@]}; do
+        DOCKER_EXTRA_ARGS="${DOCKER_EXTRA_ARGS} -v /home/developer/ws/src/beluga_demo/${dir}"
+    done
+fi
+
 # Note: The `--build` flag was added to docker compose run after
 # https://github.com/docker/compose/releases/tag/v2.13.0.
 # We have this for convenience and compatibility with previous versions.
 # Otherwise, we could just forward the script arguments to the run verb.
 [[ "$BUILD" = true ]] && docker compose build beluga-demo-dev
 
-PRIVILEGED_CONTAINER=$PRIVILEGED_CONTAINER USERID=$(id -u) GROUPID=dialout docker compose run --rm beluga-demo-dev
+PRIVILEGED_CONTAINER=$PRIVILEGED_CONTAINER USERID=$(id -u) GROUPID=dialout docker compose run -v ${BASE_PATH}:/home/developer/ws/src/beluga_demo ${DOCKER_EXTRA_ARGS} --rm beluga-demo-dev
