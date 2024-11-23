@@ -19,7 +19,23 @@
 cmake_minimum_required(VERSION 3.5)
 project(beluga_demo_amcl3_localization)
 
-list(APPEND CMAKE_MODULE_PATH "/usr/lib/x86_64-linux-gnu/cmake/OpenVDB/")
+set(OPENVDB_CMAKE_MODULE_PATH
+    ${OPENVDB_CMAKE_MODULE_PATH}
+    CACHE PATH "Path to OpenVDB CMake module")
+
+if(NOT OPENVDB_CMAKE_MODULE_PATH)
+  file(GLOB_RECURSE OPENVDB_MODULES /usr/lib/*/FindOpenVDB.cmake /usr/local/lib/*/FindOpenVDB.cmake)
+  list(LENGTH OPENVDB_MODULES NUM_OPENVDB_MODULES)
+  if (NUM_OPENVDB_MODULES EQUAL 1)
+      list(GET OPENVDB_MODULES 0 OPENVDB_MODULE)
+      get_filename_component(OPENVDB_CMAKE_MODULE_PATH ${OPENVDB_MODULE} DIRECTORY)
+  endif()
+  unset(NUM_OPENVDB_MODULES)
+  unset(OPENVDB_MODULES)
+endif()
+if(OPENVDB_CMAKE_MODULE_PATH)
+    list(APPEND CMAKE_MODULE_PATH ${OPENVDB_CMAKE_MODULE_PATH})
+endif()
 
 ################################################################################
 # Find ament packages and libraries for ament and system dependencies
@@ -27,7 +43,6 @@ list(APPEND CMAKE_MODULE_PATH "/usr/lib/x86_64-linux-gnu/cmake/OpenVDB/")
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(OpenVDB REQUIRED)
 find_package(range-v3 REQUIRED)
 find_package(Sophus REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
@@ -42,6 +57,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(OpenVDB REQUIRED)
 
 
 ################################################################################

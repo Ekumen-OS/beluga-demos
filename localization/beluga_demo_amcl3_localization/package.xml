@@ -12,6 +12,8 @@
   <depend>rclcpp</depend>
   <depend>beluga</depend>
   <depend>beluga_ros</depend>
+  <depend>libboost-iostreams-dev</depend>
+  <depend>libboost-thread-dev</depend>
   <depend>libopenvdb-dev</depend>
   
   <export>

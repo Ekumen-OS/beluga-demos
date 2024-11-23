@@ -78,8 +78,8 @@ def generate_launch_description():
                         'leaf_size': 0.1}],
         remappings=[
             ('/input', '/velodyne_points'),
-            ('/output', '/pointcloud'),
-            #('/output', '/output_voxel_filter'),
+            #('/output', '/pointcloud'),
+            ('/output', '/output_voxel_filter'),
         ],
             output="screen",
     )
@@ -121,7 +121,7 @@ def generate_launch_description():
         tf,
         markers,
         voxel_filter,
-        #crop_box_filter,
+        crop_box_filter,
         RegisterEventHandler(event_handler=OnProcessStart(target_action=rviz,
                                                           on_start=[beluga_amcl3])
         )

@@ -148,7 +148,7 @@ class Amcl3 {
     static constexpr double kUpdateMinA = 0.2;
     static constexpr size_t kResampleInterval = 10;
     static constexpr int kMinParticles = 500;
-    static constexpr int kMaxParticles = 1200;
+    static constexpr int kMaxParticles = 5000;
     static constexpr double kLdEpsilon = 0.05;
     static constexpr double kLdZ = 3.0;
     static constexpr double kRecoveryAlphaSlow = 0.001;
