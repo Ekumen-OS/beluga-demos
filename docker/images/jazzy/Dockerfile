@@ -19,10 +19,8 @@ RUN apt-get update \
     curl \
     gdb \
     git \
-    libopenvdb-dev \
     python3-pip \
     mc \
-    ros-jazzy-pcl-ros \
     tmux \ 
   && rm -rf /var/lib/apt/lists/*
 
@@ -105,3 +103,4 @@ ENV MAKEFLAGS "-j 2"
 
 ENV SHELL /bin/bash
 ENTRYPOINT ["fixuid", "-q", "/ros_entrypoint.sh", "/bin/bash"]
+

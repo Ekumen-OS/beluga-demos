@@ -15,8 +15,10 @@
   <depend>libboost-iostreams-dev</depend>
   <depend>libboost-thread-dev</depend>
   <depend>libopenvdb-dev</depend>
+  <depend>pcl_ros</depend>
   
   <export>
     <build_type>ament_cmake</build_type>
   </export>
 </package>
+
