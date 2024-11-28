@@ -333,8 +333,7 @@ class Amcl3Node : public rclcpp::Node {
             message.header.stamp = cloud->header.stamp;
             message.header.frame_id = kGlobalFrameId;
             const auto& [base_pose_in_map, base_pose_covariance] = new_estimate.value();
-            tf2::toMsg(base_pose_in_map, message.pose.pose);
-            //tf2::covarianceEigenToRowMajor(base_pose_covariance, message.pose.covariance);
+            message.pose = tf2::toMsg(base_pose_in_map, base_pose_covariance);
             pose_pub_->publish(message);
         }
     }  
