@@ -60,6 +60,7 @@
 #include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <visualization_msgs/msg/marker.hpp>
+#include <visualization_msgs/msg/marker_array.hpp>
 #include <std_msgs/msg/color_rgba.hpp>
 
 
@@ -76,7 +77,7 @@ using execution_policy = std::execution::parallel_policy;
 
 class Amcl3 {
  public:
-    explicit Amcl3(motion_model &&motion, sensor_model &&sensor, Sophus::SE3d pose, Sophus::Matrix6d covariance, execution_policy policy = std::execution::par)
+    explicit Amcl3(motion_model &&motion, sensor_model &&sensor, const Sophus::SE3d& pose, const Sophus::Matrix6d& covariance, execution_policy policy = std::execution::par)
         : motion_model_{std::move(motion)},
           sensor_model_{std::move(sensor)},
           execution_policy_{std::move(policy)},
@@ -107,10 +108,7 @@ class Amcl3 {
         particles_ |=
             beluga::actions::propagate(execution_policy_, motion_model_(control_action_window_ << base_pose_in_odom)) | 
             beluga::actions::reweight(execution_policy_, sensor_model_(std::move(pointcloud))) |                        
-            beluga::actions::normalize(execution_policy_) |
-            beluga::actions::assign;
-
-        
+            beluga::actions::normalize(execution_policy_);        
 
         if (resample_policy_(particles_)) {
 
@@ -193,7 +191,7 @@ class Amcl3Node : public rclcpp::Node {
 
         // Initial position
         const auto pose = Sophus::SE3d{
-            Sophus::SO3d{/*kInitialPoseYaw, kInitialPosePitch, kInitialPoseRoll*/},
+            Sophus::SO3d{},
             Eigen::Vector3d{
                 kInitialPoseX,
                 kInitialPoseY,
@@ -244,6 +242,10 @@ class Amcl3Node : public rclcpp::Node {
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Subscribed to pointcloud_topic: %s", pointcloud_sub_->getTopic().c_str());
 
         pose_pub_ = create_publisher<geometry_msgs::msg::PoseWithCovarianceStamped>("amcl3_poses", rclcpp::SystemDefaultsQoS());
+
+        particle_markers_pub_ = create_publisher<visualization_msgs::msg::MarkerArray>("particle_markers", rclcpp::SensorDataQoS());
+
+        timer_ = create_wall_timer(std::chrono_literals::operator""ms(200), std::bind(&Amcl3Node::timer_callback, this), callback_group_);
 
         if (kDisplayMap) {
             m_visualization_marker_pub_ = create_publisher<visualization_msgs::msg::Marker>("vdb_map_visualization", rclcpp::SystemDefaultsQoS());
@@ -337,25 +339,36 @@ class Amcl3Node : public rclcpp::Node {
         }
     }  
 
+    void timer_callback() {
+        if (!particle_filter_) {
+            return;
+        }
+
+        if (particle_markers_pub_->get_subscription_count() > 0) {
+            auto message = visualization_msgs::msg::MarkerArray{};
+            //beluga_ros::assign_particle_cloud(particle_filter_->particles(), message);
+            //beluga_ros::stamp_message(kGlobalFrameId, this->get_clock()->now(), message);
+            //particle_markers_pub_->publish(message);
+        }
+    }
+  
     // Map displayer
     // Adapted from:
     // https://github.com/fzi-forschungszentrum-informatik/vdb_mapping_ros
     void display_map(const openvdb::FloatGrid::Ptr grid) const {
         visualization_msgs::msg::Marker marker_msg;
-        std_msgs::msg::ColorRGBA point_color;
-        openvdb::CoordBBox bbox = grid->evalActiveVoxelBoundingBox();
-        double min_z, max_z;
-
-        openvdb::Vec3d min_world_coord = grid->indexToWorld(bbox.getStart());
-        openvdb::Vec3d max_world_coord = grid->indexToWorld(bbox.getEnd());
-
-        min_z = min_world_coord.z();
-        max_z = max_world_coord.z();
-
-        point_color.r = 1.0;
-        point_color.g = 1.0;
-        point_color.b = 1.0;
-        point_color.a = 1.0;
+        const auto point_color = []() { std_msgs::msg::ColorRGBA msg;
+                                        msg.r = 1.0;
+                                        msg.g = 1.0;
+                                        msg.b = 1.0;
+                                        msg.a = 1.0;
+                                        return msg; 
+        }();
+        const openvdb::CoordBBox bbox = grid->evalActiveVoxelBoundingBox();
+        const openvdb::Vec3d min_world_coord = grid->indexToWorld(bbox.getStart());
+        const openvdb::Vec3d max_world_coord = grid->indexToWorld(bbox.getEnd());
+        const double min_z = min_world_coord.z();
+        const double max_z = max_world_coord.z();
 
         for (openvdb::FloatGrid::ValueOnCIter iter = grid->cbeginValueOn(); iter; ++iter) {
             openvdb::Vec3d world_coord = grid->indexToWorld(iter.getCoord());
@@ -371,7 +384,7 @@ class Amcl3Node : public rclcpp::Node {
             marker_msg.colors.push_back(point_color);
         }
 
-        double size                   = grid->transform().voxelSize()[0];
+        const double size             = grid->transform().voxelSize()[0];
         marker_msg.header.frame_id    = kGlobalFrameId;
         marker_msg.header.stamp       = this->get_clock()->now();
         marker_msg.id                 = 0;
@@ -395,6 +408,8 @@ class Amcl3Node : public rclcpp::Node {
 
     // Callback group
     rclcpp::CallbackGroup::SharedPtr callback_group_;
+    // Timer
+    rclcpp::TimerBase::SharedPtr timer_;
     // Pointcloud updates subscription.
     std::unique_ptr<message_filters::Subscriber<sensor_msgs::msg::PointCloud2>> pointcloud_sub_;
     // Transform synchronization filter for pointcloud updates.
@@ -403,6 +418,8 @@ class Amcl3Node : public rclcpp::Node {
     rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr m_visualization_marker_pub_;
     // Connection for pointcloud updates filter and callback.
     message_filters::Connection pointcloud_connection_;
+    // Particle marker publisher
+    rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr particle_markers_pub_;
     // Particle filter instance.
     std::unique_ptr<Amcl3> particle_filter_;
     // Last known pose estimate, if any.
