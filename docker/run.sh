@@ -94,3 +94,4 @@ fi
 [[ "$BUILD" = true ]] && docker compose build beluga-demo-dev
 
 PRIVILEGED_CONTAINER=$PRIVILEGED_CONTAINER USERID=$(id -u) GROUPID=dialout docker compose run -v ${BASE_PATH}:/home/developer/ws/src/beluga_demo ${DOCKER_EXTRA_ARGS} --rm beluga-demo-dev
+
