@@ -146,7 +146,7 @@ class Amcl3 {
     static constexpr double kUpdateMinA = 0.2;
     static constexpr size_t kResampleInterval = 10;
     static constexpr int kMinParticles = 500;
-    static constexpr int kMaxParticles = 5000;
+    static constexpr int kMaxParticles = 1500;
     static constexpr double kLdEpsilon = 0.05;
     static constexpr double kLdZ = 3.0;
     static constexpr double kRecoveryAlphaSlow = 0.001;
@@ -345,9 +345,9 @@ class Amcl3Node : public rclcpp::Node {
 
         if (particle_markers_pub_->get_subscription_count() > 0) {
             auto message = visualization_msgs::msg::MarkerArray{};
-            //beluga_ros::assign_particle_cloud(particle_filter_->particles(), message);
-            //beluga_ros::stamp_message(kGlobalFrameId, this->get_clock()->now(), message);
-            //particle_markers_pub_->publish(message);
+            beluga_ros::assign_particle_cloud(particle_filter_->particles(), message);
+            beluga_ros::stamp_message(kGlobalFrameId, this->get_clock()->now(), message);
+            particle_markers_pub_->publish(message);
         }
     }
   
