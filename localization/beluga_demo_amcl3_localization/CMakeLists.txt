@@ -20,21 +20,23 @@ cmake_minimum_required(VERSION 3.5)
 project(beluga_demo_amcl3_localization)
 
 set(OPENVDB_CMAKE_MODULE_PATH
-    ${OPENVDB_CMAKE_MODULE_PATH}
-    CACHE PATH "Path to OpenVDB CMake module")
+  ${OPENVDB_CMAKE_MODULE_PATH}
+  CACHE PATH "Path to OpenVDB CMake module")
 
 if(NOT OPENVDB_CMAKE_MODULE_PATH)
-  file(GLOB_RECURSE OPENVDB_MODULES /usr/lib/*/FindOpenVDB.cmake /usr/local/lib/*/FindOpenVDB.cmake)
+  file(GLOB_RECURSE OPENVDB_MODULES /usr/lib/*/FindOpenVDB.cmake
+                                    /usr/local/lib/*/FindOpenVDB.cmake)
   list(LENGTH OPENVDB_MODULES NUM_OPENVDB_MODULES)
   if (NUM_OPENVDB_MODULES EQUAL 1)
-      list(GET OPENVDB_MODULES 0 OPENVDB_MODULE)
-      get_filename_component(OPENVDB_CMAKE_MODULE_PATH ${OPENVDB_MODULE} DIRECTORY)
+    list(GET OPENVDB_MODULES 0 OPENVDB_MODULE)
+    get_filename_component(OPENVDB_CMAKE_MODULE_PATH ${OPENVDB_MODULE}
+                           DIRECTORY)
   endif()
   unset(NUM_OPENVDB_MODULES)
   unset(OPENVDB_MODULES)
 endif()
 if(OPENVDB_CMAKE_MODULE_PATH)
-    list(APPEND CMAKE_MODULE_PATH ${OPENVDB_CMAKE_MODULE_PATH})
+  list(APPEND CMAKE_MODULE_PATH ${OPENVDB_CMAKE_MODULE_PATH})
 endif()
 
 ################################################################################
@@ -114,4 +116,3 @@ install(DIRECTORY maps DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY rviz DESTINATION share/${PROJECT_NAME})
 
 ament_package()
-

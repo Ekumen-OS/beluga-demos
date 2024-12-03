@@ -74,11 +74,11 @@ if [ "${ROSDISTRO}" == "humble" ]; then
 fi
 
 if [ "${ROSDISTRO}" == "jazzy" ]; then
-    EXCLUDE_FOLDERS=("common" 
-                     "integration" 
-                     "misc" 
-                     "localization/beluga_demo_bearing_localization" 
-                     "localization/beluga_demo_fiducial_localization" 
+    EXCLUDE_FOLDERS=("common"
+                     "integration"
+                     "misc"
+                     "localization/beluga_demo_bearing_localization"
+                     "localization/beluga_demo_fiducial_localization"
                      "localization/beluga_demo_lidar_localization"
     )
 
@@ -94,4 +94,3 @@ fi
 [[ "$BUILD" = true ]] && docker compose build beluga-demo-dev
 
 PRIVILEGED_CONTAINER=$PRIVILEGED_CONTAINER USERID=$(id -u) GROUPID=dialout docker compose run -v ${BASE_PATH}:/home/developer/ws/src/beluga_demo ${DOCKER_EXTRA_ARGS} --rm beluga-demo-dev
-

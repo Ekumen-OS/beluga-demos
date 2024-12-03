@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from launch import LaunchDescription
 from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessStart
@@ -30,12 +29,9 @@ def generate_launch_description():
     amcl3_package_name = "beluga_demo_amcl3_localization"
 
     # Rviz config file
-    rviz_config_file = PathJoinSubstitution([
-        FindPackageShare(amcl3_package_name),
-        "rviz",
-        "rviz.rviz"
-    ])
-
+    rviz_config_file = PathJoinSubstitution(
+        [FindPackageShare(amcl3_package_name), "rviz", "rviz.rviz"]
+    )
 
     ################################################################################
     # NODES DEFINITION
@@ -44,7 +40,7 @@ def generate_launch_description():
         package="beluga_demo_amcl3_localization",
         executable="beluga_amcl3_demo_node",
         name="beluga_amcl3_demo",
-        parameters = [{'use_sim_time': True}],
+        parameters=[{'use_sim_time': True}],
         output="screen",
     )
 
@@ -52,54 +48,66 @@ def generate_launch_description():
         package='tf2_ros',
         executable='static_transform_publisher',
         name='velodyne_in_xsense',
-        arguments = ['0.0584867781527745', '0.00840419966766332', '0.168915521980526', '0.0078031', '0.0015042', '-0.0252884', 'base_link', 'velodyne'],
-        parameters = [{'use_sim_time': True}],
+        arguments=[
+            '0.0584867781527745',
+            '0.00840419966766332',
+            '0.168915521980526',
+            '0.0078031',
+            '0.0015042',
+            '-0.0252884',
+            'base_link',
+            'velodyne',
+        ],
+        parameters=[{'use_sim_time': True}],
     )
 
     tf = Node(
         package='beluga_demo_amcl3_localization',
         executable='tf_publisher.py',
         name='odom_to_base_link',
-        parameters = [{'use_sim_time': True}],
+        parameters=[{'use_sim_time': True}],
     )
 
     markers = Node(
         package='beluga_demo_amcl3_localization',
         executable='marker_publisher.py',
         name='pose_marker_node',
-        parameters = [{'use_sim_time': True}],
+        parameters=[{'use_sim_time': True}],
     )
 
     voxel_filter = Node(
         package="pcl_ros",
         executable="filter_voxel_grid_node",
         name="filter_voxel_grid_node",
-        parameters = [{'use_sim_time': True, 
-                        'leaf_size': 0.1}],
+        parameters=[{'use_sim_time': True, 'leaf_size': 0.1}],
         remappings=[
             ('/input', '/velodyne_points'),
-            #('/output', '/pointcloud'),
+            # ('/output', '/pointcloud'),
             ('/output', '/output_voxel_filter'),
         ],
-            output="screen",
+        output="screen",
     )
 
     crop_box_filter = Node(
         package="pcl_ros",
         executable="filter_crop_box_node",
         name="filter_crop_box_node",
-        parameters = [{'use_sim_time': True, 
-                        'min_x': -20.0,
-                        'max_x': 20.0,
-                        'min_y': -20.0,
-                        'max_y': 20.0,
-                        'min_z': -20.0,
-                        'max_z': 20.0}],
+        parameters=[
+            {
+                'use_sim_time': True,
+                'min_x': -20.0,
+                'max_x': 20.0,
+                'min_y': -20.0,
+                'max_y': 20.0,
+                'min_z': -20.0,
+                'max_z': 20.0,
+            }
+        ],
         remappings=[
             ('/input', '/output_voxel_filter'),
             ('/output', '/pointcloud'),
         ],
-            output="screen",
+        output="screen",
     )
 
     rviz = Node(
@@ -111,7 +119,6 @@ def generate_launch_description():
         arguments=["-d", rviz_config_file],
     )
 
-
     ################################################################################
     # LAUNCH NODES
     ################################################################################
@@ -122,11 +129,9 @@ def generate_launch_description():
         markers,
         voxel_filter,
         crop_box_filter,
-        RegisterEventHandler(event_handler=OnProcessStart(target_action=rviz,
-                                                          on_start=[beluga_amcl3])
-        )
+        RegisterEventHandler(
+            event_handler=OnProcessStart(target_action=rviz, on_start=[beluga_amcl3])
+        ),
     ]
 
     return LaunchDescription(nodes)
-
-    

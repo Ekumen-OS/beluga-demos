@@ -21,7 +21,7 @@ RUN apt-get update \
     git \
     python3-pip \
     mc \
-    tmux \ 
+    tmux \
   && rm -rf /var/lib/apt/lists/*
 
 ENV PIP_BREAK_SYSTEM_PACKAGES 1
@@ -103,4 +103,3 @@ ENV MAKEFLAGS "-j 2"
 
 ENV SHELL /bin/bash
 ENTRYPOINT ["fixuid", "-q", "/ros_entrypoint.sh", "/bin/bash"]
-

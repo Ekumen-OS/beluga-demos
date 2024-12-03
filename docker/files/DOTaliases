@@ -46,4 +46,3 @@ else
     && source install/setup.bash \
     && ros2 launch beluga_demo_amcl3_localization demo_botanic_garden_amcl3_localization.launch.py'
 fi
-
