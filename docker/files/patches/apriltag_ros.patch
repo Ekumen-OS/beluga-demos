@@ -1,13 +1,80 @@
+diff --git a/apriltag_ros/CMakeLists.txt b/apriltag_ros/CMakeLists.txt
+index 91adf02..f353198 100644
+--- a/apriltag_ros/CMakeLists.txt
++++ b/apriltag_ros/CMakeLists.txt
+@@ -19,6 +19,13 @@ find_package(OpenCV REQUIRED)
+ find_package(Threads REQUIRED)
+ find_package(apriltag REQUIRED)
+ 
++if(cv_bridge_VERSION VERSION_GREATER_EQUAL 3.3.0)
++    add_compile_definitions(cv_bridge_HAS_HPP)
++endif()
++if(image_geometry_VERSION VERSION_GREATER_EQUAL 3.3.0)
++    add_compile_definitions(image_geometry_HAS_HPP)
++endif()
++
+ include_directories(include ${EIGEN3_INCLUDE_DIR})
+ 
+ add_executable(tag_detector src/AprilTagNode.cpp)
 diff --git a/apriltag_ros/include/AprilTagNode.hpp b/apriltag_ros/include/AprilTagNode.hpp
-index 8abbbcc..fa21b80 100644
+index 8abbbcc..b3ebbcb 100644
 --- a/apriltag_ros/include/AprilTagNode.hpp
 +++ b/apriltag_ros/include/AprilTagNode.hpp
-@@ -85,7 +85,7 @@ private:
+@@ -37,9 +37,17 @@
+ #include <Eigen/Geometry>
+ 
+ // ros
++#ifdef cv_bridge_HAS_HPP
++#include <cv_bridge/cv_bridge.hpp>
++#else
+ #include <cv_bridge/cv_bridge.h>
+-#include <image_geometry/pinhole_camera_model.h>
++#endif
+ 
++#ifdef image_geometry_HAS_HPP
++#include <image_geometry/pinhole_camera_model.hpp>
++#else
++#include <image_geometry/pinhole_camera_model.h>
++#endif
+ 
+ // C++ Headers
+ #include <map>
+@@ -85,7 +93,7 @@ private:
    std::unordered_map<int, double> tag_sizes;
    std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-
+ 
 -  bool remove_duplicates_ = true;
 +  bool remove_duplicates_ = false;
    bool z_up;
    // function pointer for tag family creation / destruction
    static const std::map<std::string, apriltag_family_t * (*)(void)> tag_create;
+diff --git a/apriltag_ros/src/AprilTagNode.cpp b/apriltag_ros/src/AprilTagNode.cpp
+index fd516fc..4744939 100644
+--- a/apriltag_ros/src/AprilTagNode.cpp
++++ b/apriltag_ros/src/AprilTagNode.cpp
+@@ -28,8 +28,14 @@
+ // POSSIBILITY OF SUCH DAMAGE.
+ 
+ #include <AprilTagNode.hpp>
+-// C Headers
++// ros
++#ifdef cv_bridge_HAS_HPP
++#include <cv_bridge/cv_bridge.hpp>
++#else
+ #include <cv_bridge/cv_bridge.h>
++#endif
++
++#include <image_transport/image_transport.hpp>
+ 
+ // default tag families
+ #include <tag16h5.h>
+@@ -41,9 +47,6 @@
+ #include <tagStandard41h12.h>
+ #include <tagStandard52h13.h>
+ 
+-// C++ Headers
+-#include <image_transport/image_transport.hpp>
+-
+ // create and delete functions for default tags
+ #define TAG_CREATE(name) {#name, tag ## name ## _create},
+ #define TAG_DESTROY(name) {#name, tag ## name ## _destroy},

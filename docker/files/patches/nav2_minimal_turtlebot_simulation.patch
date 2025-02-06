@@ -1,0 +1,87 @@
+diff --git a/nav2_minimal_tb3_sim/configs/turtlebot3_waffle_bridge.yaml b/nav2_minimal_tb3_sim/configs/turtlebot3_waffle_bridge.yaml
+index 36a14d8..a62fa0d 100644
+--- a/nav2_minimal_tb3_sim/configs/turtlebot3_waffle_bridge.yaml
++++ b/nav2_minimal_tb3_sim/configs/turtlebot3_waffle_bridge.yaml
+@@ -39,6 +39,16 @@
+ 
+ # replace cmd_vel_bridge
+ - topic_name: "cmd_vel"
+-  ros_type_name: "geometry_msgs/msg/TwistStamped"
++  ros_type_name: "geometry_msgs/msg/Twist"
+   gz_type_name: "gz.msgs.Twist"
+   direction: ROS_TO_GZ
++
++- topic_name: "camera/image_raw"
++  ros_type_name: "sensor_msgs/msg/Image"
++  gz_type_name: "gz.msgs.Image"
++  direction: GZ_TO_ROS
++
++- topic_name: "camera/camera_info"
++  ros_type_name: "sensor_msgs/msg/CameraInfo"
++  gz_type_name: "gz.msgs.CameraInfo"
++  direction: GZ_TO_ROS
+diff --git a/nav2_minimal_tb3_sim/urdf/gz_waffle.sdf.xacro b/nav2_minimal_tb3_sim/urdf/gz_waffle.sdf.xacro
+index af30b5e..cf37592 100644
+--- a/nav2_minimal_tb3_sim/urdf/gz_waffle.sdf.xacro
++++ b/nav2_minimal_tb3_sim/urdf/gz_waffle.sdf.xacro
+@@ -3,6 +3,16 @@
+     <xacro:arg name="namespace" default=""/>
+ 
+     <model name="turtlebot3_waffle"> 
++      <plugin
++        filename="gz-sim-sensors-system"
++        name="gz::sim::systems::Sensors">
++        <render_engine>ogre2</render_engine>
++      </plugin>
++      <plugin
++        filename="gz-sim-imu-system"
++        name="gz::sim::systems::Imu">
++      </plugin>
++
+       <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
+ 
+       <link name="base_footprint"/>
+@@ -375,12 +385,43 @@
+ 
+         <pose>0.069 -0.047 0.107 0 0 0</pose>
+ 
++        <sensor name="intel_realsense_r200_rgb" type="camera">
++          <always_on>1</always_on>
++          <update_rate>10</update_rate>
++          <pose>0.064 -0.047 0.107 0 0 0</pose>
++          <topic>$(arg namespace)/camera/image_raw</topic>
++          <camera_info_topic>$(arg namespace)/camera/camera_info</camera_info_topic>
++	  <gz_frame_id>camera_rgb_frame</gz_frame_id>
++	  <camera name="realsense_rgb_camera">
++            <optical_frame_id>camera_rgb_optical_frame</optical_frame_id>
++            <horizontal_fov>1.02974</horizontal_fov>
++            <image>
++              <width>640</width>
++              <height>480</height>
++              <format>R8G8B8</format>
++            </image>
++            <clip>
++              <near>0.02</near>
++              <far>300</far>
++            </clip>
++            <noise>
++              <type>gaussian</type>
++              <!-- Noise is sampled independently per pixel on each frame.
++                  That pixel's noise value is added to each of its color
++                  channels, which at that point lie in the range [0,1]. -->
++              <mean>0.0</mean>
++              <stddev>0.007</stddev>
++            </noise>
++          </camera>
++        </sensor>
++
+         <sensor name="intel_realsense_r200_depth" type="depth">
+           <always_on>1</always_on>
+           <update_rate>5</update_rate>
+           <pose>0.064 -0.047 0.107 0 0 0</pose>
+           <gz_frame_id>camera_depth_frame</gz_frame_id>
+           <camera name="realsense_depth_camera">
++            <optical_frame_id>camera_depth_optical_frame</optical_frame_id>
+             <horizontal_fov>1.047</horizontal_fov>
+             <image>
+               <width>320</width>

@@ -1,5 +1,5 @@
 alias demo_build='cd ~/ws \
-  && colcon build --symlink-install \
+  && colcon build --symlink-install --packages-up-to-regex beluga_demo \
   && source install/setup.bash'
 
 alias lidar_beam_model_hallway_demo='cd ~/ws \

@@ -43,6 +43,13 @@ find_package(image_transport REQUIRED)
 find_package(image_geometry REQUIRED)
 find_package(beluga_april_tag_adapter_msgs REQUIRED)
 
+if(cv_bridge_VERSION VERSION_GREATER_EQUAL 3.3.0)
+  add_compile_definitions(cv_bridge_HAS_HPP)
+endif()
+if(image_geometry_VERSION VERSION_GREATER_EQUAL 3.3.0)
+  add_compile_definitions(image_geometry_HAS_HPP)
+endif()
+
 add_library(beluga_demo_spotlight_detector_component SHARED)
 target_include_directories(
   beluga_demo_spotlight_detector_component

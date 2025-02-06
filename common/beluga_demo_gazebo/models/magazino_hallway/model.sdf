@@ -23,16 +23,16 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://magazino_hallway.stl</uri>
+            <uri>meshes/magazino_hallway.stl</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
         <material>
           <lighting>1</lighting>
-          <script>
-            <uri>file://media/materials/scripts/gazebo.material</uri>
-            <name>Gazebo/Grey</name>
-          </script>
+          <ambient>0.3 0.3 0.3 1.0</ambient>
+          <diffuse>0.7 0.7 0.7 1.0</diffuse>
+          <specular>0.01 0.01 0.01 1.0</specular>
+          <shininess>1.5</shininess>
           <shader type='pixel'>
             <normal_map>__default__</normal_map>
           </shader>
@@ -50,7 +50,7 @@
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://magazino_hallway.stl</uri>
+            <uri>meshes/magazino_hallway.stl</uri>
             <scale>1 1 1</scale>
           </mesh>
         </geometry>
