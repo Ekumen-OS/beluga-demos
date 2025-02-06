@@ -1,5 +1,5 @@
 repositories:
   beluga:
     type: git
-    url: https://github.com/pvela2017/beluga.git
-    version: likelihood_field_3d_model
+    url: https://github.com/Ekumen-OS/beluga.git
+    version: b6d5ee387cd196aa3c11617c993aa6300c7a9484
