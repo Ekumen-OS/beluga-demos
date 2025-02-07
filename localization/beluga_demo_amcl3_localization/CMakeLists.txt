@@ -109,7 +109,6 @@ install(TARGETS beluga_amcl3_demo_node DESTINATION lib/${PROJECT_NAME})
 
 # Install Python executables
 install(PROGRAMS
-  scripts/tf_publisher.py
   scripts/marker_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )

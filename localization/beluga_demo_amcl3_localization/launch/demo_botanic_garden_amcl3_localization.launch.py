@@ -44,30 +44,6 @@ def generate_launch_description():
         output="screen",
     )
 
-    static_tf = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='velodyne_in_xsense',
-        arguments=[
-            '0.0584867781527745',
-            '0.00840419966766332',
-            '0.168915521980526',
-            '0.0078031',
-            '0.0015042',
-            '-0.0252884',
-            'base_link',
-            'velodyne',
-        ],
-        parameters=[{'use_sim_time': True}],
-    )
-
-    tf = Node(
-        package='beluga_demo_amcl3_localization',
-        executable='tf_publisher.py',
-        name='odom_to_base_link',
-        parameters=[{'use_sim_time': True}],
-    )
-
     markers = Node(
         package='beluga_demo_amcl3_localization',
         executable='marker_publisher.py',
@@ -124,8 +100,6 @@ def generate_launch_description():
     ################################################################################
     nodes = [
         rviz,
-        static_tf,
-        tf,
         markers,
         voxel_filter,
         crop_box_filter,
