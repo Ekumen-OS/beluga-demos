@@ -50,6 +50,7 @@ find_package(Sophus REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(beluga REQUIRED)
 find_package(beluga_ros REQUIRED)
+find_package(beluga_vdb REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(tf2 REQUIRED)
 find_package(tf2_eigen REQUIRED)
@@ -70,7 +71,7 @@ add_library(beluga_amcl3_demo_component SHARED)
 target_sources(beluga_amcl3_demo_component PRIVATE src/beluga_amcl3_demo.cpp)
 target_compile_features(beluga_amcl3_demo_component PUBLIC cxx_std_17)
 target_link_libraries(beluga_amcl3_demo_component
-  PUBLIC beluga::beluga beluga_ros::beluga_ros)
+  PUBLIC beluga::beluga beluga_ros::beluga_ros beluga_vdb::beluga_vdb)
 ament_target_dependencies(
   beluga_amcl3_demo_component
   PUBLIC geometry_msgs
@@ -85,7 +86,8 @@ ament_target_dependencies(
          tf2_geometry_msgs
          tf2_ros
          beluga
-         beluga_ros)
+         beluga_ros
+         beluga_vdb)
 rclcpp_components_register_node(
   beluga_amcl3_demo_component
   PLUGIN

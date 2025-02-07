@@ -39,7 +39,7 @@ if [ "${ROSDISTRO}" == "humble" ]; then
 
 else
   alias demo_build='cd ~/ws \
-    && colcon build --symlink-install --packages-up-to beluga_demo_amcl3_localization --cmake-args -DCMAKE_BUILD_TYPE=Release -DUSE_OPENVDB=ON \
+    && colcon build --symlink-install --packages-up-to beluga_demo_amcl3_localization --cmake-args -DCMAKE_BUILD_TYPE=Release \
     && source install/setup.bash'
 
   alias amcl3_localization_demo='cd ~/ws \

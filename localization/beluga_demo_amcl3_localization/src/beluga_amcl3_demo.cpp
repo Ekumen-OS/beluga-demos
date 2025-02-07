@@ -39,6 +39,7 @@
 
 #include <beluga/beluga.hpp>
 #include <beluga_ros/beluga_ros.hpp>
+#include <beluga_vdb/sensor/likelihood_field_model3.hpp>
 
 #include <message_filters/subscriber.h>
 
@@ -69,8 +70,8 @@ using particle_type = std::tuple<Sophus::SE3d, beluga::Weight>;
 using motion_model = beluga::DifferentialDriveModel3d;
 // Sensor model variant type for runtime selection support.
 using sensor_model =
-    beluga::LikelihoodFieldModel3<openvdb::FloatGrid,
-                                  beluga_ros::SparsePointCloud3<float>>;
+    beluga_vdb::LikelihoodFieldModel3<openvdb::FloatGrid,
+                                      beluga_ros::SparsePointCloud3<float>>;
 // Execution policy variant type for runtime selection support.
 using execution_policy = std::execution::parallel_policy;
 
@@ -183,7 +184,7 @@ public:
         openvdb::gridPtrCast<openvdb::FloatGrid>((*grids)[0]);
 
     // Create Likelihood 3D Field Sensor Model
-    auto params_sm = beluga::LikelihoodFieldModel3Param{};
+    auto params_sm = beluga_vdb::LikelihoodFieldModel3Param{};
     params_sm.max_obstacle_distance = kLaserLikelihoodMaxDist;
     params_sm.max_laser_distance = kLaserMaxRange;
     params_sm.z_hit = kZHit;
