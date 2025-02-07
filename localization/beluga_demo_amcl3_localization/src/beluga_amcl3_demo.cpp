@@ -41,6 +41,8 @@
 #include <beluga_ros/beluga_ros.hpp>
 #include <beluga_vdb/sensor/likelihood_field_model3.hpp>
 
+#include <ament_index_cpp/get_package_share_directory.hpp>
+
 #include <message_filters/subscriber.h>
 
 #include <tf2/convert.h>
@@ -473,9 +475,9 @@ private:
   static constexpr bool kDisplayMap = false;
   const std::string kPointcloudTopic = "/pointcloud";
   const std::string kOdomFrameId = "odom";
-  const std::string kMapFile =
-      "/home/developer/ws/src/beluga_demo/localization/"
-      "beluga_demo_amcl3_localization/maps/map.vdb";
+  const std::string kMapFile = ament_index_cpp::get_package_share_directory(
+                                   "beluga_demo_amcl3_localization") +
+                               "/maps/map_1005_07.vdb";
 
   // Get Initial Estimate
   static constexpr double kInitialPoseX = 0.0;

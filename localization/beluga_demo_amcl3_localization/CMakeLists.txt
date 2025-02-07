@@ -74,7 +74,8 @@ target_link_libraries(beluga_amcl3_demo_component
   PUBLIC beluga::beluga beluga_ros::beluga_ros beluga_vdb::beluga_vdb)
 ament_target_dependencies(
   beluga_amcl3_demo_component
-  PUBLIC geometry_msgs
+  PUBLIC ament_index_cpp
+         geometry_msgs
          visualization_msgs
          std_msgs
          sensor_msgs
