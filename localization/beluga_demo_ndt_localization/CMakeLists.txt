@@ -1,6 +1,4 @@
-#!/usr/bin/python3
-
-# Copyright 2024 Ekumen, Inc.
+# Copyright 2023-2024 Ekumen, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,22 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+cmake_minimum_required(VERSION 3.5)
+project(beluga_demo_ndt_localization)
 
-from launch import LaunchDescription
-from launch_ros.actions import Node
+find_package(ament_cmake REQUIRED)
 
+install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY maps DESTINATION share/${PROJECT_NAME})
 
-def generate_launch_description():
-    return LaunchDescription(
-        [
-            Node(
-                package="turtlebot3_teleop",
-                executable="teleop_keyboard",
-                output="screen",
-                prefix="xterm -e",
-                remappings={
-                    ('/cmd_vel', '/commands/velocity'),
-                },
-            ),
-        ]
-    )
+if(BUILD_TESTING)
+  find_package(ament_lint_auto REQUIRED)
+  ament_lint_auto_find_test_dependencies()
+endif()
+
+ament_package()

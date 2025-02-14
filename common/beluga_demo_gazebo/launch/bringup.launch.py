@@ -21,6 +21,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument
 from launch_ros.substitutions import FindPackageShare
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
@@ -60,23 +61,26 @@ def generate_launch_description():
         launch_arguments=[("world", world_path)],
     )
 
-    spawn_command = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            [
-                os.path.join(
-                    get_package_share_directory("turtlebot3_gazebo"),
-                    "launch",
-                    "spawn_turtlebot3.launch.py",
-                )
-            ],
-        ),
-        launch_arguments=[("x_pose", "0"), ("y_pose", "-2")],
+    spawn_entity_node = Node(
+        package="gazebo_ros",
+        executable="spawn_entity.py",
+        arguments=[
+            "-topic",
+            "robot_description",
+            "-entity",
+            "gonbuki_robot",
+            "-x",
+            "0.0",
+            "-y",
+            "2.0",
+        ],
+        output="screen",
     )
 
     return LaunchDescription(
         [
             world_name_arg,
             gazebo_node,
-            spawn_command,
+            spawn_entity_node,
         ]
     )

@@ -1,22 +1,22 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>beluga_demo_gazebo</name>
+  <name>beluga_demo_ndt_localization</name>
   <version>2.0.0</version>
-  <description>Gazebo simulated scenarios used by Beluga demos</description>
+  <description>Demos of Beluga AMCL based localization indoors.</description>
   <maintainer email="glpuga@ekumenlabs.com">Gerardo Puga</maintainer>
   <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>gazebo_ros</depend>
-  <depend>gazebo_plugins</depend>
-  <depend>gonbuki_simulation</depend>
+  <depend>beluga_demo_bringup</depend>
 
-  <depend>xacro</depend>
+  <depend>beluga_amcl</depend>
+  <depend>nav2_amcl</depend>
+  <depend>nav2_map_server</depend>
+  <depend>nav2_lifecycle_manager</depend>
 
   <export>
     <build_type>ament_cmake</build_type>
-    <gazebo_ros gazebo_model_path="${prefix}/models"/>
   </export>
 </package>
