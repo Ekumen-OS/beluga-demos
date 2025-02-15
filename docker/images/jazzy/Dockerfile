@@ -51,6 +51,11 @@ RUN pipx install pre-commit==2.20.0
 ARG USER=developer
 ARG GROUP=ekumen
 
+# Drop ubuntu user on Noble to prevent fixuid from
+# mixing up users if the external UID happens to match
+# that of the ubuntu user.
+RUN deluser ubuntu
+
 RUN addgroup --gid 1010 $GROUP \
   && adduser --uid 1010 --ingroup $GROUP --home /home/$USER --shell /bin/sh --disabled-password --gecos "" $USER \
   && adduser $USER sudo \
