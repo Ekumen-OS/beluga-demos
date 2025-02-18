@@ -1,4 +1,6 @@
-# Copyright 2025 Ekumen, Inc.
+#!/usr/bin/python3
+
+# Copyright 2023 Ekumen, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,48 +16,83 @@
 
 
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.substitutions import LaunchConfiguration
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution
-from launch_ros.actions import SetParameter
 from launch_ros.substitutions import FindPackageShare
+from launch.substitutions import PathJoinSubstitution
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
     return LaunchDescription(
         [
-            SetParameter(
-                name="use_sim_time",
-                value=True,
+            DeclareLaunchArgument(
+                name='localization_ndt_map',
+                description='Map HDF5 file used by the localization node.',
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     PathJoinSubstitution(
                         [
-                            FindPackageShare("beluga_demo_bringup"),
+                            FindPackageShare("beluga_example"),
                             "launch",
-                            "simulation.launch.py",
+                            "utils",
+                            "ndt_3d_localization_launch.py",
                         ]
                     ),
                 ),
                 launch_arguments={
-                    "world_name": "magazino_hallway.world",
+                    'localization_ndt_map': LaunchConfiguration('localization_ndt_map')
                 }.items(),
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     PathJoinSubstitution(
                         [
-                            FindPackageShare("beluga_demo_ndt_localization"),
+                            FindPackageShare("beluga_example"),
+                            "launch",
+                            "utils",
+                            "rviz_launch.py",
+                        ]
+                    ),
+                ),
+                launch_arguments={
+                    'user_sim_time': 'true',
+                    # 'display_config': LaunchConfiguration('localization_params_file'),
+                }.items(),
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    PathJoinSubstitution(
+                        [
+                            FindPackageShare("gonbuki_description"),
+                            "launch",
+                            "robot_description.launch.py",
+                        ]
+                    ),
+                ),
+                launch_arguments={'world_name': 'magazino_hallway.world'}.items(),
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    PathJoinSubstitution(
+                        [
+                            FindPackageShare("beluga_demo_gazebo"),
                             "launch",
                             "bringup.launch.py",
                         ]
                     ),
                 ),
-                launch_arguments={
-                    "map_name": "magazino_hallway",
-                    "amcl_params_file": "default_ndt_3d.ros2.yaml",
-                }.items(),
+            ),
+            Node(
+                package='teleop_twist_keyboard',
+                executable='teleop_twist_keyboard',
+                output='screen',
+                prefix='xterm -e',
+                remappings=[
+                    ('/cmd_vel', '/commands/velocity'),
+                ],
             ),
         ]
     )
