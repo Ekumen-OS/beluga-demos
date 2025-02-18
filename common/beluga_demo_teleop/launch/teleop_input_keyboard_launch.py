@@ -27,9 +27,6 @@ def generate_launch_description():
                 executable="teleop_keyboard",
                 output="screen",
                 prefix="xterm -e",
-                remappings={
-                    ('/cmd_vel', '/commands/velocity'),
-                },
             ),
         ]
     )

@@ -15,33 +15,32 @@
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from ament_index_python.packages import get_package_share_directory
 from launch.substitutions import Command
-from launch.substitutions import PathJoinSubstitution
-from launch_ros.substitutions import FindPackageShare
+
+import os
 
 
 def generate_launch_description():
-    robot_description_xacro_file = PathJoinSubstitution(
-        [FindPackageShare("gonbuki_description"), "urdf", "gonbuki.urdf.xacro"]
-    )
+    TURTLEBOT3_MODEL = os.environ["TURTLEBOT3_MODEL"]
 
-    robot_state_publisher_node = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        output="screen",
-        parameters=[
-            {"robot_description": Command(["xacro ", robot_description_xacro_file])}
-        ],
-    )
+    urdf_file_name = "turtlebot3_" + TURTLEBOT3_MODEL + ".urdf"
 
-    robot_joint_publisher_node = Node(
-        package="joint_state_publisher",
-        executable="joint_state_publisher",
+    urdf_path = os.path.join(
+        get_package_share_directory("turtlebot3_description"), "urdf", urdf_file_name
     )
 
     return LaunchDescription(
         [
-            robot_state_publisher_node,
-            robot_joint_publisher_node,
+            Node(
+                package="robot_state_publisher",
+                executable="robot_state_publisher",
+                output="screen",
+                parameters=[
+                    {
+                        "robot_description": Command(["xacro ", urdf_path]),
+                    }
+                ],
+            ),
         ]
     )

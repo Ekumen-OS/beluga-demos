@@ -14,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 
+from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.substitutions import LaunchConfiguration
@@ -25,11 +27,31 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
+    worlds_install_folder = os.path.join(
+        get_package_share_directory("beluga_demo_gazebo"),
+        "worlds",
+    )
+    available_worlds = os.listdir(worlds_install_folder)
+    world_name_conf = LaunchConfiguration("world_name")
+    world_path = PathJoinSubstitution(
+        [
+            FindPackageShare("beluga_demo_gazebo"),
+            "worlds",
+            world_name_conf,
+        ]
+    )
+
     return LaunchDescription(
         [
             DeclareLaunchArgument(
                 name='localization_ndt_map',
                 description='Map HDF5 file used by the localization node.',
+            ),
+            DeclareLaunchArgument(
+                name="world_name",
+                default_value="magazino_hallway.world",
+                description="Name of the world file to load in simulation",
+                choices=available_worlds,
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
@@ -64,6 +86,33 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
+                    [
+                        os.path.join(
+                            get_package_share_directory("gazebo_ros"),
+                            "launch",
+                            "gazebo.launch.py",
+                        )
+                    ],
+                ),
+                launch_arguments=[("world", world_path)],
+            ),
+            Node(
+                package="gazebo_ros",
+                executable="spawn_entity.py",
+                arguments=[
+                    "-topic",
+                    "robot_description",
+                    "-entity",
+                    "gonbuki_robot",
+                    "-x",
+                    "0.0",
+                    "-y",
+                    "2.0",
+                ],
+                output="screen",
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
                     PathJoinSubstitution(
                         [
                             FindPackageShare("gonbuki_description"),
@@ -73,17 +122,6 @@ def generate_launch_description():
                     ),
                 ),
                 launch_arguments={'world_name': 'magazino_hallway.world'}.items(),
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    PathJoinSubstitution(
-                        [
-                            FindPackageShare("beluga_demo_gazebo"),
-                            "launch",
-                            "bringup.launch.py",
-                        ]
-                    ),
-                ),
             ),
             Node(
                 package='teleop_twist_keyboard',

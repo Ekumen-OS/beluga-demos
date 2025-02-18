@@ -11,7 +11,7 @@
 
   <exec_depend>xacro</exec_depend>
 
-  <depend>gonbuki_description</depend>
+  <depend>turtlebot3_description</depend>
   <depend>launch</depend>
 
   <test_depend>ament_lint_auto</test_depend>

@@ -11,7 +11,7 @@
 
   <depend>gazebo_ros</depend>
   <depend>gazebo_plugins</depend>
-  <depend>gonbuki_simulation</depend>
+  <depend>turtlebot3_gazebo</depend>
 
   <depend>xacro</depend>
 
