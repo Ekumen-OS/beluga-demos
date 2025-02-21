@@ -50,7 +50,8 @@ def generate_launch_description():
     localization_params_file = PathJoinSubstitution(
         [pkg_dir, "config", amcl_ndt_params_file_conf]
     )
-    print(localization_params_file)
+
+    rviz_file = PathJoinSubstitution([pkg_dir, "rviz", "ndt_amcl_3d.ros2.rviz"])
 
     return LaunchDescription(
         [
@@ -83,9 +84,7 @@ def generate_launch_description():
                     ),
                 ),
                 launch_arguments={
-                    # 'localization_params_file': localization_params_file,
-                    'localization_params_file': '/home/adminuser/ws/src/beluga-demos/localization/\
-                    beluga_demo_ndt_3d_localization/config/ndt_3d_params.yaml',
+                    'localization_params_file': localization_params_file,
                     'localization_ndt_map': LaunchConfiguration('localization_ndt_map'),
                 }.items(),
             ),
@@ -102,8 +101,7 @@ def generate_launch_description():
                 ),
                 launch_arguments={
                     'user_sim_time': 'true',
-                    'display_config': '/home/adminuser/ws/src/beluga/beluga_example/\
-                    rviz/ndt_amcl_3d.ros2.rviz',
+                    'display_config': rviz_file,
                 }.items(),
             ),
             IncludeLaunchDescription(
