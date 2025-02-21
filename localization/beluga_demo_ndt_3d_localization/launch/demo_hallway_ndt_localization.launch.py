@@ -56,14 +56,14 @@ def generate_launch_description():
     return LaunchDescription(
         [
             DeclareLaunchArgument(
-                name='amcl_ndt_params_file',
+                name="amcl_ndt_params_file",
                 description="Node parameters file for AMCL NDT node.",
                 choices=available_param_files,
                 default_value="ndt_3d_params.yaml",
             ),
             DeclareLaunchArgument(
-                name='localization_ndt_map',
-                description='Map HDF5 file used by the localization node.',
+                name="localization_ndt_map",
+                description="Map HDF5 file used by the localization node.",
             ),
             DeclareLaunchArgument(
                 name="world_name",
@@ -84,8 +84,8 @@ def generate_launch_description():
                     ),
                 ),
                 launch_arguments={
-                    'localization_params_file': localization_params_file,
-                    'localization_ndt_map': LaunchConfiguration('localization_ndt_map'),
+                    "localization_params_file": localization_params_file,
+                    "localization_ndt_map": LaunchConfiguration("localization_ndt_map"),
                 }.items(),
             ),
             IncludeLaunchDescription(
@@ -100,8 +100,8 @@ def generate_launch_description():
                     ),
                 ),
                 launch_arguments={
-                    'user_sim_time': 'true',
-                    'display_config': rviz_file,
+                    "user_sim_time": "true",
+                    "display_config": rviz_file,
                 }.items(),
             ),
             IncludeLaunchDescription(
@@ -126,7 +126,7 @@ def generate_launch_description():
                         ]
                     ),
                 ),
-                launch_arguments={'world_name': 'magazino_hallway.world'}.items(),
+                launch_arguments={"world_name": "magazino_hallway.world"}.items(),
             ),
             ###
             Node(
@@ -145,12 +145,12 @@ def generate_launch_description():
                 output="screen",
             ),
             Node(
-                package='teleop_twist_keyboard',
-                executable='teleop_twist_keyboard',
-                output='screen',
-                prefix='xterm -e',
+                package="teleop_twist_keyboard",
+                executable="teleop_twist_keyboard",
+                output="screen",
+                prefix="xterm -e",
                 remappings=[
-                    ('/cmd_vel', '/commands/velocity'),
+                    ("/cmd_vel", "/commands/velocity"),
                 ],
             ),
         ]
