@@ -46,11 +46,17 @@ def generate_launch_description():
         ]
     )
 
+    amcl_ndt_params_file_conf = LaunchConfiguration("amcl_ndt_params_file")
+    localization_params_file = PathJoinSubstitution(
+        [pkg_dir, "config", amcl_ndt_params_file_conf]
+    )
+    print(localization_params_file)
+
     return LaunchDescription(
         [
             DeclareLaunchArgument(
-                name='localization_params_file',
-                description="Yaml file with configuration for the localization node.",
+                name='amcl_ndt_params_file',
+                description="Node parameters file for AMCL NDT node.",
                 choices=available_param_files,
                 default_value="ndt_3d_params.yaml",
             ),
@@ -77,8 +83,10 @@ def generate_launch_description():
                     ),
                 ),
                 launch_arguments={
-                    # 'localization_params_file': LaunchConfiguration('localization_params_file'),
-                    'localization_ndt_map': LaunchConfiguration('localization_ndt_map')
+                    # 'localization_params_file': localization_params_file,
+                    'localization_params_file': '/home/adminuser/ws/src/beluga-demos/localization/\
+                    beluga_demo_ndt_3d_localization/config/ndt_3d_params.yaml',
+                    'localization_ndt_map': LaunchConfiguration('localization_ndt_map'),
                 }.items(),
             ),
             IncludeLaunchDescription(
@@ -94,6 +102,8 @@ def generate_launch_description():
                 ),
                 launch_arguments={
                     'user_sim_time': 'true',
+                    'display_config': '/home/adminuser/ws/src/beluga/beluga_example/\
+                    rviz/ndt_amcl_3d.ros2.rviz',
                 }.items(),
             ),
             IncludeLaunchDescription(
