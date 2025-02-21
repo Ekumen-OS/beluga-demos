@@ -1,0 +1,40 @@
+<?xml version='1.0'?>
+<sdf version='1.7'>
+  <model name='playground'>
+    <link name='link'>
+      <collision name='collision'>
+        <max_contacts>10</max_contacts>
+        <geometry>
+          <mesh>
+            <uri>meshes/playground.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+        <surface>
+          <contact>
+            <ode/>
+          </contact>
+          <bounce/>
+          <friction>
+            <torsional>
+              <ode/>
+            </torsional>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+      <visual name='visual'>
+        <geometry>
+          <mesh>
+            <uri>meshes/playground.dae</uri>
+            <scale>1 1 1</scale>
+          </mesh>
+        </geometry>
+      </visual>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+      <kinematic>0</kinematic>
+    </link>
+    <static>1</static>
+  </model>
+</sdf>

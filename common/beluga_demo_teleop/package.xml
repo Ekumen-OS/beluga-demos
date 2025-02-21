@@ -9,7 +9,7 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>turtlebot3_teleop</depend>
+  <depend>teleop_twist_keyboard</depend>
   <depend>teleop_twist_joy</depend>
   <depend>joy_linux</depend>
   <depend>xterm</depend>

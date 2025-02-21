@@ -15,7 +15,12 @@
 #ifndef BELUGA_SPOTLIGHT_DETECTOR_NODE_HPP
 #define BELUGA_SPOTLIGHT_DETECTOR_NODE_HPP
 
+#ifdef image_geometry_HAS_HPP
+#include <image_geometry/pinhole_camera_model.hpp>
+#else
 #include <image_geometry/pinhole_camera_model.h>
+#endif
+
 #include <image_transport/image_transport.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/image.hpp>

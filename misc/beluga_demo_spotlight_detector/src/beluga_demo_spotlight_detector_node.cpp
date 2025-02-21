@@ -17,7 +17,11 @@
 #include <beluga_demo_spotlight_detector/beluga_demo_spotlight_detector_node.hpp>
 #include <rclcpp_components/register_node_macro.hpp>
 
+#ifdef cv_bridge_HAS_HPP
+#include <cv_bridge/cv_bridge.hpp>
+#else
 #include <cv_bridge/cv_bridge.h>
+#endif
 
 // standard library
 #include <functional>
@@ -158,11 +162,12 @@ void BelugaDemoSpotlightDetectorNode::image_callback(
   cv::Mat filtered;
   cv_ptr->image.copyTo(filtered, mask);
 
-  std::vector<cv::Vec3f> circles;
+  cv::Mat kernel = cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3));
+  cv::morphologyEx(mask, filtered, cv::MORPH_CLOSE, kernel);
 
   std::vector<std::vector<cv::Point>> contours;
   std::vector<cv::Vec4i> hierarchy;
-  cv::findContours(mask, contours, hierarchy, cv::RETR_EXTERNAL,
+  cv::findContours(filtered, contours, hierarchy, cv::RETR_EXTERNAL,
                    cv::CHAIN_APPROX_SIMPLE);
 
   std::vector<DetectionData> detections;
@@ -179,12 +184,10 @@ void BelugaDemoSpotlightDetectorNode::image_callback(
         v < cv_ptr->image.size().height) {
       auto r = static_cast<int>(std::sqrt(area / M_PI));
       detections.push_back({u, v, r});
-
-      cv::circle(filtered, cv::Point(u, v), 50, CV_RGB(0, 0, 255));
     }
   }
 
-  cv_ptr->image = mask;
+  cv_ptr->image = filtered;
   cv_ptr->encoding = "mono8";
   image_publisher_.publish(*cv_ptr->toImageMsg());
 

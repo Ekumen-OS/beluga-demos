@@ -22,12 +22,10 @@ import os
 
 
 def generate_launch_description():
-    TURTLEBOT3_MODEL = os.environ["TURTLEBOT3_MODEL"]
-
-    urdf_file_name = "turtlebot3_" + TURTLEBOT3_MODEL + ".urdf"
+    urdf_file_name = "turtlebot3_waffle.urdf"
 
     urdf_path = os.path.join(
-        get_package_share_directory("turtlebot3_description"), "urdf", urdf_file_name
+        get_package_share_directory("nav2_minimal_tb3_sim"), "urdf", urdf_file_name
     )
 
     return LaunchDescription(

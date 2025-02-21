@@ -70,8 +70,8 @@ public:
             Eigen::AlignedBox2d(landmark_map.map_limits().min().head(2),
                                 landmark_map.map_limits().max().head(2))},
         sensor_model_(sensor_model_params(), std::move(landmark_map)) {
-    auto motion_policy = beluga::policies::on_motion(kMinTranslationForUpdate,
-                                                     kMinRotationForUpdate);
+    auto motion_policy = beluga::policies::on_motion<Sophus::SE2d>(
+        kMinTranslationForUpdate, kMinRotationForUpdate);
     update_policy_ = beluga::make_policy(
         [=](const Sophus::SE2d &odometry,
             const LandmarkBearingDetectionV &detections) mutable {
@@ -154,10 +154,8 @@ private:
   static beluga::BearingModelParam sensor_model_params() {
     auto params = beluga::BearingModelParam{};
     params.sigma_bearing = 0.025;
-    params.sensor_pose_in_robot = Sophus::SE3d{
-        Sophus::SO3d{},
-        Eigen::Vector3d{0.076, 0.000, 0.103}
-    };
+    params.sensor_pose_in_robot =
+        Sophus::SE3d{Sophus::SO3d{}, Eigen::Vector3d{0.069, -0.047, 0.107}};
     return params;
   }
 
@@ -380,8 +378,8 @@ private:
 
     std::vector<beluga::LandmarkPositionDetection> landmarks;
     landmarks.reserve(feature_map->positions.size());
-    const auto categories =
-        ranges::views::concat(feature_map->categories, ranges::views::repeat(0));
+    const auto categories = ranges::views::concat(feature_map->categories,
+                                                  ranges::views::repeat(0));
     for (const auto &[position, category] :
          ranges::views::zip(feature_map->positions, categories)) {
       auto &landmark = landmarks.emplace_back();

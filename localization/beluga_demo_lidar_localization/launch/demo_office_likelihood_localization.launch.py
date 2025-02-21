@@ -39,7 +39,7 @@ def generate_launch_description():
                     ),
                 ),
                 launch_arguments={
-                    "world_name": "hq4_office_populated.world",
+                    "world_name": "populated_ekumen_hq4.world",
                 }.items(),
             ),
             IncludeLaunchDescription(

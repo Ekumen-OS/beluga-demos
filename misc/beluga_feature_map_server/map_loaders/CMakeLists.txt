@@ -20,7 +20,8 @@ target_link_libraries(yaml_feature_map_loader PUBLIC)
 set_target_properties(yaml_feature_map_loader
                       PROPERTIES POSITION_INDEPENDENT_CODE ON)
 ament_target_dependencies(yaml_feature_map_loader
-                          PUBLIC beluga_feature_map_server_msgs yaml_cpp_vendor)
+                          PUBLIC beluga_feature_map_server_msgs)
+target_link_libraries(yaml_feature_map_loader PUBLIC yaml-cpp)
 
 add_library(map_loaders INTERFACE)
 target_link_libraries(map_loaders INTERFACE yaml_feature_map_loader)

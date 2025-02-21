@@ -36,6 +36,7 @@ def generate_launch_description():
         [
             IncludeLaunchDescription(
                 bringup_launch_description_source(f"beluga_demo_{component}")
-            ) for component in ("gazebo", "description", "rviz2", "teleop")
+            )
+            for component in ("gazebo", "description", "rviz2", "teleop")
         ]
     )

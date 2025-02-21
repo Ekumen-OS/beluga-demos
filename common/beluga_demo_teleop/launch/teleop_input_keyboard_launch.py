@@ -23,8 +23,8 @@ def generate_launch_description():
     return LaunchDescription(
         [
             Node(
-                package="turtlebot3_teleop",
-                executable="teleop_keyboard",
+                package="teleop_twist_keyboard",
+                executable="teleop_twist_keyboard",
                 output="screen",
                 prefix="xterm -e",
             ),

@@ -16,67 +16,83 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
+from launch.actions import AppendEnvironmentVariable
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument
-from launch_ros.substitutions import FindPackageShare
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration
 
 
 def generate_launch_description():
-    worlds_install_folder = os.path.join(
-        get_package_share_directory("beluga_demo_gazebo"),
-        "worlds",
-    )
-    available_worlds = os.listdir(worlds_install_folder)
+    world_paths = [
+        os.path.join(get_package_share_directory("gz_ekumen_worlds"), "worlds"),
+        os.path.join(
+            get_package_share_directory("beluga_demo_gazebo"),
+            "worlds",
+        ),
+    ]
+
+    available_worlds = []
+    for path in world_paths:
+        available_worlds.extend(os.listdir(path))
 
     world_name_conf = LaunchConfiguration("world_name")
 
     world_name_arg = DeclareLaunchArgument(
         name="world_name",
-        default_value="hq4_office.world",
+        default_value="empty_ekumen_hq4.world",
         description="Name of the world file to load in simulation",
         choices=available_worlds,
     )
 
-    world_path = PathJoinSubstitution(
-        [
-            FindPackageShare("beluga_demo_gazebo"),
-            "worlds",
-            world_name_conf,
-        ]
+    append_tb3_gz_sim_resources = AppendEnvironmentVariable(
+        "GZ_SIM_RESOURCE_PATH",
+        os.pathsep.join(
+            [
+                os.path.dirname(get_package_share_directory("nav2_minimal_tb3_sim")),
+                os.path.join(
+                    get_package_share_directory("nav2_minimal_tb3_sim"), "models"
+                ),
+            ]
+        ),
     )
 
-    gazebo_node = IncludeLaunchDescription(
+    append_gz_worlds = AppendEnvironmentVariable(
+        "GZ_SIM_RESOURCE_PATH", os.pathsep.join(world_paths)
+    )
+
+    gz_sim_nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
                 os.path.join(
-                    get_package_share_directory("gazebo_ros"),
+                    get_package_share_directory("ros_gz_sim"),
                     "launch",
-                    "gazebo.launch.py",
+                    "gz_sim.launch.py",
                 )
             ],
         ),
-        launch_arguments=[("world", world_path)],
+        launch_arguments=[("gz_args", ["-r ", world_name_conf])],
     )
 
     spawn_command = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
                 os.path.join(
-                    get_package_share_directory("turtlebot3_gazebo"),
+                    get_package_share_directory("nav2_minimal_tb3_sim"),
                     "launch",
-                    "spawn_turtlebot3.launch.py",
+                    "spawn_tb3.launch.py",
                 )
             ],
         ),
-        launch_arguments=[("x_pose", "0"), ("y_pose", "-2")],
+        launch_arguments=[("x_pose", "0"), ("y_pose", "-2"), ("z_pose", "0.01")],
     )
 
     return LaunchDescription(
         [
             world_name_arg,
-            gazebo_node,
+            append_gz_worlds,
+            append_tb3_gz_sim_resources,
+            gz_sim_nodes,
             spawn_command,
         ]
     )

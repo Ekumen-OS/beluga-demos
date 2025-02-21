@@ -1,4 +1,4 @@
-FROM ros:humble-ros-base-jammy AS package_cacher
+FROM ros:jazzy-ros-base-noble AS package_cacher
 
 WORKDIR /ws/src
 
@@ -9,7 +9,7 @@ RUN mkdir -p /tmp/ws/src \
   && find ./ -name "COLCON_IGNORE" | xargs cp --parents -t /tmp/ws/src \
   || true
 
-FROM ros:humble-ros-base-jammy AS gz_model_cacher
+FROM ros:jazzy-ros-base-noble AS gz_model_cacher
 
 WORKDIR /ws/src
 
@@ -19,7 +19,7 @@ RUN mkdir -p /tmp/ws/src \
   && find ./ -name "*.sdf" | xargs cp --parents -t /tmp/ws/src \
   || true
 
-FROM ros:humble-ros-base-jammy AS builder
+FROM ros:jazzy-ros-base-noble AS builder
 
 SHELL ["/bin/bash", "-c"]
 ENV SHELL=/bin/bash
@@ -35,6 +35,7 @@ RUN apt-get update \
     git \
     python3-pip \
     python3-venv \
+    pipx \
     mc \
     lsb-release \
     tmux \
@@ -45,10 +46,15 @@ RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyri
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" > /etc/apt/sources.list.d/gazebo-stable.list \
   && apt-get update && apt-get install --no-install-recommends -y $(if [[ "${GZ_VERSION}" > "fortress" ]]; then echo gz; else echo ignition; fi)-${GZ_VERSION}
 
-RUN pip install pre-commit==2.20.0
+RUN pipx install pre-commit==2.20.0
 
 ARG USER=developer
 ARG GROUP=ekumen
+
+# Drop ubuntu user on Noble to prevent fixuid from
+# mixing up users if the external UID happens to match
+# that of the ubuntu user.
+RUN deluser ubuntu
 
 RUN addgroup --gid 1010 $GROUP \
   && adduser --uid 1010 --ingroup $GROUP --home /home/$USER --shell /bin/sh --disabled-password --gecos "" $USER \
@@ -80,11 +86,11 @@ RUN mkdir -p /home/$USER/.ccache $USER_WS/src
 #
 # Install base system external dependencies
 
-COPY docker/files/humble_base.repos /tmp/humble_base.repos
+COPY docker/files/jazzy_base.repos /tmp/jazzy_base.repos
 RUN cd src/ \
   && mkdir -p external-deps \
   && cd external-deps \
-  && vcs import < /tmp/humble_base.repos
+  && vcs import < /tmp/jazzy_base.repos
 
 #
 # Apply patches
@@ -102,9 +108,9 @@ RUN cd src/external-deps/nav2_minimal_turtlebot_simulation \
 
 COPY --from=package_cacher --chown=$USER:$GROUP /tmp/ws/ $USER_WS/
 RUN sudo apt-get update \
-  && . /opt/ros/humble/setup.sh \
+  && . /opt/ros/jazzy/setup.sh \
   && rosdep update \
-  && rosdep install -i -y --from-path src \
+  && PIP_BREAK_SYSTEM_PACKAGES=1 rosdep install -i -y --from-path src \
   && sudo rm -rf /var/lib/apt/lists/*
 
 #
@@ -112,7 +118,7 @@ RUN sudo apt-get update \
 
 COPY --chown=$USER:$GROUP docker/files/DOTaliases /home/$USER/.bash_aliases
 
-RUN bash -c "echo '. /opt/ros/humble/setup.bash' >> /home/$USER/.bashrc"
+RUN bash -c "echo '. /opt/ros/jazzy/setup.bash' >> /home/$USER/.bashrc"
 
 RUN bash -c "echo 'ros2 daemon start' >> /home/$USER/.bashrc"
 

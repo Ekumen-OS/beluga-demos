@@ -1,53 +1,8 @@
 <sdf version='1.7'>
   <world name='default'>
-    <model name='ground_plane'>
-      <static>1</static>
-      <link name='link'>
-        <collision name='collision'>
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>100 100</size>
-            </plane>
-          </geometry>
-          <surface>
-            <contact>
-              <collide_bitmask>65535</collide_bitmask>
-              <ode/>
-            </contact>
-            <friction>
-              <ode>
-                <mu>100</mu>
-                <mu2>50</mu2>
-              </ode>
-              <torsional>
-                <ode/>
-              </torsional>
-            </friction>
-            <bounce/>
-          </surface>
-          <max_contacts>10</max_contacts>
-        </collision>
-        <visual name='visual'>
-          <cast_shadows>0</cast_shadows>
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>100 100</size>
-            </plane>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
-          </material>
-        </visual>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-    </model>
+    <include>
+      <uri>model://beluga_demo_gazebo/models/low_profile_playground</uri>
+    </include>
     <gravity>0 0 -9.8</gravity>
     <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
     <atmosphere type='adiabatic'/>
@@ -60,6 +15,7 @@
       <ambient>0.4 0.4 0.4 1</ambient>
       <background>0.2 0.2 0.2 1</background>
       <shadows>1</shadows>
+      <grid>0</grid>
     </scene>
     <audio>
       <device>default</device>
@@ -72,715 +28,408 @@
       <elevation>0</elevation>
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
-    <model name='square_house'>
-      <pose>-0.015532 -0.015533 0 0 -0 0</pose>
-      <link name='Floor_0'>
-        <collision name='Floor_0_Collision'>
+    <model name='ceiling_light_0'>
+      <pose>5 0 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>10.1811 10.1811 0.1</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.05 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Floor_0_Visual'>
-          <pose>0 0 0.05 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10.1811 10.1811 0.1</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Wood</name>
-            </script>
             <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
+            <shininess>0.3</shininess>
           </material>
-          <meta>
-            <layer>1</layer>
-          </meta>
         </visual>
-        <pose>-1e-06 -0 0.001 0 -0 0</pose>
+        <light name='source' type='spot'>
+          <pose>0 0 0 0 -0 0</pose>
+          <diffuse>1 1 0.6 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <spot>
+            <inner_angle>1.5708</inner_angle>
+            <outer_angle>2.35619</outer_angle>
+            <falloff>0.5</falloff>
+          </spot>
+          <attenuation>
+            <range>3</range>
+            <linear>0.6</linear>
+            <constant>0.8</constant>
+            <quadratic>0.2</quadratic>
+          </attenuation>
+          <cast_shadows>0</cast_shadows>
+          <direction>0 0 -1</direction>
+        </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
-      <link name='Wall_0'>
-        <collision name='Wall_0_Collision'>
+      <static>1</static>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='ceiling_light_1'>
+      <pose>5 2.5 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>10.15 0.15 0</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.001 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Wall_0_Visual'>
-          <pose>0 0 0.001 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10.15 0.15 0</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
             <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
+            <shininess>0.3</shininess>
           </material>
-          <meta>
-            <layer>0</layer>
-          </meta>
         </visual>
-        <pose>0.015532 -4.98447 0 0 -0 0</pose>
+        <light name='source' type='spot'>
+          <pose>0 0 0 0 -0 0</pose>
+          <diffuse>1 1 0.6 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <spot>
+            <inner_angle>1.5708</inner_angle>
+            <outer_angle>2.35619</outer_angle>
+            <falloff>0.5</falloff>
+          </spot>
+          <attenuation>
+            <range>3</range>
+            <linear>0.6</linear>
+            <constant>0.8</constant>
+            <quadratic>0.2</quadratic>
+          </attenuation>
+          <cast_shadows>0</cast_shadows>
+          <direction>0 0 -1</direction>
+        </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
-      <link name='Wall_1'>
-        <collision name='Wall_1_Collision'>
+      <static>1</static>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='ceiling_light_2'>
+      <pose>5 5 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>10.15 0.15 0.001</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.0005 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Wall_1_Visual'>
-          <pose>0 0 0.0005 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10.15 0.15 0.001</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
             <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
+            <shininess>0.3</shininess>
           </material>
-          <meta>
-            <layer>0</layer>
-          </meta>
         </visual>
-        <pose>5.01553 0.015533 0 0 -0 1.5708</pose>
+        <light name='source' type='spot'>
+          <pose>0 0 0 0 -0 0</pose>
+          <diffuse>1 1 0.6 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <spot>
+            <inner_angle>1.5708</inner_angle>
+            <outer_angle>2.35619</outer_angle>
+            <falloff>0.5</falloff>
+          </spot>
+          <attenuation>
+            <range>3</range>
+            <linear>0.6</linear>
+            <constant>0.8</constant>
+            <quadratic>0.2</quadratic>
+          </attenuation>
+          <cast_shadows>0</cast_shadows>
+          <direction>0 0 -1</direction>
+        </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
-      <link name='Wall_2'>
-        <collision name='Wall_2_Collision'>
+      <static>1</static>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='ceiling_light_3'>
+      <pose>2.5 5 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>10.15 0.15 0.001</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.0005 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Wall_2_Visual'>
-          <pose>0 0 0.0005 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10.15 0.15 0.001</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
             <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
+            <shininess>0.3</shininess>
           </material>
-          <meta>
-            <layer>0</layer>
-          </meta>
         </visual>
-        <pose>0.015532 5.01553 0 0 -0 3.14159</pose>
+        <light name='source' type='spot'>
+          <pose>0 0 0 0 -0 0</pose>
+          <diffuse>1 1 0.6 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <spot>
+            <inner_angle>1.5708</inner_angle>
+            <outer_angle>2.35619</outer_angle>
+            <falloff>0.5</falloff>
+          </spot>
+          <attenuation>
+            <range>3</range>
+            <linear>0.6</linear>
+            <constant>0.8</constant>
+            <quadratic>0.2</quadratic>
+          </attenuation>
+          <cast_shadows>0</cast_shadows>
+          <direction>0 0 -1</direction>
+        </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
-      <link name='Wall_3'>
-        <collision name='Wall_3_Collision'>
+      <static>1</static>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='ceiling_light_4'>
+      <pose>0 5 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>10.15 0.15 0.001</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.0005 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Wall_3_Visual'>
-          <pose>0 0 0.0005 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10.15 0.15 0.001</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Grey</name>
-            </script>
             <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
+            <shininess>0.3</shininess>
           </material>
-          <meta>
-            <layer>0</layer>
-          </meta>
         </visual>
-        <pose>-4.98447 0.015533 0 0 -0 -1.5708</pose>
+        <light name='source' type='spot'>
+          <pose>0 0 0 0 -0 0</pose>
+          <diffuse>1 1 0.6 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <spot>
+            <inner_angle>1.5708</inner_angle>
+            <outer_angle>2.35619</outer_angle>
+            <falloff>0.5</falloff>
+          </spot>
+          <attenuation>
+            <range>3</range>
+            <linear>0.6</linear>
+            <constant>0.8</constant>
+            <quadratic>0.2</quadratic>
+          </attenuation>
+          <cast_shadows>0</cast_shadows>
+          <direction>0 0 -1</direction>
+        </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
-      <link name='Wall_5'>
-        <collision name='Wall_5_Collision'>
+      <static>1</static>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='ceiling_light_5'>
+      <pose>-2.5 5 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>10.15 0.15 0.5</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Wall_5_Visual'>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10.15 0.15 0.5</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Bricks</name>
-            </script>
             <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
+            <shininess>0.3</shininess>
           </material>
-          <meta>
-            <layer>1</layer>
-          </meta>
         </visual>
-        <pose>0.015532 -4.98447 0.001 0 -0 0</pose>
+        <light name='source' type='spot'>
+          <pose>0 0 0 0 -0 0</pose>
+          <diffuse>1 1 0.6 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <spot>
+            <inner_angle>1.5708</inner_angle>
+            <outer_angle>2.35619</outer_angle>
+            <falloff>0.5</falloff>
+          </spot>
+          <attenuation>
+            <range>3</range>
+            <linear>0.6</linear>
+            <constant>0.8</constant>
+            <quadratic>0.2</quadratic>
+          </attenuation>
+          <cast_shadows>0</cast_shadows>
+          <direction>0 0 -1</direction>
+        </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
-      <link name='Wall_6'>
-        <collision name='Wall_6_Collision'>
+      <static>1</static>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='ceiling_light_6'>
+      <pose>-5 5 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>10.15 0.15 0.5</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Wall_6_Visual'>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10.15 0.15 0.5</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Bricks</name>
-            </script>
             <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
+            <shininess>0.3</shininess>
           </material>
-          <meta>
-            <layer>1</layer>
-          </meta>
         </visual>
-        <pose>5.01553 0.015533 0.001 0 -0 1.5708</pose>
+        <light name='source' type='spot'>
+          <pose>0 0 0 0 -0 0</pose>
+          <diffuse>1 1 0.6 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <spot>
+            <inner_angle>1.5708</inner_angle>
+            <outer_angle>2.35619</outer_angle>
+            <falloff>0.5</falloff>
+          </spot>
+          <attenuation>
+            <range>3</range>
+            <linear>0.6</linear>
+            <constant>0.8</constant>
+            <quadratic>0.2</quadratic>
+          </attenuation>
+          <cast_shadows>0</cast_shadows>
+          <direction>0 0 -1</direction>
+        </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
-      <link name='Wall_7'>
-        <collision name='Wall_7_Collision'>
+      <static>1</static>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='ceiling_light_7'>
+      <pose>-5 2.5 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>10.15 0.15 0.5</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Wall_7_Visual'>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10.15 0.15 0.5</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Bricks</name>
-            </script>
             <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
+            <shininess>0.3</shininess>
           </material>
-          <meta>
-            <layer>1</layer>
-          </meta>
         </visual>
-        <pose>0.015532 5.01553 0.001 0 -0 3.14159</pose>
+        <light name='source' type='spot'>
+          <pose>0 0 0 0 -0 0</pose>
+          <diffuse>1 1 0.6 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <spot>
+            <inner_angle>1.5708</inner_angle>
+            <outer_angle>2.35619</outer_angle>
+            <falloff>0.5</falloff>
+          </spot>
+          <attenuation>
+            <range>3</range>
+            <linear>0.6</linear>
+            <constant>0.8</constant>
+            <quadratic>0.2</quadratic>
+          </attenuation>
+          <cast_shadows>0</cast_shadows>
+          <direction>0 0 -1</direction>
+        </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
-      <link name='Wall_8'>
-        <collision name='Wall_8_Collision'>
+      <static>1</static>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='ceiling_light_8'>
+      <pose>-5 0 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>10.15 0.15 0.5</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Wall_8_Visual'>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>10.15 0.15 0.5</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Bricks</name>
-            </script>
             <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
+            <shininess>0.3</shininess>
           </material>
-          <meta>
-            <layer>1</layer>
-          </meta>
         </visual>
-        <pose>-4.98447 0.015533 0.001 0 -0 -1.5708</pose>
+        <light name='source' type='spot'>
+          <pose>0 0 0 0 -0 0</pose>
+          <diffuse>1 1 0.6 1</diffuse>
+          <specular>0.1 0.1 0.1 1</specular>
+          <spot>
+            <inner_angle>1.5708</inner_angle>
+            <outer_angle>2.35619</outer_angle>
+            <falloff>0.5</falloff>
+          </spot>
+          <attenuation>
+            <range>3</range>
+            <linear>0.6</linear>
+            <constant>0.8</constant>
+            <quadratic>0.2</quadratic>
+          </attenuation>
+          <cast_shadows>0</cast_shadows>
+          <direction>0 0 -1</direction>
+        </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
-      <link name='Wall_9'>
-        <collision name='Wall_9_Collision'>
+      <static>1</static>
+      <self_collide>0</self_collide>
+      <enable_wind>0</enable_wind>
+    </model>
+    <model name='ceiling_light_9'>
+      <pose>-5 -2.5 1 0 -0 0</pose>
+      <link name='bulb'>
+        <pose>0 0 0 0 -0 0</pose>
+        <visual name='main'>
           <geometry>
-            <box>
-              <size>2.27132 0.15 0.5</size>
-            </box>
-          </geometry>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <max_contacts>10</max_contacts>
-          <surface>
-            <contact>
-              <ode/>
-            </contact>
-            <bounce/>
-            <friction>
-              <torsional>
-                <ode/>
-              </torsional>
-              <ode/>
-            </friction>
-          </surface>
-        </collision>
-        <visual name='Wall_9_Visual'>
-          <pose>0 0 0.25 0 -0 0</pose>
-          <geometry>
-            <box>
-              <size>2.27132 0.15 0.5</size>
-            </box>
+            <sphere>
+              <radius>0.10</radius>
+            </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/Bricks</name>
-            </script>
             <ambient>1 1 1 1</ambient>
-          </material>
-          <meta>
-            <layer>1</layer>
-          </meta>
-        </visual>
-        <pose>-4.23447 -4.23447 0.001 0 -0 -0.785398</pose>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-    </model>
-    <state world_name='default'>
-      <sim_time>263 965000000</sim_time>
-      <real_time>69 328351638</real_time>
-      <wall_time>1705856561 210863859</wall_time>
-      <iterations>63347</iterations>
-      <model name='Ceiling_Light_m4_m4'>
-        <pose>-6 -6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>-6 -6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_m4_m2'>
-        <pose>-6 -2 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>-6 -2 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_0_m4'>
-        <pose>0 -6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>0 -6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_0_p4'>
-        <pose>0 6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>0 6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_p2_m4'>
-        <pose>2 -6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>2 -6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_p2_p4'>
-        <pose>2 6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>2 6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_m4_0'>
-        <pose>-6 0 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>-6 0 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_p4_m4'>
-        <pose>6 -6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>6 -6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_p4_m2'>
-        <pose>6 -2 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>6 -2 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_p4_0'>
-        <pose>6 0 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>6 0 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_p4_p2'>
-        <pose>6 2 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>6 2 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_p4_p4'>
-        <pose>6 6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>6 6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_m4_p2'>
-        <pose>-6 2 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>-6 2 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_m4_p4'>
-        <pose>-6 6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>-6 6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_m2_m4'>
-        <pose>-2 -6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>-2 -6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='Ceiling_Light_m2_p4'>
-        <pose>-2 6 1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='bulb'>
-          <pose>-2 6 1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='ground_plane'>
-        <pose>0 0 0 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='link'>
-          <pose>0 0 0 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-      <model name='square_house'>
-        <pose>0 0 -0.1 0 -0 0</pose>
-        <scale>1 1 1</scale>
-        <link name='Floor_0'>
-          <pose>-1e-06 0 -0.099 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='Wall_0'>
-          <pose>0.015532 -4.98447 -0.1 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='Wall_1'>
-          <pose>5.01553 0.015533 -0.1 0 -0 1.5708</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='Wall_2'>
-          <pose>0.015532 5.01553 -0.1 0 -0 3.14159</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='Wall_3'>
-          <pose>-4.98447 0.015533 -0.1 0 0 -1.5708</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='Wall_5'>
-          <pose>0.015532 -4.98447 -0.099 0 -0 0</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='Wall_6'>
-          <pose>5.01553 0.015533 -0.099 0 -0 1.5708</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='Wall_7'>
-          <pose>0.015532 5.01553 -0.099 0 -0 3.14159</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='Wall_8'>
-          <pose>-4.98447 0.015533 -0.099 0 0 -1.5708</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-        <link name='Wall_9'>
-          <pose>-4.23447 -4.23447 -0.099 0 0 -0.785398</pose>
-          <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 0 0 -0 0</acceleration>
-          <wrench>0 0 0 0 -0 0</wrench>
-        </link>
-      </model>
-    </state>
-    <model name='Ceiling_Light_m4_m4'>
-      <pose>-6 -6 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
             <shininess>0.3</shininess>
           </material>
         </visual>
@@ -804,15 +453,13 @@
         </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
       <static>1</static>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
     </model>
-    <model name='Ceiling_Light_m4_m2'>
-      <pose>-6 -2 1 0 -0 0</pose>
+    <model name='ceiling_light_10'>
+      <pose>-5 -5 1 0 -0 0</pose>
       <link name='bulb'>
         <pose>0 0 0 0 -0 0</pose>
         <visual name='main'>
@@ -822,10 +469,10 @@
             </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
             <shininess>0.3</shininess>
           </material>
         </visual>
@@ -849,15 +496,13 @@
         </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
       <static>1</static>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
     </model>
-    <model name='Ceiling_Light_m4_0'>
-      <pose>-6 0 1 0 -0 0</pose>
+    <model name='ceiling_light_11'>
+      <pose>-2.5 -5 1 0 -0 0</pose>
       <link name='bulb'>
         <pose>0 0 0 0 -0 0</pose>
         <visual name='main'>
@@ -867,10 +512,10 @@
             </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
             <shininess>0.3</shininess>
           </material>
         </visual>
@@ -894,15 +539,13 @@
         </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
       <static>1</static>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
     </model>
-    <model name='Ceiling_Light_m4_p2'>
-      <pose>-6 2 1 0 -0 0</pose>
+    <model name='ceiling_light_12'>
+      <pose>0 -5 1 0 -0 0</pose>
       <link name='bulb'>
         <pose>0 0 0 0 -0 0</pose>
         <visual name='main'>
@@ -912,10 +555,10 @@
             </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
             <shininess>0.3</shininess>
           </material>
         </visual>
@@ -939,15 +582,13 @@
         </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
       <static>1</static>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
     </model>
-    <model name='Ceiling_Light_m4_p4'>
-      <pose>-6 6 1 0 -0 0</pose>
+    <model name='ceiling_light_13'>
+      <pose>2.5 -5 1 0 -0 0</pose>
       <link name='bulb'>
         <pose>0 0 0 0 -0 0</pose>
         <visual name='main'>
@@ -957,10 +598,10 @@
             </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
             <shininess>0.3</shininess>
           </material>
         </visual>
@@ -984,15 +625,13 @@
         </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
       <static>1</static>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
     </model>
-    <model name='Ceiling_Light_m2_m4'>
-      <pose>-2 -6 1 0 -0 0</pose>
+    <model name='ceiling_light_14'>
+      <pose>5 -5 1 0 -0 0</pose>
       <link name='bulb'>
         <pose>0 0 0 0 -0 0</pose>
         <visual name='main'>
@@ -1002,10 +641,10 @@
             </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
             <shininess>0.3</shininess>
           </material>
         </visual>
@@ -1029,15 +668,13 @@
         </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
       <static>1</static>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
     </model>
-    <model name='Ceiling_Light_m2_p4'>
-      <pose>-2 6 1 0 -0 0</pose>
+    <model name='ceiling_light_15'>
+      <pose>5 -2.5 1 0 -0 0</pose>
       <link name='bulb'>
         <pose>0 0 0 0 -0 0</pose>
         <visual name='main'>
@@ -1047,10 +684,10 @@
             </sphere>
           </geometry>
           <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
+            <ambient>1 1 1 1</ambient>
+            <diffuse>1 1 1 1</diffuse>
+            <specular>0.1 0.1 0.1 1</specular>
+            <emissive>1 1 1 1</emissive>
             <shininess>0.3</shininess>
           </material>
         </visual>
@@ -1074,417 +711,10 @@
         </light>
         <self_collide>0</self_collide>
         <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
       </link>
       <static>1</static>
       <self_collide>0</self_collide>
       <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-    </model>
-    <model name='Ceiling_Light_0_m4'>
-      <pose>0 -6 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
-            <shininess>0.3</shininess>
-          </material>
-        </visual>
-        <light name='source' type='spot'>
-          <pose>0 0 0 0 -0 0</pose>
-          <diffuse>1 1 0.6 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <spot>
-            <inner_angle>1.5708</inner_angle>
-            <outer_angle>2.35619</outer_angle>
-            <falloff>0.5</falloff>
-          </spot>
-          <attenuation>
-            <range>3</range>
-            <linear>0.6</linear>
-            <constant>0.8</constant>
-            <quadratic>0.2</quadratic>
-          </attenuation>
-          <cast_shadows>0</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-    </model>
-    <model name='Ceiling_Light_0_p4'>
-      <pose>0 6 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
-            <shininess>0.3</shininess>
-          </material>
-        </visual>
-        <light name='source' type='spot'>
-          <pose>0 0 0 0 -0 0</pose>
-          <diffuse>1 1 0.6 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <spot>
-            <inner_angle>1.5708</inner_angle>
-            <outer_angle>2.35619</outer_angle>
-            <falloff>0.5</falloff>
-          </spot>
-          <attenuation>
-            <range>3</range>
-            <linear>0.6</linear>
-            <constant>0.8</constant>
-            <quadratic>0.2</quadratic>
-          </attenuation>
-          <cast_shadows>0</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-    </model>
-    <model name='Ceiling_Light_p2_m4'>
-      <pose>2 -6 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
-            <shininess>0.3</shininess>
-          </material>
-        </visual>
-        <light name='source' type='spot'>
-          <pose>0 0 0 0 -0 0</pose>
-          <diffuse>1 1 0.6 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <spot>
-            <inner_angle>1.5708</inner_angle>
-            <outer_angle>2.35619</outer_angle>
-            <falloff>0.5</falloff>
-          </spot>
-          <attenuation>
-            <range>3</range>
-            <linear>0.6</linear>
-            <constant>0.8</constant>
-            <quadratic>0.2</quadratic>
-          </attenuation>
-          <cast_shadows>0</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-    </model>
-    <model name='Ceiling_Light_p2_p4'>
-      <pose>2 5 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
-            <shininess>0.3</shininess>
-          </material>
-        </visual>
-        <light name='source' type='spot'>
-          <pose>0 0 0 0 -0 0</pose>
-          <diffuse>1 1 0.6 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <spot>
-            <inner_angle>1.5708</inner_angle>
-            <outer_angle>2.35619</outer_angle>
-            <falloff>0.5</falloff>
-          </spot>
-          <attenuation>
-            <range>3</range>
-            <linear>0.6</linear>
-            <constant>0.8</constant>
-            <quadratic>0.2</quadratic>
-          </attenuation>
-          <cast_shadows>0</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-    </model>
-    <model name='Ceiling_Light_p4_m4'>
-      <pose>6 -6 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
-            <shininess>0.3</shininess>
-          </material>
-        </visual>
-        <light name='source' type='spot'>
-          <pose>0 0 0 0 -0 0</pose>
-          <diffuse>1 1 0.6 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <spot>
-            <inner_angle>1.5708</inner_angle>
-            <outer_angle>2.35619</outer_angle>
-            <falloff>0.5</falloff>
-          </spot>
-          <attenuation>
-            <range>3</range>
-            <linear>0.6</linear>
-            <constant>0.8</constant>
-            <quadratic>0.2</quadratic>
-          </attenuation>
-          <cast_shadows>0</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-    </model>
-    <model name='Ceiling_Light_p4_m2'>
-      <pose>6 -2 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
-            <shininess>0.3</shininess>
-          </material>
-        </visual>
-        <light name='source' type='spot'>
-          <pose>0 0 0 0 -0 0</pose>
-          <diffuse>1 1 0.6 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <spot>
-            <inner_angle>1.5708</inner_angle>
-            <outer_angle>2.35619</outer_angle>
-            <falloff>0.5</falloff>
-          </spot>
-          <attenuation>
-            <range>3</range>
-            <linear>0.6</linear>
-            <constant>0.8</constant>
-            <quadratic>0.2</quadratic>
-          </attenuation>
-          <cast_shadows>0</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-    </model>
-    <model name='Ceiling_Light_p4_0'>
-      <pose>6 0 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
-            <shininess>0.3</shininess>
-          </material>
-        </visual>
-        <light name='source' type='spot'>
-          <pose>0 0 0 0 -0 0</pose>
-          <diffuse>1 1 0.6 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <spot>
-            <inner_angle>1.5708</inner_angle>
-            <outer_angle>2.35619</outer_angle>
-            <falloff>0.5</falloff>
-          </spot>
-          <attenuation>
-            <range>3</range>
-            <linear>0.6</linear>
-            <constant>0.8</constant>
-            <quadratic>0.2</quadratic>
-          </attenuation>
-          <cast_shadows>0</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-    </model>
-    <model name='Ceiling_Light_p4_p2'>
-      <pose>6 2 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
-            <shininess>0.3</shininess>
-          </material>
-        </visual>
-        <light name='source' type='spot'>
-          <pose>0 0 0 0 -0 0</pose>
-          <diffuse>1 1 0.6 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <spot>
-            <inner_angle>1.5708</inner_angle>
-            <outer_angle>2.35619</outer_angle>
-            <falloff>0.5</falloff>
-          </spot>
-          <attenuation>
-            <range>3</range>
-            <linear>0.6</linear>
-            <constant>0.8</constant>
-            <quadratic>0.2</quadratic>
-          </attenuation>
-          <cast_shadows>0</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
-    </model>
-    <model name='Ceiling_Light_p4_p4'>
-      <pose>6 6 1 0 -0 0</pose>
-      <link name='bulb'>
-        <pose>0 0 0 0 -0 0</pose>
-        <visual name='main'>
-          <geometry>
-            <sphere>
-              <radius>0.10</radius>
-            </sphere>
-          </geometry>
-          <material>
-            <script>
-              <uri>file://media/materials/scripts/gazebo.material</uri>
-              <name>Gazebo/WhiteGlow</name>
-            </script>
-            <shininess>0.3</shininess>
-          </material>
-        </visual>
-        <light name='source' type='spot'>
-          <pose>0 0 0 0 -0 0</pose>
-          <diffuse>1 1 0.6 1</diffuse>
-          <specular>0.1 0.1 0.1 1</specular>
-          <spot>
-            <inner_angle>1.5708</inner_angle>
-            <outer_angle>2.35619</outer_angle>
-            <falloff>0.5</falloff>
-          </spot>
-          <attenuation>
-            <range>3</range>
-            <linear>0.6</linear>
-            <constant>0.8</constant>
-            <quadratic>0.2</quadratic>
-          </attenuation>
-          <cast_shadows>0</cast_shadows>
-          <direction>0 0 -1</direction>
-        </light>
-        <self_collide>0</self_collide>
-        <enable_wind>0</enable_wind>
-        <kinematic>0</kinematic>
-      </link>
-      <static>1</static>
-      <self_collide>0</self_collide>
-      <enable_wind>0</enable_wind>
-      <kinematic>0</kinematic>
     </model>
     <gui fullscreen='0'>
       <camera name='user_camera'>

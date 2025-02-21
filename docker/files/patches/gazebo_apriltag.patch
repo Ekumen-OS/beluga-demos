@@ -1,0 +1,22 @@
+diff --git a/template/model.sdf b/template/model.sdf
+index 69be7ac..ad009b5 100644
+--- a/template/model.sdf
++++ b/template/model.sdf
+@@ -6,7 +6,7 @@
+       <visual name="visual">
+         <geometry>
+           <box>
+-            <size>0.2 0.2 0.001</size>
++            <size>0.4 0.4 0.002</size>
+           </box>
+         </geometry>
+         <material>
+@@ -25,7 +25,7 @@
+       <collision name="collision">
+         <geometry>
+           <box>
+-            <size>0.2 0.2 0.001</size>
++            <size>0.4 0.4 0.002</size>
+           </box>
+         </geometry>
+       </collision>
