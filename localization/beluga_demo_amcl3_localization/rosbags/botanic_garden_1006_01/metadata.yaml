@@ -1,0 +1,43 @@
+rosbag2_bagfile_information:
+  compression_format: ''
+  compression_mode: ''
+  custom_data: {}
+  duration:
+    nanoseconds: 762370098240
+  files:
+  - duration:
+      nanoseconds: 762370098240
+    message_count: 164818
+    path: 1006_01.db3
+    starting_time:
+      nanoseconds_since_epoch: 1665024607612136000
+  message_count: 164818
+  relative_file_paths:
+  - 1006_01.db3
+  ros_distro: rosbags
+  starting_time:
+    nanoseconds_since_epoch: 1665024607612136000
+  storage_identifier: sqlite3
+  topics_with_message_count:
+  - message_count: 7445
+    topic_metadata:
+      name: /velodyne_points
+      offered_qos_profiles: ''
+      serialization_format: cdr
+      type: sensor_msgs/msg/PointCloud2
+      type_description_hash: RIHS01_9198cabf7da3796ae6fe19c4cb3bdd3525492988c70522628af5daa124bae2b5
+  - message_count: 150048
+    topic_metadata:
+      name: /odom
+      offered_qos_profiles: ''
+      serialization_format: cdr
+      type: nav_msgs/msg/Odometry
+      type_description_hash: RIHS01_3cc97dc7fb7502f8714462c526d369e35b603cfc34d946e3f2eda2766dfec6e0
+  - message_count: 7325
+    topic_metadata:
+      name: /gt_poses
+      offered_qos_profiles: ''
+      serialization_format: cdr
+      type: geometry_msgs/msg/PoseStamped
+      type_description_hash: RIHS01_10f3786d7d40fd2b54367835614bff85d4ad3b5dab62bf8bca0cc232d73b4cd8
+  version: 8
