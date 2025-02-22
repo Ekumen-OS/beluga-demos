@@ -3,3 +3,15 @@ repositories:
     type: git
     url: https://github.com/Ekumen-OS/beluga.git
     version: b6d5ee387cd196aa3c11617c993aa6300c7a9484
+  apriltag_ros:
+    type: git
+    url: https://github.com/Adlink-ROS/apriltag_ros.git
+    version: foxy-devel
+  gz_ekumen_worlds:
+    type: git
+    url: https://github.com/Ekumen-OS/gz_ekumen_worlds.git
+    version: c3ec2774cbb029979b09c0e7e6986e85d46e1e1d
+  nav2_minimal_turtlebot_simulation:
+    type: git
+    url: https://github.com/ros-navigation/nav2_minimal_turtlebot_simulation.git
+    version: afcaace36273cea2b06e76a0d0e3bc6a038a66c8

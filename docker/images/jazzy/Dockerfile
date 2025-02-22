@@ -1,42 +1,63 @@
-FROM ros:jazzy-ros-base AS cacher
+FROM ros:jazzy-ros-base-noble AS package_cacher
 
 WORKDIR /ws/src
 
-COPY localization/beluga_demo_amcl3_localization beluga_demo/localization/
+COPY . beluga_demo/
 
 RUN mkdir -p /tmp/ws/src \
   && find ./ -name "package.xml" | xargs cp --parents -t /tmp/ws/src \
   && find ./ -name "COLCON_IGNORE" | xargs cp --parents -t /tmp/ws/src \
   || true
 
-FROM ros:jazzy-ros-base AS builder
+FROM ros:jazzy-ros-base-noble AS gz_model_cacher
 
-ENV DEBIAN_FRONTEND noninteractive
+WORKDIR /ws/src
+
+COPY . beluga_demo/
+RUN mkdir -p /tmp/ws/src \
+  && find ./ -name "*.world" | xargs cp --parents -t /tmp/ws/src \
+  && find ./ -name "*.sdf" | xargs cp --parents -t /tmp/ws/src \
+  || true
+
+FROM ros:jazzy-ros-base-noble AS builder
+
+SHELL ["/bin/bash", "-c"]
+ENV SHELL=/bin/bash
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
     ccache \
     curl \
     gdb \
+    gnupg \
     git \
     python3-pip \
+    python3-venv \
+    pipx \
     mc \
+    lsb-release \
     tmux \
   && rm -rf /var/lib/apt/lists/*
 
-ENV PIP_BREAK_SYSTEM_PACKAGES 1
+ARG GZ_VERSION="harmonic"
+RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
+  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" > /etc/apt/sources.list.d/gazebo-stable.list \
+  && apt-get update && apt-get install --no-install-recommends -y $(if [[ "${GZ_VERSION}" > "fortress" ]]; then echo gz; else echo ignition; fi)-${GZ_VERSION}
 
-RUN pip install  \
-  pre-commit==2.20.0
+RUN pipx install pre-commit==2.20.0
 
 ARG USER=developer
 ARG GROUP=ekumen
 
-# Drop ubuntu user to avoid fixuid clashes.
+# Drop ubuntu user on Noble to prevent fixuid from
+# mixing up users if the external UID happens to match
+# that of the ubuntu user.
 RUN deluser ubuntu
 
-RUN addgroup --gid 1000 $GROUP \
-  && adduser --uid 1000 --ingroup $GROUP --home /home/$USER --shell /bin/sh --disabled-password --gecos "" $USER \
+RUN addgroup --gid 1010 $GROUP \
+  && adduser --uid 1010 --ingroup $GROUP --home /home/$USER --shell /bin/sh --disabled-password --gecos "" $USER \
   && adduser $USER sudo \
   && adduser $USER dialout \
   && echo "$USER ALL=NOPASSWD: ALL" >> /etc/sudoers.d/$USER
@@ -50,7 +71,7 @@ RUN curl -SsL https://github.com/boxboat/fixuid/releases/download/v0.4/fixuid-0.
 
 USER $USER:$GROUP
 
-ENV USER_WS /home/$USER/ws
+ENV USER_WS=/home/$USER/ws
 RUN mkdir -p /$USER_WS
 
 WORKDIR /tmp
@@ -71,23 +92,25 @@ RUN cd src/ \
   && cd external-deps \
   && vcs import < /tmp/jazzy_base.repos
 
-RUN sudo apt-get update \
-  && . /opt/ros/jazzy/setup.sh \
-  && rosdep update \
-  && rosdep install -i -y --from-path src \
-  && sudo rm -rf /var/lib/apt/lists/*
+#
+# Apply patches
+
+COPY docker/files/patches/apriltag_ros.patch /tmp/apriltag_ros.patch
+RUN cd src/external-deps/apriltag_ros \
+  && cat /tmp/apriltag_ros.patch | git apply -p1
+
+COPY docker/files/patches/nav2_minimal_turtlebot_simulation.patch /tmp/nav2_minimal_turtlebot_simulation.patch
+RUN cd src/external-deps/nav2_minimal_turtlebot_simulation \
+  && cat /tmp/nav2_minimal_turtlebot_simulation.patch | git apply -p1
 
 #
 # Install project dependencies
 
-USER root
-ENV PIP_BREAK_SYSTEM_PACKAGES 1
-
-COPY --from=cacher --chown=$USER:$GROUP /tmp/ws/ $USER_WS/
+COPY --from=package_cacher --chown=$USER:$GROUP /tmp/ws/ $USER_WS/
 RUN sudo apt-get update \
   && . /opt/ros/jazzy/setup.sh \
   && rosdep update \
-  && rosdep install -i -y --from-path src \
+  && PIP_BREAK_SYSTEM_PACKAGES=1 rosdep install -i -y --from-path src \
   && sudo rm -rf /var/lib/apt/lists/*
 
 #
@@ -96,10 +119,34 @@ RUN sudo apt-get update \
 COPY --chown=$USER:$GROUP docker/files/DOTaliases /home/$USER/.bash_aliases
 
 RUN bash -c "echo '. /opt/ros/jazzy/setup.bash' >> /home/$USER/.bashrc"
+
 RUN bash -c "echo 'ros2 daemon start' >> /home/$USER/.bashrc"
 
-ENV WITHIN_DEV 1
-ENV MAKEFLAGS "-j 2"
+ENV WITHIN_DEV=1
+ENV MAKEFLAGS="-j 2"
 
-ENV SHELL /bin/bash
+#
+# Install source distributed Gazebo models
+COPY docker/files/patches/gazebo_apriltag.patch /tmp/gazebo_apriltag.patch
+RUN mkdir -p ~/.gazebo/models \
+  && git clone --depth=1 --recursive https://github.com/rickarmstrong/gazebo_apriltag.git \
+  && cd gazebo_apriltag \
+  && (cat /tmp/gazebo_apriltag.patch | git apply -p1) \
+  && python3 -m venv venv \
+  && source venv/bin/activate \
+  && pip install -r requirements.txt \
+  && python3 generate.py \
+  && mv models/* ~/.gazebo/models/. \
+  && cd - \
+  && rm -rf gazebo_apriltag
+
+#
+# Cache Gazebo Fuel models
+COPY --from=gz_model_cacher --chown=$USER:$GROUP /tmp/ws/ $USER_WS/
+RUN find src -name '*.world' -or -name '*.sdf' | \
+    grep -Roh -e 'https://fuel.gazebosim.org[^<]*' src | \
+    sort | uniq | xargs -I{} gz fuel download -u {}
+
+ENV GZ_SIM_RESOURCE_PATH=/home/$USER/.gazebo/models
+
 ENTRYPOINT ["fixuid", "-q", "/ros_entrypoint.sh", "/bin/bash"]
