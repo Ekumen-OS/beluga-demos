@@ -4,6 +4,7 @@
   <name>beluga_demo_amcl3_localization</name>
   <version>1.0.0</version>
   <description>Demos of Beluga AMCL 3D based on a botanic garden dataset.</description>
+  <author email="pablovela@naver.com">Pablo Vela</author>
   <maintainer email="glpuga@ekumenlabs.com">Gerardo Puga</maintainer>
   <license>Apache License 2.0</license>
 
