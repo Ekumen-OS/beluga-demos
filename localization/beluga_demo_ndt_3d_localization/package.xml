@@ -12,7 +12,7 @@
   <depend>beluga_example</depend>
   <depend>beluga_demo_gazebo</depend>
 
-  <depend>gonbuki_description</depend>
+  <depend>gonbuki_bringup_simulation_stack</depend>
 
   <depend>teleop_twist_keyboard</depend>
 

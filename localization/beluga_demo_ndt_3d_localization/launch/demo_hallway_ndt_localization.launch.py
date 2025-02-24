@@ -40,13 +40,6 @@ def generate_launch_description():
     )
     available_worlds = os.listdir(worlds_install_folder)
     world_name_conf = LaunchConfiguration("world_name")
-    world_path = PathJoinSubstitution(
-        [
-            FindPackageShare("beluga_demo_gazebo"),
-            "worlds",
-            world_name_conf,
-        ]
-    )
 
     amcl_ndt_params_file_conf = LaunchConfiguration("amcl_ndt_params_file")
     localization_params_file = PathJoinSubstitution(
@@ -78,6 +71,23 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource(
                     PathJoinSubstitution(
                         [
+                            FindPackageShare("gonbuki_bringup_simulation_stack"),
+                            "launch",
+                            "bringup_launch.py",
+                        ]
+                    ),
+                ),
+                launch_arguments={
+                    "rviz": "false",
+                    "input_type": "keyboard",
+                    "operation_mode": "raw",
+                    "world_name": world_name_conf,
+                }.items(),
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    PathJoinSubstitution(
+                        [
                             FindPackageShare("beluga_example"),
                             "launch",
                             "utils",
@@ -90,30 +100,6 @@ def generate_launch_description():
                     "localization_ndt_map": LaunchConfiguration("localization_ndt_map"),
                 }.items(),
             ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    [
-                        os.path.join(
-                            get_package_share_directory("gazebo_ros"),
-                            "launch",
-                            "gazebo.launch.py",
-                        )
-                    ],
-                ),
-                launch_arguments=[("world", world_path)],
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    PathJoinSubstitution(
-                        [
-                            FindPackageShare("gonbuki_description"),
-                            "launch",
-                            "robot_description.launch.py",
-                        ]
-                    ),
-                ),
-                launch_arguments={"world_name": "magazino_hallway.world"}.items(),
-            ),
             ###
             SetParameter('use_sim_time', True),
             Node(
@@ -124,30 +110,6 @@ def generate_launch_description():
                 arguments=[
                     '--display-config',
                     rviz_file,
-                ],
-            ),
-            Node(
-                package="gazebo_ros",
-                executable="spawn_entity.py",
-                arguments=[
-                    "-topic",
-                    "robot_description",
-                    "-entity",
-                    "gonbuki_robot",
-                    "-x",
-                    "0.0",
-                    "-y",
-                    "2.0",
-                ],
-                output="screen",
-            ),
-            Node(
-                package="teleop_twist_keyboard",
-                executable="teleop_twist_keyboard",
-                output="screen",
-                prefix="xterm -e",
-                remappings=[
-                    ("/cmd_vel", "/commands/velocity"),
                 ],
             ),
         ]
