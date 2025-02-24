@@ -25,6 +25,8 @@ from launch_ros.substitutions import FindPackageShare
 from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 
+from launch_ros.actions import SetParameter
+
 
 def generate_launch_description():
     pkg_dir = get_package_share_directory("beluga_demo_ndt_3d_localization")
@@ -90,22 +92,6 @@ def generate_launch_description():
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    PathJoinSubstitution(
-                        [
-                            FindPackageShare("beluga_example"),
-                            "launch",
-                            "utils",
-                            "rviz_launch.py",
-                        ]
-                    ),
-                ),
-                launch_arguments={
-                    "user_sim_time": "true",
-                    "display_config": rviz_file,
-                }.items(),
-            ),
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
                     [
                         os.path.join(
                             get_package_share_directory("gazebo_ros"),
@@ -129,6 +115,17 @@ def generate_launch_description():
                 launch_arguments={"world_name": "magazino_hallway.world"}.items(),
             ),
             ###
+            SetParameter('use_sim_time', True),
+            Node(
+                package='rviz2',
+                executable='rviz2',
+                name='rviz2',
+                output='own_log',
+                arguments=[
+                    '--display-config',
+                    rviz_file,
+                ],
+            ),
             Node(
                 package="gazebo_ros",
                 executable="spawn_entity.py",
