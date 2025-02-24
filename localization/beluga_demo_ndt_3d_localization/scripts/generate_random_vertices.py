@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""This Blender script creates vertices randomly on the faces of a selected geometry."""
+
 import bpy
 import random
 
