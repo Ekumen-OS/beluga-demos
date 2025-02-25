@@ -80,7 +80,7 @@ def generate_launch_description():
                 launch_arguments={
                     "rviz": "false",
                     "input_type": "keyboard",
-                    "operation_mode": "raw",
+                    "operation_mode": "bare",
                     "world_name": world_name_conf,
                 }.items(),
             ),
