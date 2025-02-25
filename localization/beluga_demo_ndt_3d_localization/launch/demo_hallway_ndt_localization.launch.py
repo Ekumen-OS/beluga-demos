@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# Copyright 2023 Ekumen, Inc.
+# Copyright 2025 Ekumen, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
