@@ -1,4 +1,5 @@
+rosbags/
 .vscode
 *.db3
-*.vdb
 *.mcap
+*.vdb
