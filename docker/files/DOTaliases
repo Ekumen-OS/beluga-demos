@@ -33,3 +33,7 @@ alias nav2_integration_demo='cd ~/ws \
 alias amcl3_localization_demo='cd ~/ws \
   && source install/setup.bash \
   && ros2 launch beluga_demo_amcl3_localization demo_botanic_garden_amcl3_localization.launch.py'
+  
+alias mh_amcl_demo='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_mh_amcl bringup.launch.py'
