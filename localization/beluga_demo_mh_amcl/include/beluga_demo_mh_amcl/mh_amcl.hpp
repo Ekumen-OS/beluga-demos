@@ -123,7 +123,7 @@ private:
   // Time used as the timestamp for the published results
   rclcpp::Time last_time_;
 
-  // Particles
+  // Hypotheses
   std::list<std::shared_ptr<ParticlesDistribution>> particles_population_;
   std::shared_ptr<ParticlesDistribution> current_hypothesis_;
   float current_hypothesis_q_;

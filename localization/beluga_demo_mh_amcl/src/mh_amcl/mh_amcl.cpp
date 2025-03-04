@@ -32,6 +32,7 @@ using namespace std::chrono_literals;
 MH_AMCL_Node::MH_AMCL_Node(const rclcpp::NodeOptions &options)
     : rclcpp_lifecycle::LifecycleNode("mh_amcl", "", options), tf_buffer_(),
       tf_listener_(tf_buffer_) {
+  // Initialize subscribers and publishers
   laser_sub_ = create_subscription<sensor_msgs::msg::LaserScan>(
       "scan", rclcpp::QoS(100).best_effort(),
       std::bind(&MH_AMCL_Node::laser_callback, this, _1));
@@ -47,6 +48,7 @@ MH_AMCL_Node::MH_AMCL_Node(const rclcpp::NodeOptions &options)
   particles_pub_ =
       create_publisher<geometry_msgs::msg::PoseArray>("particle_cloud", 1);
 
+  // Declare all the node's parameters
   declare_parameter<int>("max_hypotheses", 5);
   declare_parameter<bool>("multihypothesis", true);
   declare_parameter<float>("min_candidate_weight", 0.5f);
@@ -64,6 +66,7 @@ CallbackReturnT
 MH_AMCL_Node::on_configure(const rclcpp_lifecycle::State &state) {
   RCLCPP_INFO(get_logger(), "Configuring...");
 
+  // Get the value of the parameters, or use the default
   get_parameter("multihypothesis", multihypothesis_);
   get_parameter("max_hypotheses", max_hypotheses_);
   get_parameter("min_candidate_weight", min_candidate_weight_);
@@ -112,14 +115,16 @@ MH_AMCL_Node::on_activate(const rclcpp_lifecycle::State &state) {
     RCLCPP_INFO(get_logger(), "use_sim_time = false");
   }
 
+  // Create the timers for the different stages of the algorithm
   predict_timer_ =
       create_wall_timer(10ms, std::bind(&MH_AMCL_Node::predict, this));
   correct_timer_ =
       create_wall_timer(100ms, std::bind(&MH_AMCL_Node::correct, this));
   reseed_timer_ = create_wall_timer(3s, std::bind(&MH_AMCL_Node::reseed, this));
-  hypotesys_timer_ =
+  hypothesis_timer_ =
       create_wall_timer(3s, std::bind(&MH_AMCL_Node::manage_hypotesis, this));
 
+  // Now, create the timers for the publishers
   publish_particles_timer_ = create_wall_timer(
       100ms, std::bind(&MH_AMCL_Node::publish_particles, this));
   publish_position_timer_ =
@@ -144,12 +149,13 @@ CallbackReturnT
 MH_AMCL_Node::on_deactivate(const rclcpp_lifecycle::State &state) {
   RCLCPP_INFO(get_logger(), "Deactivating...");
 
+  // Free the memory of the timers by assigning them to null pointers
   predict_timer_ = nullptr;
   correct_timer_ = nullptr;
   reseed_timer_ = nullptr;
   publish_particles_timer_ = nullptr;
   publish_position_timer_ = nullptr;
-  hypotesys_timer_ = nullptr;
+  hypothesis_timer_ = nullptr;
 
   std::list<CallbackReturnT> ret;
   for (auto &particles : particles_population_) {
@@ -182,11 +188,12 @@ CallbackReturnT MH_AMCL_Node::on_error(const rclcpp_lifecycle::State &state) {
 void MH_AMCL_Node::publish_particles() {
   auto start = now();
 
+  // Publish the markers for the particles for each hypothesis, using a different color in each iteration
   utils::Color color = utils::RED;
   int i = 0;
-  for (const auto &particles : particles_population_) {
+  for (const auto &hypothesis : particles_population_) {
     color = static_cast<utils::Color>((color + 1) % utils::NUM_COLORS);
-    particles->publish_particles(i++, utils::getColor(color));
+    hypothesis->publish_particles(i++, utils::getColor(color));
   }
   RCLCPP_DEBUG_STREAM(get_logger(),
                       "Publish [" << (now() - start).seconds() << " secs]");
@@ -195,6 +202,7 @@ void MH_AMCL_Node::publish_particles() {
 void MH_AMCL_Node::predict() {
   auto start = now();
 
+  // Get the transformation between the last pose and the actual pose to predict the movement of the particles
   geometry_msgs::msg::TransformStamped odom2bf_msg;
   std::string error;
   if (tf_buffer_.canTransform("odom", "base_footprint", tf2::TimePointZero,
@@ -225,11 +233,13 @@ void MH_AMCL_Node::predict() {
 
 void MH_AMCL_Node::map_callback(
     const nav_msgs::msg::OccupancyGrid::ConstSharedPtr &msg) {
+  // Every time a new map is sent, update the costmap and the map matcher
   costmap_ = std::make_shared<beluga_ros::OccupancyGrid>(msg);
   map_matcher_ = std::make_shared<mh_amcl::MapMatcher>(*msg);
 }
 
 void MH_AMCL_Node::laser_callback(sensor_msgs::msg::LaserScan::UniquePtr msg) {
+  // Store the last laser message received
   last_laser_ = std::move(msg);
 }
 
@@ -266,6 +276,7 @@ void MH_AMCL_Node::reseed() {
 void MH_AMCL_Node::initpose_callback(
     const geometry_msgs::msg::PoseWithCovarianceStamped::ConstSharedPtr
         &pose_msg) {
+  // Having a new initial pose retriggers the algorithm
   if (pose_msg->header.frame_id == "map") {
     tf2::Transform pose;
     pose.setOrigin({pose_msg->pose.pose.position.x,
@@ -321,7 +332,6 @@ void MH_AMCL_Node::publish_position() {
   }
 
   // Publish tf map -> odom
-
   tf2::Transform map2robot;
   tf2::Stamped<tf2::Transform> robot2odom;
   const auto &tpos = pose.pose.pose.position;
@@ -374,9 +384,10 @@ void MH_AMCL_Node::manage_hypotesis() {
     return;
   }
 
+  // Retrieve the candidate transforms
   const auto &tfs = map_matcher_->get_matches(*last_laser_);
 
-  // Create new Hypothesis
+  // Create new Hypotheses for each tranform
   for (const auto &transform : tfs) {
     if (transform.weight > min_candidate_weight_) {
       bool covered = false;
@@ -393,6 +404,7 @@ void MH_AMCL_Node::manage_hypotesis() {
         }
       }
 
+      // Only add the new hypothesis if it's representative and the max number hasn't been reached
       if (!covered && particles_population_.size() < max_hypotheses_) {
         auto aux_distr =
             std::make_shared<ParticlesDistribution>(shared_from_this());
@@ -408,6 +420,7 @@ void MH_AMCL_Node::manage_hypotesis() {
     }
   }
 
+  // Remove low quality hypotheses
   auto it = particles_population_.begin();
   while (it != particles_population_.end()) {
     bool low_quality = (*it)->get_quality() < low_q_hypo_threshold_;
@@ -427,6 +440,7 @@ void MH_AMCL_Node::manage_hypotesis() {
     }
   }
 
+  // Merge similar hypotheses
   auto it1 = particles_population_.begin();
   auto it2 = particles_population_.begin();
   while (it1 != particles_population_.end()) {
@@ -453,8 +467,8 @@ void MH_AMCL_Node::manage_hypotesis() {
     ++it1;
   }
 
+  // Select the best hypothesis
   current_hypothesis_q_ = current_hypothesis_->get_quality();
-
   for (const auto &amcl : particles_population_) {
     if (amcl->get_quality() > good_hypo_threshold_ &&
         amcl->get_quality() > (current_hypothesis_q_ + min_hypo_diff_winner_)) {
@@ -475,17 +489,19 @@ void MH_AMCL_Node::manage_hypotesis() {
     current_hypothesis_q_ = current_hypothesis_->get_quality();
   }
 
-  std::cerr << "=====================================" << std::endl;
+  // Debug the output
+  std::cout << "=====================================" << std::endl;
   for (const auto &amcl : particles_population_) {
     if (amcl == current_hypothesis_) {
-      std::cerr << "->\t";
+      std::cout << "->\t";
     }
-    std::cerr << amcl->get_quality() << std::endl;
+    std::cout << amcl->get_quality() << std::endl;
   }
-  std::cerr << "=====================================" << std::endl;
+  std::cout << "=====================================" << std::endl;
 }
 
 unsigned char MH_AMCL_Node::get_cost(const geometry_msgs::msg::Pose &pose) {
+  // Get the corresponding cost from the costmap for a specific pose
   auto [i, j] =
       utils::worldToMapNoBounds(costmap_, pose.position.x, pose.position.y);
 
