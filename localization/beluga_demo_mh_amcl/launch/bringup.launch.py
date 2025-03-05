@@ -20,7 +20,7 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 
 
-# TODO study if it's necessary to include Rviz with a custom configuration
+# TODO Add the node to load the occupancy grid, and other pertinent nodes
 def generate_launch_description():
     pkg_mh_amcl = get_package_share_directory('beluga_demo_mh_amcl')
     pkg_beluga_demo_bringup = get_package_share_directory("beluga_demo_bringup")
@@ -38,7 +38,7 @@ def generate_launch_description():
                     ),
                 ),
                 launch_arguments={
-                    "world_name": ["hq4_office.world"],
+                    "world_name": ["empty_ekumen_hq4.world"],
                 }.items(),
             ),
             Node(

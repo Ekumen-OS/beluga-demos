@@ -38,6 +38,9 @@ include_directories(include)
 add_executable(beluga_mh_amcl_node
   src/beluga_mh_amcl_node.cpp
   src/mh_amcl/mh_amcl.cpp
+  src/mh_amcl/map_matcher.cpp
+  src/mh_amcl/particles_distribution.cpp
+  src/mh_amcl/utils.cpp
 )
 ament_target_dependencies(beluga_mh_amcl_node
   beluga

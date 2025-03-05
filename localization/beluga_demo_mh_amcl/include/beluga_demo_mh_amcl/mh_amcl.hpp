@@ -86,7 +86,7 @@ protected:
   void get_distances(const geometry_msgs::msg::Pose &pose1,
                      const geometry_msgs::msg::Pose &pose2, double &dist_xy,
                      double &dist_theta);
-  unsigned char get_cost(const geometry_msgs::msg::Pose &pose);
+  signed char get_cost(const geometry_msgs::msg::Pose &pose);
   geometry_msgs::msg::Pose toMsg(const tf2::Transform &tf);
 
 private:
@@ -103,7 +103,7 @@ private:
   rclcpp::TimerBase::SharedPtr predict_timer_;
   rclcpp::TimerBase::SharedPtr correct_timer_;
   rclcpp::TimerBase::SharedPtr reseed_timer_;
-  rclcpp::TimerBase::SharedPtr hypotesys_timer_;
+  rclcpp::TimerBase::SharedPtr hypothesis_timer_;
   rclcpp::TimerBase::SharedPtr publish_particles_timer_;
   rclcpp::TimerBase::SharedPtr publish_position_timer_;
 

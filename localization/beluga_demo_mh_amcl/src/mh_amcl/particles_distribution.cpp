@@ -24,10 +24,6 @@
 
 #include "beluga_demo_mh_amcl/particles_distribution.hpp"
 
-// TODO Add comments to the code where missing
-// TODO the idea here is to take as input the tf2 transformations, and transform
-// them into Sophus::SE2d to apply to the particles
-
 namespace mh_amcl {
 
 using namespace std::chrono_literals;
@@ -153,13 +149,13 @@ void ParticlesDistribution::update_pose(
   // Extract the weighted mean of the particles' poses to update the current
   // pose
   for (int i = 0; i < particles_used; i++) {
-    auto [x, y, yaw] = utils::extractTranslationAndYaw(particles_[i].pose);
+    auto [x, y, yaw] = utils::extractTranslationAndYaw(particles_[i].state);
     particles_x[i] = x;
     particles_y[i] = y;
 
     particles_yaw[i] = yaw;
 
-    weights[i] = particles_[i].prob;
+    weights[i] = particles_[i].weight;
   }
 
   pose.pose.pose.position.x = utils::weighted_mean(particles_x, weights);
@@ -187,7 +183,7 @@ void ParticlesDistribution::update_covariance(
   std::vector<double> particles_yaw(particles_.size(), 0.0);
 
   for (int i = 0; i < particles_.size(); i++) {
-    auto [x, y, yaw] = utils::extractTranslationAndYaw(particles_[i].pose);
+    auto [x, y, yaw] = utils::extractTranslationAndYaw(particles_[i].state);
     particles_x[i] = x;
     particles_y[i] = y;
     particles_yaw[i] = yaw;
@@ -238,19 +234,19 @@ void ParticlesDistribution::init(const tf2::Transform &pose_init) {
   particles_.resize((max_particles_ + min_particles_) / 2);
 
   for (auto &particle : particles_) {
-    particle.prob = 1.0 / static_cast<double>(particles_.size());
-    particle.pose = init_pose_se2d;
+    particle.weight = 1.0 / static_cast<double>(particles_.size());
+    particle.state = init_pose_se2d;
 
     // Get the current translation (x,y) and rotation (yaw) from the particle's
     // pose
-    auto [x, y, yaw] = utils::extractTranslationAndYaw(particle.pose);
+    auto [x, y, yaw] = utils::extractTranslationAndYaw(particle.state);
     // Add noise to the translation components
     x += noise_x(generator_);
     y += noise_y(generator_);
 
     double new_yaw = yaw + noise_t(generator_);
 
-    particle.pose = Sophus::SE2d(new_yaw, Eigen::Vector2d(x, y));
+    particle.state = Sophus::SE2d(new_yaw, Eigen::Vector2d(x, y));
   }
 
   normalize();
@@ -270,7 +266,7 @@ void ParticlesDistribution::predict(const tf2::Transform &movement) {
     const Sophus::SE2d se2_noise = utils::tf2TransformToSE2d(noise_tf);
 
     // Update the pose of the particle
-    particle.pose = particle.pose * se2_movement * se2_noise;
+    particle.state = particle.state * se2_movement * se2_noise;
   }
   update_pose(pose_);
 }
@@ -348,7 +344,7 @@ void ParticlesDistribution::correct_once(
     for (int i = 0; i < particles_.size(); i++) {
       auto &p = particles_[i];
 
-      tf2::Transform particle_pose_tf2 = utils::se2dToTf2Transform(p.pose);
+      tf2::Transform particle_pose_tf2 = utils::se2dToTf2Transform(p.state);
 
       double calculated_distance = get_error_distance_to_obstacle(
           particle_pose_tf2, bf2laser_, laser2point, scan, costmap,
@@ -359,7 +355,7 @@ void ParticlesDistribution::correct_once(
         const double normal_comp_2 = std::exp(-0.5 * a * a);
 
         double prob = std::clamp(normal_comp_1 * normal_comp_2, 0.0, 1.0);
-        p.prob = std::max(p.prob + prob, 0.000001);
+        p.weight = std::max(p.weight + prob, 0.000001);
 
         p.hits += prob;
       }
@@ -393,7 +389,7 @@ tf2::Transform ParticlesDistribution::get_tranform_to_read(
   return transformation;
 }
 
-unsigned char ParticlesDistribution::get_cost(
+signed char ParticlesDistribution::get_cost(
     const tf2::Transform &transform,
     std::shared_ptr<beluga_ros::OccupancyGrid> costmap) {
   auto [local_x, local_y] = utils::worldToMapNoBounds(
@@ -402,7 +398,7 @@ unsigned char ParticlesDistribution::get_cost(
   if (local_x > 0 && local_y > 0 && local_x < costmap->width() &&
       local_y < costmap->height() &&
       costmap->data_at(local_x, local_y).has_value()) {
-    return costmap->data_at(local_x, local_y);
+    return costmap->data_at(local_x, local_y).value();
   } else {
     return utils::NO_INFORMATION;
   }
@@ -454,39 +450,42 @@ double ParticlesDistribution::get_error_distance_to_obstacle(
   return std::numeric_limits<double>::infinity();
 }
 
-// TODO Check this function and names
 void ParticlesDistribution::reseed() {
-  // Sort particles by prob
+  // Sort particles by probability
   std::sort(particles_.begin(), particles_.end(),
             [](const Particle &a, const Particle &b) -> bool {
-              return a.prob > b.prob;
+              return a.weight > b.weight;
             });
 
-  double percentage_losers = reseed_percentage_losers_;
-  double percentage_winners = reseed_percentage_winners_;
-
   auto number_particles = particles_.size();
-  if (get_quality() < low_q_hypo_threshold_) {
+  // If current hypothesis quality is too bad or too good, modify the particles accordingly (adding them when it's too bad and removing them when it's too good)
+  if (get_quality() < low_q_hypo_threshold_)
+  {
     number_particles =
         std::clamp(static_cast<int>(number_particles + particles_step_),
                    min_particles_, max_particles_);
-    for (int i = 0; i < number_particles - particles_.size(); i++) {
+    for (int i = 0; i < number_particles - particles_.size(); i++)
+    {
       Particle new_p = particles_.front();
       particles_.push_back(new_p);
     }
-  } else if (get_quality() > good_hypo_threshold_) {
+  }
+  else if (get_quality() > good_hypo_threshold_)
+  {
     number_particles =
         std::clamp(static_cast<int>(number_particles - particles_step_),
                    min_particles_, max_particles_);
-    for (int i = 0; i < particles_.size() - number_particles; i++) {
+    for (int i = 0; i < particles_.size() - number_particles; i++)
+    {
       particles_.pop_back();
     }
   }
 
-  int number_losers = number_particles * percentage_losers;
+  int number_losers = number_particles * reseed_percentage_losers_;
   int number_no_losers = number_particles - number_losers;
-  int number_winners = number_particles * percentage_winners;
+  int number_winners = number_particles * reseed_percentage_winners_;
 
+  // Drop the losers particles, and replace them with new particles
   std::vector<Particle> new_particles(particles_.begin(),
                                       particles_.begin() + number_no_losers);
 
@@ -498,10 +497,10 @@ void ParticlesDistribution::reseed() {
 
   for (int i = 0; i < number_losers; i++) {
     Particle p;
-    p.prob = new_particles.back().prob;
+    p.weight = new_particles.back().weight;
 
     // Extract the 2D pose of the particle
-    auto [x, y, yaw] = utils::extractTranslationAndYaw(particles_[i].pose);
+    auto [x, y, yaw] = utils::extractTranslationAndYaw(particles_[i].state);
 
     // Compute the noise
     double nx = noise_x(generator_);
@@ -513,7 +512,7 @@ void ParticlesDistribution::reseed() {
     double new_yaw = yaw + noise_t(generator_);
     new_yaw = utils::normalize_angle(new_yaw);
 
-    p.pose = Sophus::SE2d(new_yaw, Eigen::Vector2d(x, y));
+    p.state = Sophus::SE2d(new_yaw, Eigen::Vector2d(x, y));
 
     new_particles.push_back(p);
   }
@@ -527,11 +526,11 @@ void ParticlesDistribution::reseed() {
 void ParticlesDistribution::normalize() {
   double sum = 0.0;
   std::for_each(particles_.begin(), particles_.end(),
-                [&sum](const Particle &p) { sum += p.prob; });
+                [&sum](const Particle &p) { sum += p.weight; });
 
   if (sum != 0.0) {
     std::for_each(particles_.begin(), particles_.end(),
-                  [&](Particle &p) { p.prob = p.prob / sum; });
+                  [&](Particle &p) { p.weight = p.weight / sum; });
   }
 }
 
@@ -542,7 +541,7 @@ void ParticlesDistribution::merge(ParticlesDistribution &other) {
 
   std::sort(particles_.begin(), particles_.end(),
             [](const Particle &a, const Particle &b) -> bool {
-              return a.prob > b.prob;
+              return a.weight > b.weight;
             });
   particles_.erase(particles_.begin() + size, particles_.end());
 }

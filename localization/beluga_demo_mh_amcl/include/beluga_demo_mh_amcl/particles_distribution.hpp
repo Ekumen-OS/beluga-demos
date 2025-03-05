@@ -40,8 +40,8 @@ namespace mh_amcl {
  * This 'hits' value is used as the quality of the particle.
  */
 typedef struct {
-  Sophus::SE2d pose;
-  beluga::Weight prob;
+  Sophus::SE2d state;
+  beluga::Weight weight;
   float hits;
 } Particle;
 
@@ -134,7 +134,7 @@ protected:
       const tf2::Transform &laser2point,
       const sensor_msgs::msg::LaserScan &scan,
       std::shared_ptr<beluga_ros::OccupancyGrid> costmap, double o);
-  unsigned char get_cost(const tf2::Transform &transform,
+  signed char get_cost(const tf2::Transform &transform,
                          std::shared_ptr<beluga_ros::OccupancyGrid> costmap);
   void normalize();
   void update_pose(geometry_msgs::msg::PoseWithCovarianceStamped &pose);

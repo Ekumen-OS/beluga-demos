@@ -235,7 +235,7 @@ void MH_AMCL_Node::map_callback(
     const nav_msgs::msg::OccupancyGrid::ConstSharedPtr &msg) {
   // Every time a new map is sent, update the costmap and the map matcher
   costmap_ = std::make_shared<beluga_ros::OccupancyGrid>(msg);
-  map_matcher_ = std::make_shared<mh_amcl::MapMatcher>(*msg);
+  map_matcher_ = std::make_shared<mh_amcl::MapMatcher>(msg);
 }
 
 void MH_AMCL_Node::laser_callback(sensor_msgs::msg::LaserScan::UniquePtr msg) {
@@ -500,7 +500,7 @@ void MH_AMCL_Node::manage_hypotesis() {
   std::cout << "=====================================" << std::endl;
 }
 
-unsigned char MH_AMCL_Node::get_cost(const geometry_msgs::msg::Pose &pose) {
+signed char MH_AMCL_Node::get_cost(const geometry_msgs::msg::Pose &pose) {
   // Get the corresponding cost from the costmap for a specific pose
   auto [i, j] =
       utils::worldToMapNoBounds(costmap_, pose.position.x, pose.position.y);

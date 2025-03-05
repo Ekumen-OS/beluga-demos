@@ -194,9 +194,7 @@ Sophus::SE2d tf2TransformToSE2d(const tf2::Transform &tf) {
 tf2::Transform se2dToTf2Transform(const Sophus::SE2d &se2) {
   // Get translation and yaw from the SE2 pose
   Eigen::Vector2d t = se2.translation();
-
-  // The (2, 1, 0) means that
-  double yaw = se2.so2().matrix().eulerAngles(2, 1, 0)[0];
+  double yaw = se2.so2().log();
 
   // Create a tf2 quaternion representing the rotation (only yaw is nonzero)
   tf2::Quaternion q;

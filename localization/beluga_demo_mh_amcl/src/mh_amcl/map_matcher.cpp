@@ -17,9 +17,9 @@
 
 namespace mh_amcl {
 
-MapMatcher::MapMatcher(const nav_msgs::msg::OccupancyGrid &map) {
-  // Construct the costmap with its different resolutions
+MapMatcher::MapMatcher(std::shared_ptr<const nav_msgs::msg::OccupancyGrid> map) {
   costmaps_.resize(NUM_LEVEL_SCALE_COSTMAP);
+  // Construct the Beluga occupancy grid wrapper from the message pointer
   costmaps_[0] = std::make_shared<beluga_ros::OccupancyGrid>(map);
 
   for (int i = 1; i < NUM_LEVEL_SCALE_COSTMAP; i++) {
@@ -29,66 +29,69 @@ MapMatcher::MapMatcher(const nav_msgs::msg::OccupancyGrid &map) {
 
 std::shared_ptr<beluga_ros::OccupancyGrid>
 MapMatcher::half_scale(std::shared_ptr<beluga_ros::OccupancyGrid> costmap_in) {
-  auto costmap = std::make_shared<beluga_ros::OccupancyGrid>(
-      costmap_in->width() / 2, costmap_in->height() / 2,
-      costmap_in->resolution() * 2.0, costmap_in->origin().translation().x(),
-      costmap_in->origin().translation().y(), utils::FREE_SPACE);
+  // Compute new grid dimensions and resolution:
+  unsigned int new_width  = costmap_in->width() / 2;
+  unsigned int new_height = costmap_in->height() / 2;
+  double new_resolution   = costmap_in->resolution() * 2.0;
 
-  for (unsigned int i = 0; i < costmap->width(); i++) {
-    for (unsigned int j = 0; j < costmap->height(); j++) {
+  // Create a new ROS occupancy grid message and fill the metadata:
+  nav_msgs::msg::OccupancyGrid new_grid;
+  new_grid.info.width = new_width;
+  new_grid.info.height = new_height;
+  new_grid.info.resolution = new_resolution;
+
+  // Set the new origin – for example, using the same origin as costmap_in.
+  // (You might want to adjust the origin if the half-scale grid should be centered differently.)
+  new_grid.info.origin.position.x = costmap_in->origin().translation().x();
+  new_grid.info.origin.position.y = costmap_in->origin().translation().y();
+  new_grid.info.origin.position.z = 0.0;
+  // Use an identity quaternion for the orientation:
+  new_grid.info.origin.orientation.w = 1.0;
+  new_grid.info.origin.orientation.x = 0.0;
+  new_grid.info.origin.orientation.y = 0.0;
+  new_grid.info.origin.orientation.z = 0.0;
+
+  // Resize the data vector and fill with a default value (e.g., FREE_SPACE)
+  new_grid.data.resize(new_width * new_height, utils::FREE_SPACE);
+
+  // Fill the new grid using a 2x2 window from costmap_in
+  for (unsigned int i = 0; i < new_width; i++) {
+    for (unsigned int j = 0; j < new_height; j++) {
       unsigned int ri = i * 2;
       unsigned int rj = j * 2;
 
-      // Retrieve cost values as optionals
       auto cost1_opt = costmap_in->data_at(ri, rj);
       auto cost2_opt = costmap_in->data_at(ri + 1, rj);
       auto cost3_opt = costmap_in->data_at(ri, rj + 1);
       auto cost4_opt = costmap_in->data_at(ri + 1, rj + 1);
 
-      // Convert optionals to concrete cost values
-      // If no value is present, treat it as NO_INFORMATION (-1)
-      unsigned char cost1 = cost1_opt.has_value()
-                                ? static_cast<unsigned char>(cost1_opt.value())
-                                : utils::NO_INFORMATION;
-      unsigned char cost2 = cost2_opt.has_value()
-                                ? static_cast<unsigned char>(cost2_opt.value())
-                                : utils::NO_INFORMATION;
-      unsigned char cost3 = cost3_opt.has_value()
-                                ? static_cast<unsigned char>(cost3_opt.value())
-                                : utils::NO_INFORMATION;
-      unsigned char cost4 = cost4_opt.has_value()
-                                ? static_cast<unsigned char>(cost4_opt.value())
-                                : utils::NO_INFORMATION;
+      unsigned char cost1 = cost1_opt.has_value() ? static_cast<unsigned char>(cost1_opt.value()) : utils::NO_INFORMATION;
+      unsigned char cost2 = cost2_opt.has_value() ? static_cast<unsigned char>(cost2_opt.value()) : utils::NO_INFORMATION;
+      unsigned char cost3 = cost3_opt.has_value() ? static_cast<unsigned char>(cost3_opt.value()) : utils::NO_INFORMATION;
+      unsigned char cost4 = cost4_opt.has_value() ? static_cast<unsigned char>(cost4_opt.value()) : utils::NO_INFORMATION;
 
-      // Check if any cost is lethal
-      bool is_lethal =
-          (cost1 == utils::LETHAL_OBSTACLE || cost2 == utils::LETHAL_OBSTACLE ||
-           cost3 == utils::LETHAL_OBSTACLE || cost4 == utils::LETHAL_OBSTACLE);
+      bool is_lethal = (cost1 == utils::LETHAL_OBSTACLE || cost2 == utils::LETHAL_OBSTACLE ||
+                        cost3 == utils::LETHAL_OBSTACLE || cost4 == utils::LETHAL_OBSTACLE);
+      bool is_free   = (cost1 == utils::FREE_SPACE || cost2 == utils::FREE_SPACE ||
+                        cost3 == utils::FREE_SPACE || cost4 == utils::FREE_SPACE);
+      bool all_unknown = (cost1 == utils::NO_INFORMATION && cost2 == utils::NO_INFORMATION &&
+                          cost3 == utils::NO_INFORMATION && cost4 == utils::NO_INFORMATION);
 
-      // Check if any cost is free
-      bool is_free =
-          (cost1 == utils::FREE_SPACE || cost2 == utils::FREE_SPACE ||
-           cost3 == utils::FREE_SPACE || cost4 == utils::FREE_SPACE);
-
-      // Check if all costs are unknown
-      bool all_unknown =
-          (cost1 == utils::NO_INFORMATION && cost2 == utils::NO_INFORMATION &&
-           cost3 == utils::NO_INFORMATION && cost4 == utils::NO_INFORMATION);
-
-      // Assign costmap value based on the checks
       if (is_lethal) {
-        costmap->data_at(i, j) = utils::LETHAL_OBSTACLE;
+        new_grid.data[j * new_width + i] = utils::LETHAL_OBSTACLE;
       } else if (is_free) {
-        costmap->data_at(i, j) = utils::FREE_SPACE;
+        new_grid.data[j * new_width + i] = utils::FREE_SPACE;
       } else if (all_unknown) {
-        costmap->data_at(i, j) = utils::NO_INFORMATION;
+        new_grid.data[j * new_width + i] = utils::NO_INFORMATION;
       } else {
-        costmap->data_at(i, j) = cost1;
+        new_grid.data[j * new_width + i] = cost1;
       }
     }
   }
 
-  return costmap;
+  // Wrap the new grid in a shared pointer and construct the Beluga occupancy grid
+  auto new_grid_ptr = std::make_shared<nav_msgs::msg::OccupancyGrid>(new_grid);
+  return std::make_shared<beluga_ros::OccupancyGrid>(new_grid_ptr);
 }
 
 std::list<TransformWeighted>

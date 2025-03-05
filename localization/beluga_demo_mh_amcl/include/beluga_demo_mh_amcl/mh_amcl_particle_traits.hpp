@@ -22,19 +22,18 @@
 namespace beluga {
 
 // It is necessary to speicify how to use Beluga's particle traits with my new
-// defined type of Particle, to be able to obtain the state (pose) and weight
-// (prob) of the particles
+// defined type of Particle, to be able to obtain the state and weight of the particles
 template <> struct particle_traits<mh_amcl::Particle> {
   // Define the types for the particle state and weight:
   using state_type = Sophus::SE2d;
   using weight_type = beluga::Weight;
 
   static inline const state_type &state(const mh_amcl::Particle &p) {
-    return p.pose;
+    return p.state;
   }
 
   static inline const weight_type &weight(const mh_amcl::Particle &p) {
-    return p.prob;
+    return p.weight;
   }
 };
 

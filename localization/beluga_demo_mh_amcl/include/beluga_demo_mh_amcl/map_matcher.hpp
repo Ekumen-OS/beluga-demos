@@ -53,7 +53,8 @@ bool operator<(const TransformWeighted &tw1, const TransformWeighted &tw2);
  */
 class MapMatcher {
 public:
-  explicit MapMatcher(const nav_msgs::msg::OccupancyGrid &map);
+  // TODO You should construct nav_msgs::msg::OccupancyGrid msgs first, and then pass them to construct beluga_ros::OccupancyGrid
+  explicit MapMatcher(std::shared_ptr<const nav_msgs::msg::OccupancyGrid> map);
 
   /**
    * @brief Get the candidate transformations from the laser information and the
