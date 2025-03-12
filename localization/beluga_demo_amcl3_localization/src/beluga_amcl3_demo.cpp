@@ -384,7 +384,7 @@ private:
   // Map displayer
   // Adapted from:
   // https://github.com/fzi-forschungszentrum-informatik/vdb_mapping_ros
-  void display_map(const openvdb::FloatGrid::Ptr grid) const {
+  void display_map(const openvdb::FloatGrid::Ptr grid) {
     visualization_msgs::msg::Marker marker_msg;
     const auto point_color = []() {
       std_msgs::msg::ColorRGBA msg;

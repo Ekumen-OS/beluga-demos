@@ -1,12 +1,6 @@
-if [ "${ROSDISTRO}" == "humble" ]; then
-  alias demo_build='cd ~/ws \
-    && colcon build --symlink-install --packages-up-to-regex beluga_demo --packages-ignore beluga_vdb beluga_demo_amcl3_localization --cmake-args -DCMAKE_BUILD_TYPE=Release \
-    && source install/setup.bash'
-else
-  alias demo_build='cd ~/ws \
-    && colcon build --symlink-install --packages-up-to-regex beluga_demo --cmake-args -DCMAKE_BUILD_TYPE=Release \
-    && source install/setup.bash'
-fi
+alias demo_build='cd ~/ws \
+  && colcon build --symlink-install --packages-up-to-regex beluga_demo --cmake-args -DCMAKE_BUILD_TYPE=Release \
+  && source install/setup.bash'
 
 alias lidar_beam_model_hallway_demo='cd ~/ws \
   && source install/setup.bash \

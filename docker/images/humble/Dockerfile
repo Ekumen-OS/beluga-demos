@@ -19,6 +19,24 @@ RUN mkdir -p /tmp/ws/src \
   && find ./ -name "*.sdf" | xargs cp --parents -t /tmp/ws/src \
   || true
 
+FROM ros:humble-ros-base-jammy AS openvdb-builder
+
+RUN apt-get update \
+  && apt-get install --no-install-recommends -y \
+    git \
+    libboost-all-dev \
+    libtbb-dev \
+    libblosc-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt
+
+RUN git clone -b v8.2.0 https://github.com/AcademySoftwareFoundation/openvdb.git \
+  && cd openvdb \
+  && mkdir build && cd build \
+  && cmake .. \
+  && make -j$(nproc)
+
 FROM ros:humble-ros-base-jammy AS builder
 
 SHELL ["/bin/bash", "-c"]
@@ -142,5 +160,12 @@ RUN find src -name '*.world' -or -name '*.sdf' | \
     sort | uniq | xargs -I{} gz fuel download -u {}
 
 ENV GZ_SIM_RESOURCE_PATH=/home/$USER/.gazebo/models
+
+#
+# Install OpenVDB files
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/openvdb/ /opt/openvdb
+RUN cd /opt/openvdb/build \
+    && sudo make install \
+    && sudo rm -rf /opt/openvdb
 
 ENTRYPOINT ["fixuid", "-q", "/ros_entrypoint.sh", "/bin/bash"]
