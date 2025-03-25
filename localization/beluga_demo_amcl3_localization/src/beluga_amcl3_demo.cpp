@@ -39,7 +39,7 @@
 
 #include <beluga/beluga.hpp>
 #include <beluga_ros/beluga_ros.hpp>
-#include <beluga_vdb/sensor/likelihood_field_model3.hpp>
+#include <beluga_vdb/sensor/vdb_likelihood_field_model.hpp>
 
 #include <ament_index_cpp/get_package_share_directory.hpp>
 
@@ -67,25 +67,25 @@
 namespace beluga_demo_amcl3_localization {
 
 // Weighted SE(2) state particle type.
-using particle_type = std::tuple<Sophus::SE3d, beluga::Weight>;
+using particle_type = std::tuple<Sophus::SE2d, beluga::Weight>;
 // Motion model variant type for runtime selection support.
-using motion_model = beluga::DifferentialDriveModel3d;
+using motion_model = beluga::DifferentialDriveModel2d;
 // Sensor model variant type for runtime selection support.
 using sensor_model =
-    beluga_vdb::LikelihoodFieldModel3<openvdb::FloatGrid,
-                                      beluga_ros::SparsePointCloud3<float>>;
+    beluga_vdb::VDBLikelihoodFieldModel2<openvdb::FloatGrid,
+                                         beluga_ros::SparsePointCloud3<float>>;
 // Execution policy variant type for runtime selection support.
 using execution_policy = std::execution::parallel_policy;
 
 class Amcl3 {
 public:
   explicit Amcl3(motion_model &&motion, sensor_model &&sensor,
-                 const Sophus::SE3d &pose, const Sophus::Matrix6d &covariance,
+                 const Sophus::SE2d &pose, const Sophus::Matrix3d &covariance,
                  execution_policy policy = std::execution::par)
       : motion_model_{std::move(motion)}, sensor_model_{std::move(sensor)},
         execution_policy_{std::move(policy)},
         spatial_hasher_{kSpatialResolutionLineal, kSpatialResolutionAngular},
-        update_policy_{beluga::policies::on_motion<Sophus::SE3d>(kUpdateMinD,
+        update_policy_{beluga::policies::on_motion<Sophus::SE2d>(kUpdateMinD,
                                                                  kUpdateMinA)},
         resample_policy_{beluga::policies::every_n(kResampleInterval)} {
     if (kRecoveryAlphaFast) {
@@ -102,9 +102,9 @@ public:
     force_update_ = true;
   }
 
-  auto update(Sophus::SE3d base_pose_in_odom,
+  auto update(Sophus::SE2d base_pose_in_odom,
               beluga_ros::SparsePointCloud3<float> pointcloud)
-      -> std::optional<std::pair<Sophus::SE3d, Sophus::Matrix6d>> {
+      -> std::optional<std::pair<Sophus::SE2d, Sophus::Matrix3d>> {
     if (particles_.empty()) {
       return std::nullopt;
     }
@@ -145,10 +145,10 @@ private:
   motion_model motion_model_;
   sensor_model sensor_model_;
   execution_policy execution_policy_;
-  beluga::spatial_hash<Sophus::SE3d> spatial_hasher_;
-  beluga::any_policy<Sophus::SE3d> update_policy_;
+  beluga::spatial_hash<Sophus::SE2d> spatial_hasher_;
+  beluga::any_policy<Sophus::SE2d> update_policy_;
   beluga::any_policy<decltype(particles_)> resample_policy_;
-  beluga::RollingWindow<Sophus::SE3d, 2> control_action_window_;
+  beluga::RollingWindow<Sophus::SE2d, 2> control_action_window_;
   bool force_update_{true};
 
   // Parameters
@@ -186,7 +186,7 @@ public:
         openvdb::gridPtrCast<openvdb::FloatGrid>((*grids)[0]);
 
     // Create Likelihood 3D Field Sensor Model
-    auto params_sm = beluga_vdb::LikelihoodFieldModel3Param{};
+    auto params_sm = beluga_vdb::VDBLikelihoodFieldModelParam{};
     params_sm.max_obstacle_distance = kLaserLikelihoodMaxDist;
     params_sm.max_laser_distance = kLaserMaxRange;
     params_sm.z_hit = kZHit;
@@ -201,23 +201,18 @@ public:
     params_mm.translation_noise_from_rotation = kAlpha4;
 
     // Initial position
-    const auto pose = Sophus::SE3d{
-        Sophus::SO3d{},
-        Eigen::Vector3d{
+    const auto pose = Sophus::SE2d{
+        Sophus::SO2d{},
+        Eigen::Vector2d{
             kInitialPoseX,
             kInitialPoseY,
-            kInitialPoseZ,
         },
     };
 
-    Eigen::Matrix<double, 6, 6> covariance =
-        Eigen::Matrix<double, 6, 6>::Zero();
+    Eigen::Matrix3d covariance = Eigen::Matrix3d::Zero();
     covariance.coeffRef(0, 0) = kInitialPoseCovarianceX;
     covariance.coeffRef(1, 1) = kInitialPoseCovarianceY;
-    covariance.coeffRef(2, 2) = kInitialPoseCovarianceZ;
-    covariance.coeffRef(3, 3) = kInitialPoseCovarianceYaw;
-    covariance.coeffRef(4, 4) = kInitialPoseCovariancePitch;
-    covariance.coeffRef(5, 5) = kInitialPoseCovarianceRoll;
+    covariance.coeffRef(2, 2) = kInitialPoseCovarianceYaw;
 
     // Create filter
     particle_filter_ = std::make_unique<Amcl3>(motion_model{params_mm},
@@ -290,7 +285,7 @@ private:
       return;
     }
 
-    auto base_pose_in_odom = Sophus::SE3d{};
+    auto base_pose_in_odom = Sophus::SE2d{};
     try {
       // Use the lookupTransform overload with no timeout since we're not using
       // a dedicated tf thread. The message filter we are using avoids the need
@@ -362,7 +357,9 @@ private:
       message.header.frame_id = kGlobalFrameId;
       const auto &[base_pose_in_map, base_pose_covariance] =
           new_estimate.value();
-      message.pose = tf2::toMsg(base_pose_in_map, base_pose_covariance);
+      tf2::toMsg(base_pose_in_map, message.pose.pose);
+      tf2::covarianceEigenToRowMajor(base_pose_covariance,
+                                     message.pose.covariance);
       pose_pub_->publish(message);
     }
   }
@@ -457,7 +454,7 @@ private:
   // Particle filter instance.
   std::unique_ptr<Amcl3> particle_filter_;
   // Last known pose estimate, if any.
-  std::pair<Sophus::SE3d, Eigen::Matrix<double, 6, 6>> last_known_estimate_;
+  std::pair<Sophus::SE2d, Eigen::Matrix3d> last_known_estimate_;
   // Estimated pose publisher.
   rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
       pose_pub_;
@@ -467,7 +464,7 @@ private:
   std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
   std::unique_ptr<tf2_ros::TransformListener> tf_listener_;
   // Last known map to odom correction estimate, if any.
-  std::optional<Sophus::SE3d> last_known_odom_transform_in_map_;
+  std::optional<Sophus::SE2d> last_known_odom_transform_in_map_;
 
   // Parameters
   // Constructor
@@ -482,17 +479,11 @@ private:
   // Get Initial Estimate
   static constexpr double kInitialPoseX = 0.0;
   static constexpr double kInitialPoseY = 0.0;
-  static constexpr double kInitialPoseZ = 0.0;
   static constexpr double kInitialPoseYaw = 0.0;
-  static constexpr double kInitialPosePitch = 0.0;
-  static constexpr double kInitialPoseRoll = 0.0;
 
   static constexpr double kInitialPoseCovarianceX = 0.25;
   static constexpr double kInitialPoseCovarianceY = 0.25;
-  static constexpr double kInitialPoseCovarianceZ = 0.25;
   static constexpr double kInitialPoseCovarianceYaw = 0.15;
-  static constexpr double kInitialPoseCovariancePitch = 0.15;
-  static constexpr double kInitialPoseCovarianceRoll = 0.15;
 
   // Get Motion Model
   static constexpr double kAlpha1 = 0.1;
