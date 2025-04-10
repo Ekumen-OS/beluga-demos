@@ -26,10 +26,10 @@ Start the container with `ROSDISTRO=jazzy docker/run.sh` and verify that you hav
     │   └── map_1006_01.vdb
     ├── rosbags/
     │    ├── botanic_garden_tf_1005_07/
-    │    │   ├── botanic_garden_tf_1005_07.mcap
+    │    │   ├── botanic_garden_tf_1005_07.db3
     │    │   └── metadata.yaml
     │    └── botanic_garden_tf_1006_01/
-    │        ├── botanic_garden_tf_1006_01.mcap
+    │        ├── botanic_garden_tf_1006_01.db3
     │        └── metadata.yaml
     ├── doc/
     ├── launch/
