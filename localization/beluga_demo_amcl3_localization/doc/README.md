@@ -63,7 +63,7 @@ amcl3_localization_demo
 Finally, play the rosbag:
 
 ```bash
-ros2 bag play ~/ws/src/beluga_demo/localization/beluga_demo_amcl3_localization/rosbags/botanic_garden_tf_1005_07/botanic_garden_tf_1005_07.mcap --clock
+ros2 bag play ~/ws/src/beluga_demo/localization/beluga_demo_amcl3_localization/rosbags/botanic_garden_tf_1005_07/botanic_garden_tf_1005_07.db3
 ```
 
 Once the bag starts playing you'll see that Rviz shows the pointcloud, pose estimation, particle filter belief, etc (see the screen capture below):
