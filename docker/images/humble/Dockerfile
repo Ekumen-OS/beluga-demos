@@ -37,6 +37,26 @@ RUN git clone -b v8.2.0 https://github.com/AcademySoftwareFoundation/openvdb.git
   && cmake .. \
   && make -j$(nproc)
 
+#
+# Build pcl_perception here to avoid installing boost again
+RUN mkdir -p /opt/perception/src
+
+RUN apt-get update \
+  && apt-get install --no-install-recommends -y \
+  libeigen3-dev \
+  libpcl-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/perception/src
+
+RUN git clone -b 2.6.1 https://github.com/ros-perception/perception_pcl.git \
+  && cd .. \
+  && sudo apt-get update \
+  && . /opt/ros/humble/setup.sh \
+  && rosdep update \
+  && rosdep install -i -y --from-path src \
+  && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+
 FROM ros:humble-ros-base-jammy AS builder
 
 SHELL ["/bin/bash", "-c"]
@@ -114,6 +134,16 @@ RUN cd src/external-deps/apriltag_ros \
 COPY docker/files/patches/nav2_minimal_turtlebot_simulation.patch /tmp/nav2_minimal_turtlebot_simulation.patch
 RUN cd src/external-deps/nav2_minimal_turtlebot_simulation \
   && cat /tmp/nav2_minimal_turtlebot_simulation.patch | git apply -p1
+
+#
+# Install fixed pcl_perception before installing it with rosdep
+
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_ros/include/pcl_ros/ /opt/ros/humble/include/
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_ros/lib/. /opt/ros/humble/lib/.
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_ros/share/pcl_ros /opt/ros/humble/share
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_conversions/include/pcl_conversions/ /opt/ros/humble/include/
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_conversions/share/pcl_conversions /opt/ros/humble/share
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/perception_pcl/share/perception_pcl /opt/ros/humble/share
 
 #
 # Install project dependencies
