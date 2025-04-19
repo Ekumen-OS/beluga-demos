@@ -13,11 +13,15 @@ This package provides 2 maps based on the [botanic garden dataset](https://githu
 
 Request the maps and bags from the team and store the maps under `beluga_demo/localization/beluga_demo_amcl3_localization/maps` and the bags under `beluga_demo/localization/beluga_demo_amcl3_localization/rosbags`.
 
+#### Local machine (Only Humble)
+
+If you want to run this example on your local machine and not in the provided docker image, you need to download and compile the [pcl_perception repo release 2.6.1](https://github.com/ros-perception/perception_pcl) by yourself. Because the filters provided for `humble` are not compiled as plugins. 
+
 ## Quick start
 
 #### Step 1: File verification
 
-Start the container with `ROSDISTRO=jazzy docker/run.sh` and verify that you have the following file structure:
+Inside the docker container verify that you have the following file structure:
 
 ```bash
     beluga_demo_amcl3_localization/
