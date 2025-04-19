@@ -197,5 +197,7 @@ COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/openvdb/ /opt/openvdb
 RUN cd /opt/openvdb/build \
     && sudo make install \
     && sudo rm -rf /opt/openvdb
+RUN dpkg -r libopenvdb8.1 \
+            libopenvdb-dev
 
 ENTRYPOINT ["fixuid", "-q", "/ros_entrypoint.sh", "/bin/bash"]
