@@ -58,7 +58,6 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True, 'leaf_size': 0.1}],
         remappings=[
             ('/input', '/velodyne_points'),
-            # ('/output', '/pointcloud'),
             ('/output', '/output_voxel_filter'),
         ],
         output="screen",
