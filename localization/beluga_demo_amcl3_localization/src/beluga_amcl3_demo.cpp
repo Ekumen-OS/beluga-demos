@@ -231,7 +231,7 @@ public:
 
     // Callback options
     callback_group_ =
-        this->create_callback_group(rclcpp::CallbackGroupType::Reentrant);
+        this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
     rclcpp::SubscriptionOptions common_subscription_options;
     common_subscription_options.callback_group = callback_group_;
 
