@@ -19,6 +19,44 @@ RUN mkdir -p /tmp/ws/src \
   && find ./ -name "*.sdf" | xargs cp --parents -t /tmp/ws/src \
   || true
 
+FROM ros:humble-ros-base-jammy AS openvdb-builder
+
+RUN apt-get update \
+  && apt-get install --no-install-recommends -y \
+    git \
+    libboost-all-dev \
+    libtbb-dev \
+    libblosc-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt
+
+RUN git clone -b v8.2.0 https://github.com/AcademySoftwareFoundation/openvdb.git \
+  && cd openvdb \
+  && mkdir build && cd build \
+  && cmake .. \
+  && make -j$(nproc)
+
+#
+# Build pcl_perception here to avoid installing boost again
+RUN mkdir -p /opt/perception/src
+
+RUN apt-get update \
+  && apt-get install --no-install-recommends -y \
+  libeigen3-dev \
+  libpcl-dev \
+  && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt/perception/src
+
+RUN git clone -b 2.6.1 https://github.com/ros-perception/perception_pcl.git \
+  && cd .. \
+  && sudo apt-get update \
+  && . /opt/ros/humble/setup.sh \
+  && rosdep update \
+  && rosdep install -i -y --from-path src \
+  && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
+
 FROM ros:humble-ros-base-jammy AS builder
 
 SHELL ["/bin/bash", "-c"]
@@ -98,6 +136,16 @@ RUN cd src/external-deps/nav2_minimal_turtlebot_simulation \
   && cat /tmp/nav2_minimal_turtlebot_simulation.patch | git apply -p1
 
 #
+# Install fixed pcl_perception before installing it with rosdep
+
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_ros/include/pcl_ros/ /opt/ros/humble/include/
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_ros/lib/. /opt/ros/humble/lib/.
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_ros/share/pcl_ros /opt/ros/humble/share
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_conversions/include/pcl_conversions/ /opt/ros/humble/include/
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/pcl_conversions/share/pcl_conversions /opt/ros/humble/share
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/perception_pcl/share/perception_pcl /opt/ros/humble/share
+
+#
 # Install project dependencies
 
 COPY --from=package_cacher --chown=$USER:$GROUP /tmp/ws/ $USER_WS/
@@ -142,5 +190,14 @@ RUN find src -name '*.world' -or -name '*.sdf' | \
     sort | uniq | xargs -I{} gz fuel download -u {}
 
 ENV GZ_SIM_RESOURCE_PATH=/home/$USER/.gazebo/models
+
+#
+# Install OpenVDB files
+COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/openvdb/ /opt/openvdb
+RUN cd /opt/openvdb/build \
+    && sudo make install \
+    && sudo rm -rf /opt/openvdb
+RUN sudo dpkg -r libopenvdb8.1 \
+                 libopenvdb-dev
 
 ENTRYPOINT ["fixuid", "-q", "/ros_entrypoint.sh", "/bin/bash"]

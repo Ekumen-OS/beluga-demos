@@ -2,7 +2,7 @@ repositories:
   beluga:
     type: git
     url: https://github.com/Ekumen-OS/beluga.git
-    version: b6d5ee387cd196aa3c11617c993aa6300c7a9484
+    version: a0cf83f70f91c9f95424c39e28c1ee71e72c5dff
   apriltag_ros:
     type: git
     url: https://github.com/Adlink-ROS/apriltag_ros.git

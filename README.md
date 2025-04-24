@@ -33,7 +33,8 @@ Step into the repository directory and start the docker image. The first time yo
 
 ```bash
 cd beluga-demos
-./docker/run.sh --build
+ROSDISTRO=humble docker/run.sh  # ROS2 Humble
+ROSDISTRO=jazzy docker/run.sh   # ROS2 Jazzy
 ```
 
 #### Step 3: Build the demo software code
@@ -70,15 +71,16 @@ You can close the demo by pressing `Ctrl+C` in the terminal where you initially 
 
 This table contains the list of predefined demos that you can run:
 
-| Alias command                        | Description                                                                                                                                                                                                                                                                                                                                                            |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `lidar_beam_model_hallway_demo`      | Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node to localize in a world built out of  the [Cartographer Magazino](https://github.com/magazino/cartographer_magazino?tab=readme-ov-file#data) dataset map. The node is configured to use the `beam` sensor model configuration.                                           |
-| `lidar_likelihood_model_hallway_demo`| Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node to localize in a world built out of  the [Cartographer Magazino](https://github.com/magazino/cartographer_magazino?tab=readme-ov-file#data) dataset map. The node is configured to use the `likelihood` sensor model configuration.                                     |
-| `lidar_beam_model_office_demo`       | Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node moving around a large office cluttered with unmapped obstacles. The configured sensor model is `beam`.                                                                                                                                                                  |
-| `lidar_likelihood_model_office_demo` | Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node moving around a large office cluttered with unmapped obstacles. Sensor model is `likelihood`.                                                                                                                                                                           |
+| Alias command                        | Description                                                                                                                                                                                                                                                                                                                                                           |
+|--------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `lidar_beam_model_hallway_demo`      | Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node to localize in a world built out of the [Cartographer Magazino](https://github.com/magazino/cartographer_magazino?tab=readme-ov-file#data) dataset map. The node is configured to use the `beam` sensor model configuration.                                           |
+| `lidar_likelihood_model_hallway_demo`| Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node to localize in a world built out of the [Cartographer Magazino](https://github.com/magazino/cartographer_magazino?tab=readme-ov-file#data) dataset map. The node is configured to use the `likelihood` sensor model configuration.                                     |
+| `lidar_beam_model_office_demo`       | Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node moving around a large office cluttered with unmapped obstacles. The configured sensor model is `beam`.                                                                                                                                                                 |
+| `lidar_likelihood_model_office_demo` | Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node moving around a large office cluttered with unmapped obstacles. Sensor model is `likelihood`.                                                                                                                                                                          |
 | `apriltags_localization_demo`        | Simple custom localization node using the `beluga` library to localize the robot within a large $10m \times 10m$ area using Apriltag markers as landmarks. The code of this localization node can be found within this repository [here](https://github.com/Ekumen-OS/beluga-demos/blob/main/localization/beluga_demo_fiducial_localization/src/beluga_lmcl_demo.cpp). |
 | `light_beacons_localization_demo`    | Simple custom localization node using the `beluga` library to localize the robot within a large $10m \times 10m$ area using light sources as landmarks. The code of this localization node can be found within this repository [here](https://github.com/Ekumen-OS/beluga-demos/blob/main/localization/beluga_demo_bearing_localization/src/beluga_bmcl_demo.cpp).     |
-| `nav2_integration_demo`              | Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node in lieu of the [_nav2_amcl_](https://github.com/ros-navigation/navigation2/tree/main/nav2_amcl) in a [Nav2](https://docs.nav2.org/) stack to navigate around a large office cluttered with unmapped obstacles.                                                          |
+| `nav2_integration_demo`              | Demo using the [_beluga_amcl_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_amcl) node in lieu of the [_nav2_amcl_](https://github.com/ros-navigation/navigation2/tree/main/nav2_amcl) in a [Nav2](https://docs.nav2.org/) stack to navigate around a large office cluttered with unmapped obstacles.                                                                 |
+| `amcl3_localization_demo`            | Custom 3D localization node using the [_beluga_vdb_](https://github.com/Ekumen-OS/beluga/tree/main/beluga_vdb) library to localize the robot in a botanic garden [dataset](https://github.com/robot-pesg/BotanicGarden). The code of this localization node is based on `OpenVDB` and can be found within this repository [here](https://github.com/Ekumen-OS/beluga/blob/main/beluga_vdb/include/beluga_vdb/sensor/vdb_likelihood_field_model.hpp). To download the dataset and run this demo please follow the [INSTRUCTIONS](localization/beluga_demo_amcl3_localization/doc/README.md). |
 
 ## Under the hood
 
@@ -90,7 +92,7 @@ The `demo_build` alias command is a wrapper around the `colcon` build tool that 
 
 ```bash
 cd ~/ws
-colcon build --symlink-install
+colcon build --symlink-install --packages-up-to-regex beluga_demo --cmake-args -DCMAKE_BUILD_TYPE=Release
 source install/setup.bash
 ```
 
