@@ -321,7 +321,8 @@ void ParticlesDistribution::correct_once(
         tf_buffer_.lookupTransform(scan.header.frame_id, "base_footprint",
                                    tf2_ros::fromMsg(scan.header.stamp));
     tf2::fromMsg(bf2laser_msg, bf2laser_);
-  } else {
+  } 
+  else {
     RCLCPP_WARN(parent_node_->get_logger(),
                 "Timeout while waiting TF %s -> base_footprint [%s]",
                 scan.header.frame_id.c_str(), error.c_str());
@@ -349,7 +350,7 @@ void ParticlesDistribution::correct_once(
       double calculated_distance = get_error_distance_to_obstacle(
           particle_pose_tf2, bf2laser_, laser2point, scan, costmap,
           distance_perception_error_);
-
+      
       if (!std::isinf(calculated_distance)) {
         const double a = calculated_distance / distance_perception_error_;
         const double normal_comp_2 = std::exp(-0.5 * a * a);
@@ -370,6 +371,7 @@ void ParticlesDistribution::correct_once(
     p.hits = p.hits / static_cast<float>(scan.ranges.size());
     quality_ = std::max(quality_, p.hits);
   }
+  RCLCPP_WARN_STREAM(parent_node_->get_logger(), "Quality computed: " << quality_);
 }
 
 tf2::Transform ParticlesDistribution::get_tranform_to_read(

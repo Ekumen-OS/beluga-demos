@@ -1,6 +1,6 @@
 mh_amcl:
   ros__parameters:
-    use_sim_time: True
+    use_sim_time: true
 
     # Maximum number of hypotheses maintained
     max_hypotheses: 5
@@ -15,7 +15,7 @@ mh_amcl:
     min_candidate_distance: 0.5
 
     # Minimum angular difference between candidate hypotheses (in radians)
-    min_candidate_angle: 1.5708  # Equivalent to PI/2
+    min_candidate_angle: 1.5708 # Equivalent to PI/2
 
     # Threshold for low-quality hypotheses
     low_q_hypo_threshold: 0.25
@@ -30,10 +30,13 @@ mh_amcl:
     hypo_merge_angle: 0.3
 
     # Threshold to consider a hypothesis as "good"
-    good_hypo_threshold: 0.6
+    good_hypo_threshold: 0.7
 
     # Minimum difference in quality between the best hypothesis and others
     min_hypo_diff_winner: 0.2
 
     # Bond timeout
     bond_timeout: 4.0
+
+    # Standard deviation for the LiDAR
+    distance_perception_error: 0.05

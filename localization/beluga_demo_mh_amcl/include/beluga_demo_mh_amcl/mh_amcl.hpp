@@ -122,6 +122,7 @@ private:
   rclcpp::TimerBase::SharedPtr publish_position_timer_;
 
   // Configurable params
+  bool use_sim_time_;
   int max_hypotheses_;
   bool multihypothesis_;
   float min_candidate_weight_;

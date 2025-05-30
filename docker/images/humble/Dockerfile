@@ -21,12 +21,14 @@ RUN mkdir -p /tmp/ws/src \
 
 FROM ros:humble-ros-base-jammy AS openvdb-builder
 
-RUN apt-get update \
+RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
+
+RUN apt-get update -y --fix-missing \
   && apt-get install --no-install-recommends -y \
-    git \
-    libboost-all-dev \
-    libtbb-dev \
-    libblosc-dev \
+  git \
+  libboost-all-dev \
+  libtbb-dev \
+  libblosc-dev \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
@@ -41,7 +43,9 @@ RUN git clone -b v8.2.0 https://github.com/AcademySoftwareFoundation/openvdb.git
 # Build pcl_perception here to avoid installing boost again
 RUN mkdir -p /opt/perception/src
 
-RUN apt-get update \
+RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
+
+RUN apt-get update -y --fix-missing \
   && apt-get install --no-install-recommends -y \
   libeigen3-dev \
   libpcl-dev \
@@ -49,9 +53,11 @@ RUN apt-get update \
 
 WORKDIR /opt/perception/src
 
+RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
+
 RUN git clone -b 2.6.1 https://github.com/ros-perception/perception_pcl.git \
   && cd .. \
-  && sudo apt-get update \
+  && sudo apt-get update -y --fix-missing \
   && . /opt/ros/humble/setup.sh \
   && rosdep update \
   && rosdep install -i -y --from-path src \
@@ -64,24 +70,27 @@ ENV SHELL=/bin/bash
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update \
+RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
+
+RUN apt-get update -y --fix-missing \
   && apt-get install --no-install-recommends -y \
-    ccache \
-    curl \
-    gdb \
-    gnupg \
-    git \
-    python3-pip \
-    python3-venv \
-    mc \
-    lsb-release \
-    tmux \
+  ccache \
+  curl \
+  gdb \
+  gnupg \
+  git \
+  python3-pip \
+  python3-venv \
+  mc \
+  lsb-release \
+  tmux \
   && rm -rf /var/lib/apt/lists/*
 
 ARG GZ_VERSION="harmonic"
+RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
 RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" > /etc/apt/sources.list.d/gazebo-stable.list \
-  && apt-get update && apt-get install --no-install-recommends -y $(if [[ "${GZ_VERSION}" > "fortress" ]]; then echo gz; else echo ignition; fi)-${GZ_VERSION}
+  && apt-get update -y --fix-missing && apt-get install --no-install-recommends -y $(if [[ "${GZ_VERSION}" > "fortress" ]]; then echo gz; else echo ignition; fi)-${GZ_VERSION}
 
 RUN pip install pre-commit==2.20.0
 
@@ -149,7 +158,7 @@ COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/percept
 # Install project dependencies
 
 COPY --from=package_cacher --chown=$USER:$GROUP /tmp/ws/ $USER_WS/
-RUN sudo apt-get update \
+RUN sudo apt-get update -y --fix-missing \
   && . /opt/ros/humble/setup.sh \
   && rosdep update \
   && rosdep install -i -y --from-path src \
@@ -186,8 +195,8 @@ RUN mkdir -p ~/.gazebo/models \
 # Cache Gazebo Fuel models
 COPY --from=gz_model_cacher --chown=$USER:$GROUP /tmp/ws/ $USER_WS/
 RUN find src -name '*.world' -or -name '*.sdf' | \
-    grep -Roh -e 'https://fuel.gazebosim.org[^<]*' src | \
-    sort | uniq | xargs -I{} gz fuel download -u {}
+  grep -Roh -e 'https://fuel.gazebosim.org[^<]*' src | \
+  sort | uniq | xargs -I{} gz fuel download -u {}
 
 ENV GZ_SIM_RESOURCE_PATH=/home/$USER/.gazebo/models
 
@@ -195,9 +204,9 @@ ENV GZ_SIM_RESOURCE_PATH=/home/$USER/.gazebo/models
 # Install OpenVDB files
 COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/openvdb/ /opt/openvdb
 RUN cd /opt/openvdb/build \
-    && sudo make install \
-    && sudo rm -rf /opt/openvdb
+  && sudo make install \
+  && sudo rm -rf /opt/openvdb
 RUN sudo dpkg -r libopenvdb8.1 \
-                 libopenvdb-dev
+  libopenvdb-dev
 
 ENTRYPOINT ["fixuid", "-q", "/ros_entrypoint.sh", "/bin/bash"]

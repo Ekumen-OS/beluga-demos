@@ -53,20 +53,6 @@ CallbackReturnT
 MH_AMCL_Node::on_configure(const rclcpp_lifecycle::State &state) {
   RCLCPP_INFO(get_logger(), "Configuring...");
 
-  // Get the value of the parameters, or use the default
-  get_parameter("multihypothesis", multihypothesis_);
-  get_parameter("max_hypotheses", max_hypotheses_);
-  get_parameter("min_candidate_weight", min_candidate_weight_);
-  get_parameter("min_candidate_distance", min_candidate_distance_);
-  get_parameter("min_candidate_angle", min_candidate_angle_);
-  get_parameter("low_q_hypo_threshold", low_q_hypo_threshold_);
-  get_parameter("very_low_q_hypo_threshold", very_low_q_hypo_threshold_);
-  get_parameter("hypo_merge_distance", hypo_merge_distance_);
-  get_parameter("hypo_merge_angle", hypo_merge_angle_);
-  get_parameter("good_hypo_threshold", good_hypo_threshold_);
-  get_parameter("min_hypo_diff_winner", min_hypo_diff_winner_);
-  get_parameter("bond_timeout", bond_timeout_);
-
   current_hypothesis_ =
       std::make_shared<ParticlesDistribution>(shared_from_this());
   current_hypothesis_q_ = 1.0;
@@ -99,6 +85,27 @@ CallbackReturnT
 MH_AMCL_Node::on_activate(const rclcpp_lifecycle::State &state) {
   RCLCPP_INFO(get_logger(), "Activating...");
 
+  // Get the value of the parameters, or use the default
+  get_parameter("use_sim_time", use_sim_time_);
+  get_parameter("multihypothesis", multihypothesis_);
+  get_parameter("max_hypotheses", max_hypotheses_);
+  get_parameter("min_candidate_weight", min_candidate_weight_);
+  get_parameter("min_candidate_distance", min_candidate_distance_);
+  get_parameter("min_candidate_angle", min_candidate_angle_);
+  get_parameter("low_q_hypo_threshold", low_q_hypo_threshold_);
+  get_parameter("very_low_q_hypo_threshold", very_low_q_hypo_threshold_);
+  get_parameter("hypo_merge_distance", hypo_merge_distance_);
+  get_parameter("hypo_merge_angle", hypo_merge_angle_);
+  get_parameter("good_hypo_threshold", good_hypo_threshold_);
+  get_parameter("min_hypo_diff_winner", min_hypo_diff_winner_);
+  get_parameter("bond_timeout", bond_timeout_);
+
+  if (use_sim_time_) {
+    RCLCPP_INFO(get_logger(), "use_sim_time = true");
+  } else {
+    RCLCPP_INFO(get_logger(), "use_sim_time = false");
+  }
+
   // Subscribers
   map_sub_ = create_subscription<nav_msgs::msg::OccupancyGrid>(
     "map", rclcpp::QoS(rclcpp::KeepLast(1)).transient_local().reliable(),
@@ -115,7 +122,7 @@ MH_AMCL_Node::on_activate(const rclcpp_lifecycle::State &state) {
   laser_scan_filter_ = std::make_unique<LaserScanFilter>(
     *laser_sub_,
     tf_buffer_,
-    "odom",
+    "base_footprint",
     100,
     get_node_logging_interface(),
     get_node_clock_interface(),
@@ -306,7 +313,7 @@ void MH_AMCL_Node::correct() {
 
   last_time_ = last_laser_->header.stamp;
 
-  RCLCPP_DEBUG_STREAM(get_logger(),
+  RCLCPP_INFO_STREAM(get_logger(),
                       "Correct [" << (now() - start).seconds() << " secs]");
 }
 
@@ -317,7 +324,7 @@ void MH_AMCL_Node::reseed() {
     particles->reseed();
   }
 
-  RCLCPP_DEBUG_STREAM(get_logger(), "==================Reseed ["
+  RCLCPP_INFO_STREAM(get_logger(), "==================Reseed ["
                                         << (now() - start).seconds()
                                         << " secs]");
 }
@@ -425,138 +432,9 @@ geometry_msgs::msg::Pose MH_AMCL_Node::toMsg(const tf2::Transform &tf) {
   return ret;
 }
 
-// void MH_AMCL_Node::manage_hypotheses() {
-//   if (last_laser_ == nullptr || costmap_ == nullptr ||
-//       map_matcher_ == nullptr) {
-//     return;
-//   }
-
-//   if (!multihypothesis_) {
-//     return;
-//   }
-
-//   // Retrieve the candidate transforms
-//   const auto &tfs = map_matcher_->get_matches(*last_laser_);
-
-//   // Create new Hypotheses for each tranform
-//   for (const auto &transform : tfs) {
-//     if (transform.weight > min_candidate_weight_) {
-//       bool covered = false;
-
-//       for (const auto &distr : particles_population_) {
-//         const auto &pose = distr->get_pose().pose.pose;
-//         geometry_msgs::msg::Pose posetf = toMsg(transform.transform);
-
-//         double dist_xy, theta_diff;
-//         get_distances(pose, posetf, dist_xy, theta_diff);
-
-//         if (dist_xy < min_candidate_distance_ && theta_diff < min_candidate_angle_) {
-//           covered = true;
-//         }
-//       }
-
-//       // Only add the new hypothesis if it's representative and the max number hasn't been reached
-//       if (!covered && particles_population_.size() < max_hypotheses_) {
-//         auto aux_distr =
-//             std::make_shared<ParticlesDistribution>(shared_from_this());
-//         aux_distr->on_configure(get_current_state());
-//         aux_distr->init(transform.transform);
-//         aux_distr->on_activate(get_current_state());
-//         particles_population_.push_back(aux_distr);
-//       }
-//     }
-
-//     if (particles_population_.size() == max_hypotheses_) {
-//       break;
-//     }
-//   }
-
-//   // Remove low quality hypotheses
-//   auto it = particles_population_.begin();
-//   while (it != particles_population_.end()) {
-//     bool low_quality = (*it)->get_quality() < low_q_hypo_threshold_;
-//     bool very_low_quality = (*it)->get_quality() < very_low_q_hypo_threshold_;
-//     bool max_hypo_reached = particles_population_.size() == max_hypotheses_;
-//     bool in_free = get_cost((*it)->get_pose().pose.pose) == utils::FREE_SPACE;
-
-//     if (particles_population_.size() > 1 &&
-//         (!in_free || very_low_quality || (low_quality && max_hypo_reached))) {
-//       it = particles_population_.erase(it);
-//       if (current_hypothesis_ == *it) {
-//         current_hypothesis_ = particles_population_.front();
-//         current_hypothesis_q_ = low_q_hypo_threshold_ + 0.1;
-//       }
-//     } else {
-//       ++it;
-//     }
-//   }
-
-//   // Merge similar hypotheses
-//   auto it1 = particles_population_.begin();
-//   auto it2 = particles_population_.begin();
-//   while (it1 != particles_population_.end()) {
-//     while (it2 != particles_population_.end()) {
-//       if (*it1 == *it2) {
-//         ++it2;
-//         continue;
-//       }
-
-//       double dist_xy, theta_diff;
-//       get_distances((*it1)->get_pose().pose.pose, (*it2)->get_pose().pose.pose,
-//                     dist_xy, theta_diff);
-//       if (dist_xy < hypo_merge_distance_ && theta_diff < hypo_merge_angle_) {
-//         (*it1)->merge(**it2);
-//         it2 = particles_population_.erase(it2);
-//         if (current_hypothesis_ == *it2) {
-//           current_hypothesis_ = particles_population_.front();
-//           current_hypothesis_q_ = current_hypothesis_->get_quality();
-//         }
-//       } else {
-//         ++it2;
-//       }
-//     }
-//     ++it1;
-//   }
-
-//   // Select the best hypothesis
-//   current_hypothesis_q_ = current_hypothesis_->get_quality();
-//   for (const auto &amcl : particles_population_) {
-//     if (amcl->get_quality() > good_hypo_threshold_ &&
-//         amcl->get_quality() > (current_hypothesis_q_ + min_hypo_diff_winner_)) {
-//       current_hypothesis_q_ = amcl->get_quality();
-//       current_hypothesis_ = amcl;
-//     }
-//   }
-
-//   bool is_selected = false;
-//   for (const auto &amcl : particles_population_) {
-//     if (amcl == current_hypothesis_) {
-//       is_selected = true;
-//     }
-//   }
-
-//   if (!is_selected) {
-//     current_hypothesis_ = particles_population_.front();
-//     current_hypothesis_q_ = current_hypothesis_->get_quality();
-//   }
-
-//   // Debug the output
-//   std::cout << "=====================================" << std::endl;
-//   for (const auto &amcl : particles_population_) {
-//     if (amcl == current_hypothesis_) {
-//       std::cout << "->\t";
-//     }
-//     std::cout << amcl->get_quality() << std::endl;
-//   }
-//   std::cout << "=====================================" << std::endl;
-// }
-
 void MH_AMCL_Node::manage_hypotheses() {
   if (!last_laser_ || !costmap_ || !map_matcher_ || !multihypothesis_) {
-    return;
-  }
-
-  if (!multihypothesis_) {
+    RCLCPP_WARN(get_logger(), "Returning in manage hypotheses");
     return;
   }
 
