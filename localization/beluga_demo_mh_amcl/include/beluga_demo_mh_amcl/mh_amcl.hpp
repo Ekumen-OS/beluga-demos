@@ -157,11 +157,11 @@ private:
   std::shared_ptr<mh_amcl::MapMatcher> map_matcher_;
 
   // Callbacks
-  void map_callback(const nav_msgs::msg::OccupancyGrid::ConstSharedPtr &msg);
+  void map_callback(nav_msgs::msg::OccupancyGrid::ConstSharedPtr msg);
   void laser_callback(sensor_msgs::msg::LaserScan::ConstSharedPtr msg);
   void initpose_callback(
-      const geometry_msgs::msg::PoseWithCovarianceStamped::ConstSharedPtr
-          &pose_msg);
+    geometry_msgs::msg::PoseWithCovarianceStamped::ConstSharedPtr
+        pose_msg);
 };
 
 } // namespace mh_amcl

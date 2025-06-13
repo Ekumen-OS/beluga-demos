@@ -115,58 +115,62 @@ std_msgs::msg::ColorRGBA getColor(Color color_id, double alpha) {
 }
 
 std::tuple<double, double>
-mapToWorld(std::shared_ptr<beluga_ros::OccupancyGrid> costmap, int localX,
-           int localY) {
-  double worldX = costmap->origin().translation().x() +
-                  (localX + 0.5) * costmap->resolution();
-  double worldY = costmap->origin().translation().y() +
-                  (localY + 0.5) * costmap->resolution();
-  return std::make_tuple(worldX, worldY);
+mapToWorld(std::shared_ptr<beluga_ros::OccupancyGrid> costmap,
+           int local_x,
+           int local_y)
+{
+  // map origin in world frame
+  double origin_x = costmap->origin().translation().x();
+  double origin_y = costmap->origin().translation().y();
+  double res     = costmap->resolution();
+
+  // use the origin + the center of the cell (local + 0.5) times the resolution of each cell
+  double world_x = origin_x + (local_x + 0.5) * res;
+  double world_y = origin_y + (local_y + 0.5) * res;
+  return std::make_tuple(world_x, world_y);
 }
 
 std::tuple<int, int>
 worldToMapNoBounds(std::shared_ptr<beluga_ros::OccupancyGrid> costmap,
-                   double worldX, double worldY) {
-  // No clamping or bounds checking is done here, result might be negative or
-  // exceed the grid limits
-  int localX = static_cast<int>((worldX + costmap->origin().translation().x()) /
-                                costmap->resolution());
-  int localY = static_cast<int>((worldY + costmap->origin().translation().y()) /
-                                costmap->resolution());
-  return std::make_tuple(localX, localY);
+                   double world_x,
+                   double world_y)
+{
+  double origin_x = costmap->origin().translation().x();
+  double origin_y = costmap->origin().translation().y();
+  double res     = costmap->resolution();
+
+  // subtract origin, divide by resolution, floor to get cell index
+  int local_x = static_cast<int>(std::floor((world_x - origin_x) / res));
+  int local_y = static_cast<int>(std::floor((world_y - origin_y) / res));
+  return std::make_tuple(local_x, local_y);
 }
 
 std::tuple<int, int>
 worldToMapEnforceBounds(std::shared_ptr<beluga_ros::OccupancyGrid> costmap,
-                        double worldX, double worldY) {
-  int localX;
-  int localY;
+                        double world_x,
+                        double world_y)
+{
+  double origin_x = costmap->origin().translation().x();
+  double origin_y = costmap->origin().translation().y();
+  double res     = costmap->resolution();
+  int width      = costmap->width();
+  int height     = costmap->height();
 
-  // If the world coordinates given are inferior to the costmap origin, start on
-  // the origin of the grid
-  if (worldX < costmap->origin().translation().x() ||
-      worldY < costmap->origin().translation().y())
-    localX = 0;
-  localY = 0;
+  // again subtract origin, divide by resolution, floor to get cell index
+  int local_x = static_cast<int>(std::floor((world_x - origin_x) / res));
+  int local_y = static_cast<int>(std::floor((world_y - origin_y) / res));
 
-  localX = static_cast<int>((worldX + costmap->origin().translation().x()) /
-                            costmap->resolution());
-  localY = static_cast<int>((worldY + costmap->origin().translation().y()) /
-                            costmap->resolution());
-
-  // Clamp the indices within grid dimensions:
-  if (localX < 0) {
-    localX = 0;
-  } else if (localX >= costmap->width()) {
-    localX = costmap->width() - 1;
-  }
-  if (localY < 0) {
-    localY = 0;
-  } else if (localY >= costmap->height()) {
-    localY = costmap->height() - 1;
+  // if completely before the map origin, snap to (0,0)
+  if (world_x < origin_x || world_y < origin_y) {
+    local_x = 0;
+    local_y = 0;
   }
 
-  return std::make_tuple(localX, localY);
+  // clamp into [0_width-1], [0_height-1]
+  local_x = std::clamp(local_x, 0, width  - 1);
+  local_y = std::clamp(local_y, 0, height - 1);
+
+  return std::make_tuple(local_x, local_y);
 }
 
 std::tuple<double, double, double>

@@ -288,7 +288,7 @@ void MH_AMCL_Node::predict() {
 }
 
 void MH_AMCL_Node::map_callback(
-    const nav_msgs::msg::OccupancyGrid::ConstSharedPtr &msg) {
+    nav_msgs::msg::OccupancyGrid::ConstSharedPtr msg) {
   // Every time a new map is sent, update the costmap and the map matcher
   costmap_ = std::make_shared<beluga_ros::OccupancyGrid>(msg);
   map_matcher_ = std::make_shared<mh_amcl::MapMatcher>(msg);
@@ -312,9 +312,6 @@ void MH_AMCL_Node::correct() {
   }
 
   last_time_ = last_laser_->header.stamp;
-
-  RCLCPP_INFO_STREAM(get_logger(),
-                      "Correct [" << (now() - start).seconds() << " secs]");
 }
 
 void MH_AMCL_Node::reseed() {
@@ -323,15 +320,11 @@ void MH_AMCL_Node::reseed() {
   for (auto &particles : particles_population_) {
     particles->reseed();
   }
-
-  RCLCPP_INFO_STREAM(get_logger(), "==================Reseed ["
-                                        << (now() - start).seconds()
-                                        << " secs]");
 }
 
 void MH_AMCL_Node::initpose_callback(
-    const geometry_msgs::msg::PoseWithCovarianceStamped::ConstSharedPtr
-        &pose_msg) {
+    geometry_msgs::msg::PoseWithCovarianceStamped::ConstSharedPtr
+      pose_msg) {
   // Having a new initial pose retriggers the algorithm
   if (pose_msg->header.frame_id == "map") {
     RCLCPP_INFO(get_logger(), "Map initial pose received!");
@@ -517,10 +510,10 @@ void MH_AMCL_Node::manage_hypotheses() {
 
 signed char MH_AMCL_Node::get_cost(const geometry_msgs::msg::Pose &pose) {
   // Get the corresponding cost from the costmap for a specific pose
-  auto [i, j] =
+  auto [local_x, local_y] =
       utils::worldToMapNoBounds(costmap_, pose.position.x, pose.position.y);
 
-  std::optional<signed char> opt = costmap_->data_at(i, j);
+  std::optional<signed char> opt = costmap_->data_at(local_x, local_y);
   if (opt.has_value()) {
     return static_cast<unsigned char>(opt.value());
   } else {

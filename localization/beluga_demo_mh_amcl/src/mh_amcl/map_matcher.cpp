@@ -183,11 +183,11 @@ float MapMatcher::match(
 
   for (int i = 0; i < scan.size(); i = i + scale) {
     tf2::Vector3 test_point = transform * scan[i];
-    auto [gi, gj] =
+    auto [local_x, local_y] =
         utils::worldToMapNoBounds(costmap, test_point.x(), test_point.y());
 
-    if (gi > 0 && gj > 0 && gi < costmap->width() && gj < costmap->height() &&
-        costmap->data_at(gi, gj) == utils::LETHAL_OBSTACLE) {
+    if (local_x > 0 && local_y > 0 && local_x < costmap->width() && local_y < costmap->height() &&
+        costmap->data_at(local_x, local_y) == utils::LETHAL_OBSTACLE) {
       hits++;
     }
     total++;

@@ -67,8 +67,8 @@ std_msgs::msg::ColorRGBA getColor(Color color_id, double alpha = 1.0);
  * frame to the global frame
  */
 std::tuple<double, double>
-mapToWorld(std::shared_ptr<beluga_ros::OccupancyGrid> costmap, int localX,
-           int localY);
+mapToWorld(std::shared_ptr<beluga_ros::OccupancyGrid> costmap, int local_x,
+           int local_y);
 
 /**
  * @brief Function to transform the coordinates of a point from global frame to
@@ -77,7 +77,7 @@ mapToWorld(std::shared_ptr<beluga_ros::OccupancyGrid> costmap, int localX,
  */
 std::tuple<int, int>
 worldToMapNoBounds(std::shared_ptr<beluga_ros::OccupancyGrid> costmap,
-                   double worldX, double worldY);
+                   double world_x, double world_y);
 
 /**
  * @brief Function to transform the coordinates of a point from global frame to
@@ -87,7 +87,7 @@ worldToMapNoBounds(std::shared_ptr<beluga_ros::OccupancyGrid> costmap,
  */
 std::tuple<int, int>
 worldToMapEnforceBounds(std::shared_ptr<beluga_ros::OccupancyGrid> costmap,
-                        double worldX, double worldY);
+                        double world_x, double world_y);
 
 /**
  * @brief extracts the X, Y coordinates and the yaw angle from a Sophus::SE2d

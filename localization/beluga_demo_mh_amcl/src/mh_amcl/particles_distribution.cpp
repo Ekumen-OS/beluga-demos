@@ -371,7 +371,6 @@ void ParticlesDistribution::correct_once(
     p.hits = p.hits / static_cast<float>(scan.ranges.size());
     quality_ = std::max(quality_, p.hits);
   }
-  RCLCPP_WARN_STREAM(parent_node_->get_logger(), "Quality computed: " << quality_);
 }
 
 tf2::Transform ParticlesDistribution::get_tranform_to_read(
