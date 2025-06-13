@@ -9,31 +9,31 @@ mh_amcl:
     multihypothesis: true
 
     # Minimum weight for a candidate hypothesis to be considered
-    min_candidate_weight: 0.5
+    min_candidate_weight: 0.6
 
     # Minimum distance between candidate hypotheses (in meters)
-    min_candidate_distance: 0.5
+    min_candidate_distance: 1.0
 
     # Minimum angular difference between candidate hypotheses (in radians)
-    min_candidate_angle: 1.5708 # Equivalent to PI/2
+    min_candidate_angle: 1.047 # Equivalent to 60 degrees
 
     # Threshold for low-quality hypotheses
-    low_q_hypo_threshold: 0.25
+    low_q_hypo_threshold: 0.15
 
     # Threshold for very low-quality hypotheses
-    very_low_q_hypo_threshold: 0.1
+    very_low_q_hypo_threshold: 0.07
 
     # Distance threshold for merging similar hypotheses (in meters)
-    hypo_merge_distance: 0.2
+    hypo_merge_distance: 0.4
 
     # Angular threshold for merging similar hypotheses (in radians)
-    hypo_merge_angle: 0.3
+    hypo_merge_angle: 0.5 # Equivalent to 30 degrees
 
     # Threshold to consider a hypothesis as "good"
-    good_hypo_threshold: 0.7
+    good_hypo_threshold: 0.8
 
     # Minimum difference in quality between the best hypothesis and others
-    min_hypo_diff_winner: 0.2
+    min_hypo_diff_winner: 0.3
 
     # Bond timeout
     bond_timeout: 4.0
