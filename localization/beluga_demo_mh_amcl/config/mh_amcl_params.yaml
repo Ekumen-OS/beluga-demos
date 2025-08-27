@@ -18,25 +18,22 @@ mh_amcl:
     min_candidate_angle: 1.047 # Equivalent to 60 degrees
 
     # Threshold for low-quality hypotheses
-    low_q_hypo_threshold: 0.15
-
-    # Threshold for very low-quality hypotheses
-    very_low_q_hypo_threshold: 0.07
+    low_q_hypo_threshold: 0.2
 
     # Distance threshold for merging similar hypotheses (in meters)
     hypo_merge_distance: 0.4
 
     # Angular threshold for merging similar hypotheses (in radians)
-    hypo_merge_angle: 0.5 # Equivalent to 30 degrees
+    hypo_merge_angle: 0.523 # Equivalent to 30 degrees
 
     # Threshold to consider a hypothesis as "good"
-    good_hypo_threshold: 0.8
+    good_hypo_threshold: 0.5
 
     # Minimum difference in quality between the best hypothesis and others
-    min_hypo_diff_winner: 0.3
+    min_hypo_diff_winner: 0.25
 
     # Bond timeout
-    bond_timeout: 4.0
+    bond_timeout: 8.0
 
     # Standard deviation for the LiDAR
-    distance_perception_error: 0.05
+    distance_perception_error: 0.01

@@ -17,7 +17,8 @@
 
 #include "beluga_demo_mh_amcl/mh_amcl.hpp"
 
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   // Just initiate rclcpp and create an instance of the node
   rclcpp::init(argc, argv);
   auto mh_amcl = std::make_shared<mh_amcl::MH_AMCL_Node>();

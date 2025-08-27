@@ -23,13 +23,9 @@
 #include <Eigen/Dense>
 #include <Eigen/LU>
 
-// The particle traits need to be included before the particle_cloud
-#include "beluga_demo_mh_amcl/mh_amcl_particle_traits.hpp"
 #include <beluga_ros/particle_cloud.hpp>
-
 #include <bondcpp/bond.hpp>
 #include <geometry_msgs/msg/pose_array.hpp>
-#include <geometry_msgs/msg/pose_with_covariance_stamped.hpp>
 #include <message_filters/subscriber.h>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <rclcpp/rclcpp.hpp>
@@ -45,124 +41,122 @@
 #include "beluga_demo_mh_amcl/map_matcher.hpp"
 #include "beluga_demo_mh_amcl/particles_distribution.hpp"
 
-namespace mh_amcl {
+namespace mh_amcl
+{
 
-// Alias for complex types
-using CallbackReturnT =
-    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
-using LaserScanSubscriber =
-    message_filters::Subscriber<sensor_msgs::msg::LaserScan, rclcpp_lifecycle::LifecycleNode>;
-using LaserScanFilter = tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>;
+  // Alias for complex types
+  using CallbackReturnT =
+      rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+  using LaserScanSubscriber =
+      message_filters::Subscriber<sensor_msgs::msg::LaserScan, rclcpp_lifecycle::LifecycleNode>;
+  using LaserScanFilter = tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>;
 
-/**
- * MH_AMCL_Node class
- *
- * Serves as the main lifecycle node, integrating all the components.
- * Instantiates a list of 'ParticlesDistribution', each element representing a
- * set of particles (hypothesis), and the map matcher.
- */
-class MH_AMCL_Node : public rclcpp_lifecycle::LifecycleNode {
-public:
-  explicit MH_AMCL_Node(
-      const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
+  /**
+   * MH_AMCL_Node class
+   *
+   * Serves as the main lifecycle node, integrating all the components.
+   * Instantiates a list of 'ParticlesDistribution', each element representing a
+   * set of particles (hypothesis), and the map matcher.
+   */
+  class MH_AMCL_Node : public rclcpp_lifecycle::LifecycleNode
+  {
+  public:
+    explicit MH_AMCL_Node(
+        const rclcpp::NodeOptions &options = rclcpp::NodeOptions());
 
-  // Initialization
-  void init();
+    // Lifecycle node methods
+    CallbackReturnT on_configure(const rclcpp_lifecycle::State &state) override;
+    CallbackReturnT on_activate(const rclcpp_lifecycle::State &state) override;
+    CallbackReturnT on_deactivate(const rclcpp_lifecycle::State &state) override;
+    CallbackReturnT on_cleanup(const rclcpp_lifecycle::State &state) override;
+    CallbackReturnT on_shutdown(const rclcpp_lifecycle::State &state) override;
+    CallbackReturnT on_error(const rclcpp_lifecycle::State &state) override;
 
-  // Lifecycle node methods
-  CallbackReturnT on_configure(const rclcpp_lifecycle::State &state) override;
-  CallbackReturnT on_activate(const rclcpp_lifecycle::State &state) override;
-  CallbackReturnT on_deactivate(const rclcpp_lifecycle::State &state) override;
-  CallbackReturnT on_cleanup(const rclcpp_lifecycle::State &state) override;
-  CallbackReturnT on_shutdown(const rclcpp_lifecycle::State &state) override;
-  CallbackReturnT on_error(const rclcpp_lifecycle::State &state) override;
+  protected:
+    // Steps of the MH-AMCL algorithm
+    void predict();
+    void correct();
+    void reseed();
+    void manage_hypotheses();
 
-protected:
-  // Steps of the MH-AMCL algorithm
-  void predict();
-  void correct();
-  void reseed();
-  void manage_hypotheses();
+    // Methods to publish the results of the algorithm (for localization and for
+    // visualization)
+    void publish_particles();
+    void publish_position();
 
-  // Methods to publish the results of the algorithm (for localization and for
-  // visualization)
-  void publish_particles();
-  void publish_position();
+  private:
+    // Publishers and subscribers
+    rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
+    rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
+        init_pose_sub_;
+    rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
+        pose_pub_;
+    rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr particles_pub_;
 
-  // Auxiliar methods
-  void get_distances(const geometry_msgs::msg::Pose &pose1,
-                     const geometry_msgs::msg::Pose &pose2, double &dist_xy,
-                     double &dist_theta);
-  signed char get_cost(const geometry_msgs::msg::Pose &pose);
-  geometry_msgs::msg::Pose toMsg(const tf2::Transform &tf);
+    // Message filter for the laser subscription
+    std::unique_ptr<LaserScanSubscriber> laser_sub_;
+    std::unique_ptr<LaserScanFilter> laser_scan_filter_;
+    message_filters::Connection laser_scan_connection_;
 
-private:
-  // Publishers and subscribers
-  rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr map_sub_;
-  rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
-      init_pose_sub_;
-  rclcpp::Publisher<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr
-      pose_pub_;
-  rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr particles_pub_;
+    // Bond object to use with the lifecycle manager
+    std::unique_ptr<bond::Bond> bond_;
 
-  // Message filter for the laser subscription
-  std::unique_ptr<LaserScanSubscriber> laser_sub_;
-  std::unique_ptr<LaserScanFilter> laser_scan_filter_;
-  message_filters::Connection laser_scan_connection_;
+    // Timers
+    rclcpp::TimerBase::SharedPtr predict_timer_;
+    rclcpp::TimerBase::SharedPtr correct_timer_;
+    rclcpp::TimerBase::SharedPtr reseed_timer_;
+    rclcpp::TimerBase::SharedPtr hypothesis_timer_;
+    rclcpp::TimerBase::SharedPtr publish_particles_timer_;
+    rclcpp::TimerBase::SharedPtr publish_position_timer_;
 
-  // Bond object to use with the lifecycle manager
-  std::unique_ptr<bond::Bond> bond_;
+    // Configurable params
+    bool use_sim_time_;
+    int max_hypotheses_;
+    bool multihypothesis_;
+    float min_candidate_weight_;
+    double min_candidate_distance_;
+    double min_candidate_angle_;
+    float low_q_hypo_threshold_;
+    float very_low_q_hypo_threshold_;
+    double hypo_merge_distance_;
+    double hypo_merge_angle_;
+    float good_hypo_threshold_;
+    float min_hypo_diff_winner_;
+    double bond_timeout_;
 
-  // Timers
-  rclcpp::TimerBase::SharedPtr predict_timer_;
-  rclcpp::TimerBase::SharedPtr correct_timer_;
-  rclcpp::TimerBase::SharedPtr reseed_timer_;
-  rclcpp::TimerBase::SharedPtr hypothesis_timer_;
-  rclcpp::TimerBase::SharedPtr publish_particles_timer_;
-  rclcpp::TimerBase::SharedPtr publish_position_timer_;
+    // Time used as the timestamp for the published results
+    rclcpp::Time last_time_;
 
-  // Configurable params
-  bool use_sim_time_;
-  int max_hypotheses_;
-  bool multihypothesis_;
-  float min_candidate_weight_;
-  double min_candidate_distance_;
-  double min_candidate_angle_;
-  float low_q_hypo_threshold_;
-  float very_low_q_hypo_threshold_;
-  double hypo_merge_distance_;
-  double hypo_merge_angle_;
-  float good_hypo_threshold_;
-  float min_hypo_diff_winner_;
-  double bond_timeout_;
+    // Initial pose
+    double init_pos_x_;
+    double init_pos_y_;
+    double init_pos_yaw_;
+    bool initial_hypothesis_initialized_{false};
 
-  // Time used as the timestamp for the published results
-  rclcpp::Time last_time_;
+    // Hypotheses (use list instead of vector to avoid complexity in operations like erasing)
+    std::list<std::shared_ptr<ParticlesDistribution>> particles_population_;
+    std::shared_ptr<ParticlesDistribution> current_hypothesis_;
+    float current_hypothesis_q_;
 
-  // Hypotheses
-  std::list<std::shared_ptr<ParticlesDistribution>> particles_population_;
-  std::shared_ptr<ParticlesDistribution> current_hypothesis_;
-  float current_hypothesis_q_;
+    // Transformations
+    tf2_ros::Buffer tf_buffer_;
+    tf2_ros::TransformListener tf_listener_;
+    std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
+    tf2::Stamped<tf2::Transform> odom2prevbf_;
+    bool valid_prev_odom2bf_{false};
 
-  // Transformations
-  tf2_ros::Buffer tf_buffer_;
-  tf2_ros::TransformListener tf_listener_;
-  std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
-  tf2::Stamped<tf2::Transform> odom2prevbf_;
-  bool valid_prev_odom2bf_{false};
+    // Map-matching
+    std::shared_ptr<beluga_ros::OccupancyGrid> costmap_;
+    sensor_msgs::msg::LaserScan::ConstSharedPtr last_laser_;
+    std::shared_ptr<mh_amcl::MapMatcher> map_matcher_;
 
-  // Map-matching
-  std::shared_ptr<beluga_ros::OccupancyGrid> costmap_;
-  sensor_msgs::msg::LaserScan::ConstSharedPtr last_laser_;
-  std::shared_ptr<mh_amcl::MapMatcher> map_matcher_;
-
-  // Callbacks
-  void map_callback(nav_msgs::msg::OccupancyGrid::ConstSharedPtr msg);
-  void laser_callback(sensor_msgs::msg::LaserScan::ConstSharedPtr msg);
-  void initpose_callback(
-    geometry_msgs::msg::PoseWithCovarianceStamped::ConstSharedPtr
-        pose_msg);
-};
+    // Callbacks
+    void map_callback(nav_msgs::msg::OccupancyGrid::ConstSharedPtr msg);
+    void laser_callback(sensor_msgs::msg::LaserScan::ConstSharedPtr msg);
+    void initpose_callback(
+        geometry_msgs::msg::PoseWithCovarianceStamped::ConstSharedPtr
+            pose_msg);
+  };
 
 } // namespace mh_amcl
 

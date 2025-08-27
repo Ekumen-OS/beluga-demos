@@ -32,149 +32,150 @@
 
 #include "beluga_demo_mh_amcl/utils.hpp"
 
-namespace mh_amcl {
+namespace mh_amcl
+{
 
-/**
- * @brief Structure representing a Particle, containing the pose, probability
- * and hits (normalization of how well a particle aligns with the laser data).
- * This 'hits' value is used as the quality of the particle.
- */
-typedef struct {
-  Sophus::SE2d state;
-  beluga::Weight weight;
-  float hits;
-} Particle;
-
-/**
- * ParticlesDistribution class
- *
- * Defines a set of particles (hypothesis). the core logic of the algorithm is
- * performed in this class.
- */
-class ParticlesDistribution {
-public:
-  explicit ParticlesDistribution(
-      rclcpp_lifecycle::LifecycleNode::SharedPtr parent_node);
-
-  // Initialization
-  void init(const tf2::Transform &pose_init);
+  const double kInitialHypothesisQuality = 0.25;
 
   /**
-   * @brief The pose of every particle is updated according to the input
-   * movement and some noise
+   * @brief Structure representing a Particle, containing the pose, probability
+   * and hits (normalization of how well a particle aligns with the laser data).
+   * This 'hits' value is used as the quality of the particle.
    */
-  void predict(const tf2::Transform &movement);
+  struct Particle
+  {
+    Sophus::SE2d state;
+    beluga::Weight weight;
+    float hits;
+  };
 
   /**
-   * @brief The quality of the hypothesis is computed as the highest quality of
-   * the particles. It's only done if laser data and costmap information are
-   * present.
+   * ParticlesDistribution class
+   *
+   * Defines a set of particles (hypothesis). the core logic of the algorithm is
+   * performed in this class.
    */
-  void correct_once(const sensor_msgs::msg::LaserScan &scan,
-                    std::shared_ptr<beluga_ros::OccupancyGrid> costmap);
+  class ParticlesDistribution
+  {
+  public:
+    explicit ParticlesDistribution(
+        rclcpp_lifecycle::LifecycleNode::SharedPtr parent_node);
 
-  /**
-   * @brief Particles are ordered by probability, winners and losers are
-   * computed, and new particles are introduced if there are too  bad or too
-   * good particles.
-   */
-  void reseed();
+    // Initialization
+    void init(const tf2::Transform &pose_init,
+              std::shared_ptr<beluga_ros::OccupancyGrid> costmap);
 
-  /**
-   * @brief Get the vector of particles
-   */
-  const std::vector<mh_amcl::Particle> &get_particles() const {
-    return particles_;
-  }
+    /**
+     * @brief The pose of every particle is updated according to the input
+     * movement and some noise
+     */
+    void predict(const tf2::Transform &movement);
 
-  using CallbackReturnT =
-      rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
-  // Lifecycle node methods
-  CallbackReturnT on_configure(const rclcpp_lifecycle::State &state);
-  CallbackReturnT on_activate(const rclcpp_lifecycle::State &state);
-  CallbackReturnT on_deactivate(const rclcpp_lifecycle::State &state);
-  CallbackReturnT on_cleanup(const rclcpp_lifecycle::State &state);
+    /**
+     * @brief The quality of the hypothesis is computed as the highest quality of
+     * the particles. It's only done if laser data and costmap information are
+     * present.
+     */
+    void correct_once(const sensor_msgs::msg::LaserScan &scan);
 
-  /**
-   * @brief Publish the particles' markers for visualization in RViz
-   */
-  void publish_particles(int base_idx,
-                         const std_msgs::msg::ColorRGBA &color) const;
+    /**
+     * @brief Particles are ordered by probability, winners and losers are
+     * computed, and new particles are introduced if there are too  bad or too
+     * good particles.
+     */
+    void reseed();
 
-  /**
-   * @brief Get the weighted mean pose of the set of particles (hypothesis)
-   */
-  geometry_msgs::msg::PoseWithCovarianceStamped get_pose() const {
-    return pose_;
-  }
+    /**
+     * @brief Get the vector of particles
+     */
+    const std::vector<mh_amcl::Particle> &get_particles() const
+    {
+      return particles_;
+    }
 
-  /**
-   * @brief Get the quality of the hypothesis
-   */
-  float get_quality() { return quality_; }
+    using CallbackReturnT =
+        rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
+    // Lifecycle node methods
+    CallbackReturnT on_configure(const rclcpp_lifecycle::State &state);
+    CallbackReturnT on_activate(const rclcpp_lifecycle::State &state);
+    CallbackReturnT on_deactivate(const rclcpp_lifecycle::State &state);
+    CallbackReturnT on_cleanup(const rclcpp_lifecycle::State &state);
 
-  /**
-   * @brief Merge a hypothesis with this one when they are too similar
-   */
-  void merge(ParticlesDistribution &other);
+    /**
+     * @brief Publish the particles' markers for visualization in RViz
+     */
+    void publish_particles(int base_idx,
+                           const std_msgs::msg::ColorRGBA &color) const;
 
-protected:
-  rclcpp_lifecycle::LifecycleNode::SharedPtr parent_node_;
+    /**
+     * @brief Get the weighted mean pose of the set of particles (hypothesis)
+     */
+    const geometry_msgs::msg::PoseWithCovarianceStamped &get_pose() const
+    {
+      return pose_;
+    }
 
-  // Publisher for visualization in RViz
-  rclcpp_lifecycle::LifecyclePublisher<
-      visualization_msgs::msg::MarkerArray>::SharedPtr pub_particles_;
+    /**
+     * @brief Get the quality of the hypothesis, which is determined by the
+     * highest 'hits' value among its constituent particles.
+     */
+    float get_quality() const
+    {
+      return quality_;
+    }
 
-  // Auxiliary methods for the steps of the AMCL algorithm
-  tf2::Transform add_noise(const tf2::Transform &dm);
-  tf2::Transform get_tranform_to_read(const sensor_msgs::msg::LaserScan &scan,
-                                      int index);
-  double get_error_distance_to_obstacle(
-      const tf2::Transform &map2bf, const tf2::Transform &bf2laser,
-      const tf2::Transform &laser2point,
-      const sensor_msgs::msg::LaserScan &scan,
-      std::shared_ptr<beluga_ros::OccupancyGrid> costmap, double o);
-  signed char get_cost(const tf2::Transform &transform,
-                         std::shared_ptr<beluga_ros::OccupancyGrid> costmap);
-  void normalize();
-  void update_pose(geometry_msgs::msg::PoseWithCovarianceStamped &pose);
-  void update_covariance(geometry_msgs::msg::PoseWithCovarianceStamped &pose);
+    /**
+     * @brief Merge a hypothesis with this one when they are too similar
+     */
+    void merge(ParticlesDistribution &other);
 
-  // Wighted mean pose of the set of particles
-  geometry_msgs::msg::PoseWithCovarianceStamped pose_;
+  private:
+    rclcpp_lifecycle::LifecycleNode::SharedPtr parent_node_;
 
-  // Mersenne Twister 19937 pseudo-random number generator
-  std::random_device rd_;
-  std::mt19937 generator_;
+    // Publisher for visualization in RViz
+    rclcpp_lifecycle::LifecyclePublisher<
+        visualization_msgs::msg::MarkerArray>::SharedPtr pub_particles_;
 
-  // Particles used and quality of the hypothesis
-  std::vector<Particle> particles_;
-  float quality_;
+    // Auxiliary methods for the steps of the AMCL algorithm
+    tf2::Transform add_noise(const tf2::Transform &dm);
+    void update_pose(geometry_msgs::msg::PoseWithCovarianceStamped &pose);
+    void update_covariance(geometry_msgs::msg::PoseWithCovarianceStamped &pose);
 
-  // Transformations
-  tf2::BufferCore tf_buffer_;
-  tf2_ros::TransformListener tf_listener_;
-  tf2::Stamped<tf2::Transform> bf2laser_;
-  bool bf2laser_init_{false};
+    // Wighted mean pose of the set of particles
+    geometry_msgs::msg::PoseWithCovarianceStamped pose_;
 
-  // MH-AMCL Parameters
-  int max_particles_;
-  int min_particles_;
-  double init_pos_x_;
-  double init_pos_y_;
-  double init_pos_yaw_;
-  double init_error_x_;
-  double init_error_y_;
-  double init_error_yaw_;
-  double translation_noise_;
-  double rotation_noise_;
-  double distance_perception_error_;
-  double reseed_percentage_losers_;
-  double reseed_percentage_winners_;
-  float good_hypo_threshold_;
-  float low_q_hypo_threshold_;
-  int particles_step_;
-};
+    // Mersenne Twister 19937 pseudo-random number generator
+    std::random_device rd_;
+    std::mt19937 generator_;
+
+    // Particles used and quality of the hypothesis
+    std::vector<Particle> particles_;
+    float quality_;
+
+    // Transformations
+    tf2::BufferCore tf_buffer_;
+    tf2_ros::TransformListener tf_listener_;
+    tf2::Stamped<tf2::Transform> base_to_laser_tf_;
+    bool bf2laser_init_{false};
+
+    // Costmap and Likelihood Field Sensor model
+    std::shared_ptr<beluga_ros::OccupancyGrid> costmap_;
+
+    // MH-AMCL Parameters
+    int max_particles_;
+    int min_particles_;
+    double init_error_x_;
+    double init_error_y_;
+    double init_error_yaw_;
+    double translation_noise_;
+    double rotation_noise_;
+    double distance_perception_error_;
+    double reseed_percentage_losers_;
+    double reseed_percentage_winners_;
+    float good_hypo_threshold_;
+    float low_q_hypo_threshold_;
+    int particles_step_;
+  };
 
 } // namespace mh_amcl
 

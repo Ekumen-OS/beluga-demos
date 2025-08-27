@@ -57,7 +57,8 @@ def generate_launch_description():
                             'map.yaml'])},
                     {'use_sim_time': True}
                     ],
-                output='screen'
+                output='screen',
+                emulate_tty=True
             ),
             # Node containing the localization functionality
             Node(
@@ -68,17 +69,21 @@ def generate_launch_description():
                 parameters=[
                     PathJoinSubstitution([pkg_mh_amcl, 'config', 'mh_amcl_params.yaml'])
                 ],
+                output='screen',
+                emulate_tty=True,
             ),
             Node(
                 package='nav2_lifecycle_manager',
                 executable='lifecycle_manager',
                 name='lifecycle_manager_localization',
-                output='screen',
                 parameters=[
                     {"autostart": True},
+                    {"bond_timeout": 8.0},
                     {'node_names': lifecycle_nodes},
                     {'use_sim_time': True}
-                ]
+                ],
+                output='screen',
+                emulate_tty=True
             )
         ]
     )

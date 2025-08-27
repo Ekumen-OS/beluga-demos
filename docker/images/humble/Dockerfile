@@ -21,9 +21,7 @@ RUN mkdir -p /tmp/ws/src \
 
 FROM ros:humble-ros-base-jammy AS openvdb-builder
 
-RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
-
-RUN apt-get update -y --fix-missing \
+RUN apt-get update \
   && apt-get install --no-install-recommends -y \
   git \
   libboost-all-dev \
@@ -43,9 +41,7 @@ RUN git clone -b v8.2.0 https://github.com/AcademySoftwareFoundation/openvdb.git
 # Build pcl_perception here to avoid installing boost again
 RUN mkdir -p /opt/perception/src
 
-RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
-
-RUN apt-get update -y --fix-missing \
+RUN apt-get update \
   && apt-get install --no-install-recommends -y \
   libeigen3-dev \
   libpcl-dev \
@@ -53,11 +49,9 @@ RUN apt-get update -y --fix-missing \
 
 WORKDIR /opt/perception/src
 
-RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
-
 RUN git clone -b 2.6.1 https://github.com/ros-perception/perception_pcl.git \
   && cd .. \
-  && sudo apt-get update -y --fix-missing \
+  && sudo apt-get update \
   && . /opt/ros/humble/setup.sh \
   && rosdep update \
   && rosdep install -i -y --from-path src \
@@ -70,9 +64,7 @@ ENV SHELL=/bin/bash
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
-
-RUN apt-get update -y --fix-missing \
+RUN apt-get update \
   && apt-get install --no-install-recommends -y \
   ccache \
   curl \
@@ -87,10 +79,9 @@ RUN apt-get update -y --fix-missing \
   && rm -rf /var/lib/apt/lists/*
 
 ARG GZ_VERSION="harmonic"
-RUN sed -i 's|http://archive.ubuntu.com|http://security.ubuntu.com|g' /etc/apt/sources.list
 RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" > /etc/apt/sources.list.d/gazebo-stable.list \
-  && apt-get update -y --fix-missing && apt-get install --no-install-recommends -y $(if [[ "${GZ_VERSION}" > "fortress" ]]; then echo gz; else echo ignition; fi)-${GZ_VERSION}
+  && apt-get update && apt-get install --no-install-recommends -y $(if [[ "${GZ_VERSION}" > "fortress" ]]; then echo gz; else echo ignition; fi)-${GZ_VERSION}
 
 RUN pip install pre-commit==2.20.0
 
@@ -158,7 +149,7 @@ COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/perception/install/percept
 # Install project dependencies
 
 COPY --from=package_cacher --chown=$USER:$GROUP /tmp/ws/ $USER_WS/
-RUN sudo apt-get update -y --fix-missing \
+RUN sudo apt-get update \
   && . /opt/ros/humble/setup.sh \
   && rosdep update \
   && rosdep install -i -y --from-path src \

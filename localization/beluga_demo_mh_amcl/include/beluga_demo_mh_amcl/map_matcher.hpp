@@ -27,73 +27,76 @@
 #include <tf2/LinearMath/Transform.h>
 #include <tf2/transform_datatypes.h>
 
-namespace mh_amcl {
-
-/**
- * @brief Struct containing a transform and its associated weight
- */
-typedef struct {
-  float weight;
-  tf2::Transform transform;
-} TransformWeighted;
-
-/**
- * @brief Overload of the operator '<' to be able to compare TransformWeighted
- * structs
- */
-bool operator<(const TransformWeighted &tw1, const TransformWeighted &tw2);
-
-/**
- * MapMatcher class
- *
- * Performs the multi-resolution map matching process. It receives an occupancy
- * grid map and laser scan data to find transformations (poses) that align the
- * scan data with the map. It weights all potential transformations to select
- * the higher quality candidates.
- */
-class MapMatcher {
-public:
-  explicit MapMatcher(std::shared_ptr<const nav_msgs::msg::OccupancyGrid> map);
+namespace mh_amcl
+{
 
   /**
-   * @brief Get the candidate transformations from the laser information and the
-   * map
+   * @brief Struct containing a transform and its associated weight
    */
-  std::list<TransformWeighted>
-  get_matches(const sensor_msgs::msg::LaserScan &scan);
-
-protected:
-  static const int NUM_LEVEL_SCALE_COSTMAP = 4;
+  struct TransformWeighted
+  {
+    float weight;
+    tf2::Transform transform;
+  };
 
   /**
-   * @brief Reduce the resolution of the map to half to perform the
-   * multi-resolution map-matching
+   * @brief Overload of the operator '<' to be able to compare TransformWeighted
+   * structs
    */
-  std::shared_ptr<beluga_ros::OccupancyGrid>
-  half_scale(std::shared_ptr<beluga_ros::OccupancyGrid> costmap_in);
+  bool operator<(const TransformWeighted &tw1, const TransformWeighted &tw2);
 
   /**
-   * @brief Transform the LaserScan message in a vector of 3D points
+   * MapMatcher class
+   *
+   * Performs the multi-resolution map matching process. It receives an occupancy
+   * grid map and laser scan data to find transformations (poses) that align the
+   * scan data with the map. It weights all potential transformations to select
+   * the higher quality candidates.
    */
-  std::vector<tf2::Vector3>
-  laser2points(const sensor_msgs::msg::LaserScan &scan);
+  class MapMatcher
+  {
+  public:
+    explicit MapMatcher(std::shared_ptr<const nav_msgs::msg::OccupancyGrid> map);
 
-  // Auxiliary methods to get the matches between the laser data and the map
-  std::list<TransformWeighted>
-  get_matches(int scale, const std::vector<tf2::Vector3> &scan, float min_x,
-              float min_y, float max_y, float max_x);
-  float match(int scale, std::shared_ptr<beluga_ros::OccupancyGrid> costmap,
-              const std::vector<tf2::Vector3> &scan, tf2::Transform &transform);
+    /**
+     * @brief Get the candidate transformations from the laser information and the
+     * map
+     */
+    std::vector<TransformWeighted>
+    get_matches(const sensor_msgs::msg::LaserScan &scan);
 
-  // Current costmaps
-  std::vector<std::shared_ptr<beluga_ros::OccupancyGrid>> costmaps_;
-};
+  protected:
+    static const int NUM_LEVEL_SCALE_COSTMAP = 4;
 
-/**
- * @brief wrapper to transform the costmap to ROS Occupancy grid message
- */
-nav_msgs::msg::OccupancyGrid
-toMsg(std::shared_ptr<beluga_ros::OccupancyGrid> costmap);
+    /**
+     * @brief Reduce the resolution of the map to half to perform the
+     * multi-resolution map-matching
+     */
+    std::shared_ptr<beluga_ros::OccupancyGrid>
+    half_scale(std::shared_ptr<beluga_ros::OccupancyGrid> costmap_in);
+
+    /**
+     * @brief Transform the LaserScan message in a vector of 3D points
+     */
+    std::vector<tf2::Vector3>
+    laser2points(const sensor_msgs::msg::LaserScan &scan);
+
+    // Auxiliary methods to get the matches between the laser data and the map
+    std::vector<TransformWeighted>
+    get_matches(int scale, const std::vector<tf2::Vector3> &scan, float min_x,
+                float min_y, float max_y, float max_x);
+    float match(int scale, std::shared_ptr<beluga_ros::OccupancyGrid> costmap,
+                const std::vector<tf2::Vector3> &scan, const tf2::Transform &transform);
+
+    // Current costmaps
+    std::vector<std::shared_ptr<beluga_ros::OccupancyGrid>> costmaps_;
+  };
+
+  /**
+   * @brief wrapper to transform the costmap to ROS Occupancy grid message
+   */
+  nav_msgs::msg::OccupancyGrid
+  toMsg(std::shared_ptr<beluga_ros::OccupancyGrid> costmap);
 
 } // namespace mh_amcl
 
