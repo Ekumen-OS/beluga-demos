@@ -36,7 +36,7 @@ alias nav2_integration_demo='cd ~/ws \
 
 alias point_clouds_integration_demo='cd ~/ws \
   && source install/setup.bash \
-  && ros2 launch beluga_demo_point_clouds_integration demo_office_navigation.launch.py'
+  && ros2 launch beluga_demo_point_cloud_integration demo_office_navigation.launch.py'
 
 alias amcl3_localization_demo='cd ~/ws \
   && source install/setup.bash \

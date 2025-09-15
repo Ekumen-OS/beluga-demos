@@ -15,3 +15,24 @@ repositories:
     type: git
     url: https://github.com/ros-navigation/nav2_minimal_turtlebot_simulation.git
     version: afcaace36273cea2b06e76a0d0e3bc6a038a66c8
+  robotnik_simulation:
+    type: git
+    url: https://github.com/RobotnikAutomation/robotnik_simulation.git
+    version: c0286ce98a7ac1cc9541e021fe76c35c6361a60e
+  robotnik_description:
+    type: git
+    url: https://github.com/RobotnikAutomation/robotnik_description.git
+    version: b14797f3ac91c22756803cd7042e1f1871869267
+  robotnik_sensors:
+    type: git
+    url: https://github.com/RobotnikAutomation/robotnik_sensors.git
+    version: 6b3ad963e801712e25f45db706372806bf60a105
+  robotnik_common:
+    type: git
+    url: https://github.com/RobotnikAutomation/robotnik_common.git
+    version: 69ba228d3b7fe711c0b18ca415ef6e88e5ddc217
+  robotnik_interfaces:
+    type: git
+    url: https://github.com/RobotnikAutomation/robotnik_interfaces.git
+    version: e5e07b88740a033894aa45a26d7e556383838410
+  

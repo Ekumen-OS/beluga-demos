@@ -42,7 +42,7 @@ def generate_launch_description():
                 PythonLaunchDescriptionSource(
                     PathJoinSubstitution(
                         [
-                            FindPackageShare("beluga_demo_nav2_integration"),
+                            FindPackageShare("beluga_demo_point_cloud_integration"),
                             "launch",
                             "bringup.launch.py",
                         ]
@@ -50,7 +50,7 @@ def generate_launch_description():
                 ),
                 launch_arguments={
                     "map_name": "hq4_office",
-                    "params_file": "beluga_nav2_params.yaml",
+                    "params_file": "beluga_point_cloud_params.yaml",
                 }.items(),
             ),
         ]

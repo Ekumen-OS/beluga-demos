@@ -26,7 +26,7 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    pkg_dir = get_package_share_directory("beluga_demo_nav2_integration")
+    pkg_dir = get_package_share_directory("beluga_demo_point_cloud_integration")
 
     maps_install_folder = os.path.join(pkg_dir, "maps")
     available_maps = os.listdir(maps_install_folder)
@@ -39,7 +39,7 @@ def generate_launch_description():
 
     configured_params = ParameterFile(
         PathJoinSubstitution(
-            [FindPackageShare('beluga_demo_nav2_integration'), "params", params_file]
+            [FindPackageShare('beluga_demo_point_cloud_integration'), "params", params_file]
         ),
         allow_substs=True,
     )
@@ -47,7 +47,7 @@ def generate_launch_description():
     # Declare the launch arguments
     declare_params_file_cmd = DeclareLaunchArgument(
         'params_file',
-        default_value='beluga_nav2_params.yaml',
+        default_value='beluga_point_cloud_params.yaml',
         description='Parameter filename to use to configure all nodes',
         choices=available_param_files,
     )
@@ -60,6 +60,7 @@ def generate_launch_description():
     )
 
     # Container for the nav2 nodes and beluga_amcl
+    # IT IS CALLED NAV2_CONTAINER...SHOULD I CHANGE TO BELUGA_AMCL CONTAINER?
     start_nav2_container_cmd = Node(
         name='nav2_container',
         package='rclcpp_components',
