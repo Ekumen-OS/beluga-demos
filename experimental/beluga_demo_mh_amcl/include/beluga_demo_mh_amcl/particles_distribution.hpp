@@ -76,7 +76,7 @@ namespace mh_amcl
      * the particles. It's only done if laser data and costmap information are
      * present.
      */
-    void correct_once(const sensor_msgs::msg::LaserScan &scan);
+    void correct(const sensor_msgs::msg::LaserScan &scan);
 
     /**
      * @brief Particles are ordered by probability, winners and losers are

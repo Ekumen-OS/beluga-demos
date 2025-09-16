@@ -24,7 +24,7 @@ namespace mh_amcl
     // Construct the Beluga occupancy grid wrapper from the message pointer
     costmaps_[0] = std::make_shared<beluga_ros::OccupancyGrid>(map);
 
-    for (int i = 1; i < NUM_LEVEL_SCALE_COSTMAP; i++)
+    for (int i = 1; i < NUM_LEVEL_SCALE_COSTMAP; ++i)
     {
       costmaps_[i] = half_scale(costmaps_[i - 1]);
     }
@@ -59,9 +59,9 @@ namespace mh_amcl
     new_grid.data.resize(new_width * new_height, utils::FREE_SPACE);
 
     // Fill the new grid using a 2x2 window from costmap_in
-    for (unsigned int i = 0; i < new_width; i++)
+    for (unsigned int i = 0; i < new_width; ++i)
     {
-      for (unsigned int j = 0; j < new_height; j++)
+      for (unsigned int j = 0; j < new_height; ++j)
       {
         unsigned int ri = i * 2;
         unsigned int rj = j * 2;
@@ -167,16 +167,23 @@ namespace mh_amcl
     auto [init_i, init_j] = utils::worldToMapEnforceBounds(costmap, min_x, min_y);
     auto [end_i, end_j] = utils::worldToMapEnforceBounds(costmap, max_x, max_y);
 
-    for (unsigned int i = init_i; i < end_i; i++)
+    for (unsigned int i = init_i; i < end_i; ++i)
     {
-      for (unsigned int j = init_j; j < end_j; j++)
+      for (unsigned int j = init_j; j < end_j; ++j)
       {
         auto cost = costmap->data_at(i, j);
         if (cost == utils::FREE_SPACE)
         {
-          double inc_theta = (M_PI / 4.0);
-          for (double theta = 0; theta < 1.9 * M_PI; theta = theta + inc_theta)
+          // Define the number of angular steps and the increment value
+          const int num_angular_steps = 8;
+          const double inc_theta = M_PI / 4.0;
+
+          // Loop over a fixed number of integer steps
+          for (int k = 0; k < num_angular_steps; ++k)
           {
+            // Calculate the angle for the current step
+            double theta = k * inc_theta;
+
             auto [x, y] = utils::mapToWorld(costmap, i, j);
             TransformWeighted tw;
 
@@ -226,7 +233,7 @@ namespace mh_amcl
   {
     std::vector<tf2::Vector3> points;
     points.reserve(scan.ranges.size());
-    for (auto i = 0; i < scan.ranges.size(); i++)
+    for (auto i = 0; i < scan.ranges.size(); ++i)
     {
       const float range = scan.ranges[i];
       if (std::isnan(range) || std::isinf(range))
@@ -238,28 +245,6 @@ namespace mh_amcl
       points.emplace_back(range * cos(theta), range * sin(theta), 0.0);
     }
     return points;
-  }
-
-  nav_msgs::msg::OccupancyGrid
-  toMsg(const std::shared_ptr<beluga_ros::OccupancyGrid> costmap)
-  {
-    nav_msgs::msg::OccupancyGrid grid;
-
-    grid.info.resolution = costmap->resolution();
-    grid.info.width = costmap->width();
-    grid.info.height = costmap->height();
-
-    auto [wx, wy] = utils::mapToWorld(costmap, 0, 0);
-    grid.info.origin.position.x = wx - costmap->resolution() / 2;
-    grid.info.origin.position.y = wy - costmap->resolution() / 2;
-    grid.info.origin.position.z = 0.0;
-    grid.info.origin.orientation.w = 1.0;
-
-    grid.data.resize(grid.info.width * grid.info.height);
-    // No cost translation is needed, they operate on same scale
-    grid.data = costmap->data();
-
-    return grid;
   }
 
   bool operator<(const TransformWeighted &tw1, const TransformWeighted &tw2)

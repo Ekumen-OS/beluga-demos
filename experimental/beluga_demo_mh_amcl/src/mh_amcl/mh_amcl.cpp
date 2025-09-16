@@ -379,7 +379,7 @@ namespace mh_amcl
 
     for (auto &particles : particles_population_)
     {
-      particles->correct_once(*last_laser_);
+      particles->correct(*last_laser_);
     }
 
     last_time_ = last_laser_->header.stamp;

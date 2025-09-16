@@ -73,6 +73,7 @@ namespace mh_amcl::actions
                 if (valid_beams > 0)
                 {
                     particle.weight += total_prob;
+                    // TODO: Review if hits should be computed like this
                     particle.hits = total_prob / static_cast<float>(scan.ranges.size());
                 }
                 else

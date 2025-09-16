@@ -92,12 +92,6 @@ namespace mh_amcl
     std::vector<std::shared_ptr<beluga_ros::OccupancyGrid>> costmaps_;
   };
 
-  /**
-   * @brief wrapper to transform the costmap to ROS Occupancy grid message
-   */
-  nav_msgs::msg::OccupancyGrid
-  toMsg(std::shared_ptr<beluga_ros::OccupancyGrid> costmap);
-
 } // namespace mh_amcl
 
 #endif // MH_AMCL__MAPMATCHER_HPP_

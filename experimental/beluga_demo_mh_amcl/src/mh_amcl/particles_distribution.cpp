@@ -324,7 +324,7 @@ namespace mh_amcl
     pub_particles_->publish(particles_markers_msg);
   }
 
-  void ParticlesDistribution::correct_once(
+  void ParticlesDistribution::correct(
       const sensor_msgs::msg::LaserScan &scan)
   {
 
@@ -443,6 +443,7 @@ namespace mh_amcl
       double new_yaw = utils::normalize_angle(yaw + noise(2));
 
       Particle p;
+      // TODO: Review this assignment and if the reseed process should be changed into a more standard approach
       p.weight = winner.weight; // inherit weight from winner
       p.state = Sophus::SE2d(new_yaw, Eigen::Vector2d(new_x, new_y));
       p.hits = 0.0f;
