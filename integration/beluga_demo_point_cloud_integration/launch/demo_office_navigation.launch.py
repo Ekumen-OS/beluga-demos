@@ -36,6 +36,7 @@ def generate_launch_description():
                 ),
                 launch_arguments={
                     "world_name": "populated_ekumen_hq4.world",
+                    "robot_name": "rbkairos"
                 }.items(),
             ),
             IncludeLaunchDescription(

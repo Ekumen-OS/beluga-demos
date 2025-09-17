@@ -11,6 +11,7 @@
 
   <depend>gz_ekumen_worlds</depend>
   <depend>nav2_minimal_tb3_sim</depend>
+  <depend>robotnik_simulation</depend>
   <depend>ros_gz_sim</depend>
 
   <depend>xacro</depend>

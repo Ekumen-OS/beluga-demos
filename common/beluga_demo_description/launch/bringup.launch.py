@@ -14,31 +14,53 @@
 
 
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from launch.conditions import IfCondition, UnlessCondition
+from launch.substitutions import LaunchConfiguration, Command, PythonExpression
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 from launch.substitutions import Command
 
 import os
 
-
 def generate_launch_description():
-    urdf_file_name = "turtlebot3_waffle.urdf"
+    # Launch argument
+    robot_name = LaunchConfiguration("robot_name")
 
-    urdf_path = os.path.join(
-        get_package_share_directory("nav2_minimal_tb3_sim"), "urdf", urdf_file_name
+    # File paths
+    turtlebot_urdf = os.path.join(
+        get_package_share_directory("nav2_minimal_tb3_sim"),
+        "urdf",
+        "turtlebot3_waffle.urdf"
+    )
+    
+    rbkairos_xacro = os.path.join(
+    get_package_share_directory("robotnik_description"),
+    "robots",
+    "rbkairos",
+    "rbkairos.urdf.xacro"
     )
 
-    return LaunchDescription(
-        [
-            Node(
-                package="robot_state_publisher",
-                executable="robot_state_publisher",
-                output="screen",
-                parameters=[
-                    {
-                        "robot_description": Command(["xacro ", urdf_path]),
-                    }
-                ],
-            ),
-        ]
-    )
+    return LaunchDescription([
+        DeclareLaunchArgument(
+            name="robot_name",
+            default_value="tb3",
+            description="Robot to spawn"
+        ),
+
+        Node(
+            package="robot_state_publisher",
+            executable="robot_state_publisher",
+            output="screen",
+            parameters=[{
+                "robot_description": Command([
+                    "xacro ",
+                    PythonExpression([
+                        '"',
+                        turtlebot_urdf, '" if "', robot_name, '" != "rbkairos" else "',
+                        rbkairos_xacro, '"'
+                    ])
+                ])
+            }],
+        ),
+    ])

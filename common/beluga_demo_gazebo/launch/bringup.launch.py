@@ -21,7 +21,8 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
-
+from launch.conditions import IfCondition
+from launch.substitutions import PythonExpression
 
 def generate_launch_description():
     world_paths = [
@@ -43,6 +44,14 @@ def generate_launch_description():
         default_value="empty_ekumen_hq4.world",
         description="Name of the world file to load in simulation",
         choices=available_worlds,
+    )
+
+    robot_name_conf = LaunchConfiguration("robot_name")
+
+    robot_name_arg = DeclareLaunchArgument(
+        name="robot_name",
+        default_value="tb3",
+        description="Robot to spawn"
     )
 
     append_tb3_gz_sim_resources = AppendEnvironmentVariable(
@@ -73,8 +82,8 @@ def generate_launch_description():
         ),
         launch_arguments=[("gz_args", ["-r ", world_name_conf])],
     )
-
-    spawn_command = IncludeLaunchDescription(
+    # Spawn TurtleBot3 if robot_name == "tb3"
+    spawn_tb3 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
                 os.path.join(
@@ -85,14 +94,36 @@ def generate_launch_description():
             ],
         ),
         launch_arguments=[("x_pose", "0"), ("y_pose", "-2"), ("z_pose", "0.01")],
+        condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'tb3'"]))
+    )
+ 
+    spawn_kairos = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("robotnik_gazebo_ignition"),
+                "launch",
+                "spawn_robot.launch.py",
+            )
+        ),
+        launch_arguments={
+            "robot": "rbkairos",
+            "namespace": "kairos",
+            "x": "1.0",
+            "y": "0.0",
+            "z": "0.01",
+            "has_arm": "False",
+        }.items(),
+        condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'kairos'"]))
     )
 
     return LaunchDescription(
         [
             world_name_arg,
+            robot_name_arg,
             append_gz_worlds,
             append_tb3_gz_sim_resources,
             gz_sim_nodes,
-            spawn_command,
+            spawn_tb3,
+            spawn_kairos,
         ]
     )
