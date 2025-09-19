@@ -35,5 +35,5 @@ mh_amcl:
     # Bond timeout
     bond_timeout: 8.0
 
-    # Standard deviation for the LiDAR
-    distance_perception_error: 0.01
+    # Standard deviation for the LiDAR (shouldn't be below 0.2 for the correct computation of the qualities)
+    distance_perception_error: 0.5

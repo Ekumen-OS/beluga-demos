@@ -239,8 +239,7 @@ namespace utils
   double get_error_distance_to_obstacle(
       const tf2::Transform &map2bf, const tf2::Transform &bf2laser,
       const tf2::Transform &laser2point, const sensor_msgs::msg::LaserScan &scan,
-      std::shared_ptr<beluga_ros::OccupancyGrid> costmap,
-      double distance_perception_error)
+      std::shared_ptr<beluga_ros::OccupancyGrid> costmap)
   {
     if (std::isinf(laser2point.getOrigin().x()) ||
         std::isnan(laser2point.getOrigin().x()))
@@ -261,7 +260,9 @@ namespace utils
     }
 
     float dist = costmap->resolution();
-    while (dist < (3.0 * distance_perception_error))
+    // TODO (jesus): Review value of this constant and how it affects performance and result of the filter
+    const float max_obstacle_search_distance = 0.3;
+    while (dist < max_obstacle_search_distance)
     {
       uvector.setOrigin(unit * dist);
       // For positive

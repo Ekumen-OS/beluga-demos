@@ -1,6 +1,8 @@
 # Beluga Multi-Hypotheses AMCL demo
 
-## How the algorithm work
+**NOTE**: This demo is experimental and a work in progress. It is **not** a complete proof-of-concept or a production-ready integration. Expect bugs, breaking changes, and incomplete features.
+
+## How the algorithm works
 
 Traditional AMCL is extended by managing multiple populations of particles (each population is a hypothesis). Particles are created, destroyed, or merged based on their consistency with sensory data, choosing the best fitting hypothesis in each iteration.
 
@@ -23,8 +25,8 @@ The map-matching is done with 4 levels of resolution to improve computational co
 
 ### Steps for managing the hypotheses
 
-1. Start: At the start of the robot operation, P(0,t0) (first set of particles, hypothesis) is started at the robot’s initial position, if known.
-2. Creation: Periodically, a cascade map matching algorithm is used to determine which map positions the latest sensory readings could be obtained. If a position with a high match is found (high hit field), a new P(k,t) is started at this position.
+1. Start: At the start of the robot operation, P(0,t0) (first set of particles, hypothesis) is started at the robot initial position, if known.
+2. Creation: Periodically, a cascade map matching algorithm is used to determine in which map positions the latest sensor readings could have been obtained. If a position with a high match is found (high hit field), a new P(k,t) is initialized at this position.
 3. Destruction: If Quality(P(k,t)) is less than some threshold and |Pt| > 0, then P(k,t) is considered to be wrong, and it is removed.
 4. Merge: Even if two P(i,t) and P(j,t), start at different positions, they could end up converging to the same position. In this case, they are mixed in a P(k,t) containing the particles with more weight.
 

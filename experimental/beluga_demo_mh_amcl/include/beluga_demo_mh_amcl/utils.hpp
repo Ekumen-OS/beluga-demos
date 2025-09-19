@@ -122,7 +122,7 @@ namespace utils
         const tf2::Transform &map2bf, const tf2::Transform &bf2laser,
         const tf2::Transform &laser2point,
         const sensor_msgs::msg::LaserScan &scan,
-        std::shared_ptr<beluga_ros::OccupancyGrid> costmap, double o);
+        std::shared_ptr<beluga_ros::OccupancyGrid> costmap);
 
     signed char get_cost(const tf2::Transform &transform,
                          std::shared_ptr<beluga_ros::OccupancyGrid> costmap);

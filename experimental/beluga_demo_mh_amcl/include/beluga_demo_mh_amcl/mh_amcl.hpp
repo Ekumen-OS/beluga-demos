@@ -51,6 +51,7 @@ namespace mh_amcl
       message_filters::Subscriber<sensor_msgs::msg::LaserScan, rclcpp_lifecycle::LifecycleNode>;
   using LaserScanFilter = tf2_ros::MessageFilter<sensor_msgs::msg::LaserScan>;
 
+  // TODO (jesus): Review if the lifecycle approach is worth it or use a basic ROS 2 node
   /**
    * MH_AMCL_Node class
    *
@@ -109,6 +110,7 @@ namespace mh_amcl
     rclcpp::TimerBase::SharedPtr publish_particles_timer_;
     rclcpp::TimerBase::SharedPtr publish_position_timer_;
 
+    // TODO (jesus): This should be a struct of parameters, also merge with the 'particles_distribution' params
     // Configurable params
     bool use_sim_time_;
     int max_hypotheses_;

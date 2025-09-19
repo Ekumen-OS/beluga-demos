@@ -161,6 +161,7 @@ namespace mh_amcl
     // Costmap and Likelihood Field Sensor model
     std::shared_ptr<beluga_ros::OccupancyGrid> costmap_;
 
+    // TODO (jesus): This should be a struct of parameters
     // MH-AMCL Parameters
     int max_particles_;
     int min_particles_;

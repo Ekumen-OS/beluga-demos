@@ -23,10 +23,10 @@ FROM ros:humble-ros-base-jammy AS openvdb-builder
 
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
-  git \
-  libboost-all-dev \
-  libtbb-dev \
-  libblosc-dev \
+    git \
+    libboost-all-dev \
+    libtbb-dev \
+    libblosc-dev \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
@@ -66,16 +66,16 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update \
   && apt-get install --no-install-recommends -y \
-  ccache \
-  curl \
-  gdb \
-  gnupg \
-  git \
-  python3-pip \
-  python3-venv \
-  mc \
-  lsb-release \
-  tmux \
+    ccache \
+    curl \
+    gdb \
+    gnupg \
+    git \
+    python3-pip \
+    python3-venv \
+    mc \
+    lsb-release \
+    tmux \
   && rm -rf /var/lib/apt/lists/*
 
 ARG GZ_VERSION="harmonic"
@@ -186,8 +186,8 @@ RUN mkdir -p ~/.gazebo/models \
 # Cache Gazebo Fuel models
 COPY --from=gz_model_cacher --chown=$USER:$GROUP /tmp/ws/ $USER_WS/
 RUN find src -name '*.world' -or -name '*.sdf' | \
-  grep -Roh -e 'https://fuel.gazebosim.org[^<]*' src | \
-  sort | uniq | xargs -I{} gz fuel download -u {}
+    grep -Roh -e 'https://fuel.gazebosim.org[^<]*' src | \
+    sort | uniq | xargs -I{} gz fuel download -u {}
 
 ENV GZ_SIM_RESOURCE_PATH=/home/$USER/.gazebo/models
 
@@ -195,9 +195,9 @@ ENV GZ_SIM_RESOURCE_PATH=/home/$USER/.gazebo/models
 # Install OpenVDB files
 COPY --from=openvdb-builder --chown=$USER:$GROUP /opt/openvdb/ /opt/openvdb
 RUN cd /opt/openvdb/build \
-  && sudo make install \
-  && sudo rm -rf /opt/openvdb
+    && sudo make install \
+    && sudo rm -rf /opt/openvdb
 RUN sudo dpkg -r libopenvdb8.1 \
-  libopenvdb-dev
+                 libopenvdb-dev
 
 ENTRYPOINT ["fixuid", "-q", "/ros_entrypoint.sh", "/bin/bash"]

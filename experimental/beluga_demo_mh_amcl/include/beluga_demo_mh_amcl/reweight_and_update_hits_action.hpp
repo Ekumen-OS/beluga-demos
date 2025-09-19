@@ -17,8 +17,8 @@
 
 #include <range/v3/functional/bind_back.hpp>
 
-#include <sensor_msgs/msg/laser_scan.hpp>
 #include <beluga_ros/occupancy_grid.hpp>
+#include <sensor_msgs/msg/laser_scan.hpp>
 #include <tf2/transform_datatypes.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.hpp>
 
@@ -57,7 +57,7 @@ namespace mh_amcl::actions
 
                     tf2::Transform laser2point = utils::get_transform_to_read(scan, static_cast<int>(j));
                     double err_m = utils::get_error_distance_to_obstacle(
-                        map2bf, base_to_laser_tf, laser2point, scan, costmap, distance_perception_error);
+                        map2bf, base_to_laser_tf, laser2point, scan, costmap);
 
                     if (!std::isinf(err_m))
                     {
@@ -73,9 +73,16 @@ namespace mh_amcl::actions
                 if (valid_beams > 0)
                 {
                     particle.weight += total_prob;
-                    // TODO: Review if hits should be computed like this
                     particle.hits = total_prob / static_cast<float>(scan.ranges.size());
                 }
+                // TODO: Review if hits should be computed like this (not having good results so far)
+                // // Update the particle's weight and hits using the average likelihood
+                // if (valid_beams > 0)
+                // {
+                //     const float average_likelihood = total_prob / static_cast<float>(valid_beams);
+                //     particle.weight *= average_likelihood;
+                //     particle.hits = average_likelihood;
+                // }
                 else
                 {
                     // Assign a small weight and 0 hits if no valid beams
