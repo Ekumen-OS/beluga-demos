@@ -10,6 +10,8 @@ services:
       - DISPLAY
       - QT_X11_NO_MITSHM=1
       - XAUTHORITY=/tmp/.docker.xauth
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
     stdin_open: true
     tty: true
     user: ${USERID:-1000}:${GROUPID:-1000}
@@ -20,6 +22,13 @@ services:
       - ..:/home/developer/ws/src/beluga_demo
       - beluga_demos_ccache:/home/developer/.ccache
       - /dev:/dev
+    runtime: nvidia
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: [gpu]
+    #           count: 1 # Reserves one GPU
 volumes:
   beluga_demos_ccache:
   gazebo_models:

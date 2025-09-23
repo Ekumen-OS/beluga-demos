@@ -102,14 +102,14 @@ def generate_launch_description():
             os.path.join(
                 get_package_share_directory("robotnik_gazebo_ignition"),
                 "launch",
-                "spawn_robot.launch.py",
+                "spawn_kairos.launch.py",
             )
         ),
         launch_arguments={
             "robot": "rbkairos",
             "namespace": "kairos",
-            "x": "1.0",
-            "y": "0.0",
+            "x": "0",
+            "y": "-2",
             "z": "0.01",
             "has_arm": "False",
         }.items(),
