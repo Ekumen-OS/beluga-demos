@@ -12,65 +12,150 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
-from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
 import os
+import tempfile
+import yaml
+from pathlib import Path
+
+from ament_index_python.packages import get_package_share_directory
+
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, AppendEnvironmentVariable
+from launch.substitutions import (
+    LaunchConfiguration,
+    Command,
+    PathJoinSubstitution,
+    TextSubstitution,
+)
+from launch.substitutions.find_executable import FindExecutable
+from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    # Arguments
-    robot_arg = DeclareLaunchArgument(
-        "robot", default_value="rbkairos", description="Robot model to spawn"
-    )
-    namespace_arg = DeclareLaunchArgument(
-        "namespace", default_value="", description="Robot namespace"
-    )
-    x_arg = DeclareLaunchArgument("x", default_value="0")
-    y_arg = DeclareLaunchArgument("y", default_value="0")
-    z_arg = DeclareLaunchArgument("z", default_value="0.01")
-    yaw_arg = DeclareLaunchArgument("yaw", default_value="0.0")
-    has_arm_arg = DeclareLaunchArgument("has_arm", default_value="False")
+    # --- Paths ---
+    gazebo_pkg = get_package_share_directory("robotnik_gazebo_ignition")
 
-    # Path to the Kairos URDF/Xacro
-    description_pkg = get_package_share_directory("robotnik_description")
-    urdf_path = os.path.join(description_pkg, "robots", "rbkairos", "rbkairos.urdf.xacro")
+    # --- Arguments ---
+    robot_name = LaunchConfiguration("robot_name")
+    robot_model = LaunchConfiguration("robot_model")
+    robot_xacro = LaunchConfiguration("robot_xacro")
 
-    # Robot State Publisher
-    robot_state_publisher = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        namespace=LaunchConfiguration("namespace"),
-        parameters=[{"use_sim_time": True}],
-        arguments=[urdf_path],
-        output="screen",
+    pose = {
+        "x": LaunchConfiguration("x_pose", default="0.0"),
+        "y": LaunchConfiguration("y_pose", default="0.0"),
+        "z": LaunchConfiguration("z_pose", default="0.01"),
+        "R": LaunchConfiguration("roll", default="0.00"),
+        "P": LaunchConfiguration("pitch", default="0.00"),
+        "Y": LaunchConfiguration("yaw", default="0.00"),
+    }
+
+    declare_robot_name = DeclareLaunchArgument(
+        "robot_name", default_value="rbkairos", description="Name of the robot"
+    )
+    declare_robot_model = DeclareLaunchArgument(
+        "robot_model", default_value="rbkairos", description="Robot variant"
+    )
+    declare_robot_xacro = DeclareLaunchArgument(
+        "robot_xacro",
+        default_value=PathJoinSubstitution([
+            FindPackageShare("robotnik_description"),
+            "robots",
+            LaunchConfiguration("robot_name"),
+            [LaunchConfiguration("robot_model"), TextSubstitution(text=".urdf.xacro")],
+        ]),
+        description="Path to robot xacro file",
     )
 
-    # Spawn in Gazebo (Ignition/Harmonic)
-    spawn_entity = Node(
+    # --- Spawn in Gazebo ---
+    spawn_model = Node(
         package="ros_gz_sim",
         executable="create",
-        arguments=[
-            "-name", LaunchConfiguration("robot"),
-            "-topic", "robot_description",
-            "-x", LaunchConfiguration("x"),
-            "-y", LaunchConfiguration("y"),
-            "-z", LaunchConfiguration("z"),
-            "-Y", LaunchConfiguration("yaw"),
-        ],
         output="screen",
+        arguments=[
+            "-name", robot_name,
+            "-topic", "/robot_description",
+            # '-string', Command([
+            #     FindExecutable(name="xacro"),
+            #     " ",  # Ensures separation between executable and file path
+            #     robot_xacro,
+            # ]),
+            "-x", pose["x"], "-y", pose["y"], "-z", pose["z"],
+            "-R", pose["R"], "-P", pose["P"], "-Y", pose["Y"],
+        ],
     )
 
-    return LaunchDescription([
-        robot_arg,
-        namespace_arg,
-        x_arg,
-        y_arg,
-        z_arg,
-        yaw_arg,
-        has_arm_arg,
-        robot_state_publisher,
-        spawn_entity,
-    ])
+    # --- Bridge config ---
+    # bridge_config = [
+    #     {
+    #         "ros_topic_name": "/clock",
+    #         "gz_topic_name": "/clock",
+    #         "ros_type_name": "rosgraph_msgs/msg/Clock",
+    #         "gz_type_name": "gz.msgs.Clock",
+    #         "direction": "GZ_TO_ROS",
+    #     },
+    #     {
+    #         "ros_topic_name": "/imu/data",
+    #         "gz_topic_name": "/imu/data",
+    #         "ros_type_name": "sensor_msgs/msg/Imu",
+    #         "gz_type_name": "ignition.msgs.IMU",
+    #         "direction": "GZ_TO_ROS",
+    #     },
+    #     {
+    #         "ros_topic_name": "/gps/fix",
+    #         "gz_topic_name": "/gps/data",
+    #         "ros_type_name": "sensor_msgs/msg/NavSatFix",
+    #         "gz_type_name": "ignition.msgs.NavSat",
+    #         "direction": "GZ_TO_ROS",
+    #     },
+    # ]
+    # with tempfile.NamedTemporaryFile(mode="w", delete=False) as tmp:
+    #     yaml.dump(bridge_config, tmp)
+    #     bridge_yaml = tmp.name
+
+    # bridge = Node(
+    #     package="ros_gz_bridge",
+    #     executable="parameter_bridge",
+    #     parameters=[{"config_file": bridge_yaml}],
+    #     output="screen",
+    # )
+
+    # # --- Controllers ---
+    # robotnik_control_yaml = os.path.join(
+    #     gazebo_pkg, "config", "profile", "rbkairos", "ros2_control.yaml"
+    # )
+
+    # # Joint state broadcaster
+    # joint_state_broadcaster_spawner = Node(
+    #     package="controller_manager",
+    #     executable="spawner",
+    #     arguments=["joint_state_broadcaster"],
+    #     output="screen",
+    # )
+
+    # # Base controller
+    # base_controller_spawner = Node(
+    #     package="controller_manager",
+    #     executable="spawner",
+    #     arguments=["robotnik_base_control", "--param-file", robotnik_control_yaml],
+    #     output="screen",
+    # )
+
+    # --- Env vars for Gazebo resources ---
+    # set_env_root = AppendEnvironmentVariable(
+    #     'GZ_SIM_RESOURCE_PATH',
+    #     str(Path(os.path.join(gazebo_pkg)).parent.resolve()))
+
+    # --- Build launch description ---
+    ld = LaunchDescription()
+    ld.add_action(declare_robot_name)
+    ld.add_action(declare_robot_model)
+    ld.add_action(declare_robot_xacro)
+    #ld.add_action(set_env_root)
+    #ld.add_action(robot_description)
+    ld.add_action(spawn_model)
+    #ld.add_action(bridge)
+    #ld.add_action(base_controller_spawner)
+    #ld.add_action(joint_state_broadcaster_spawner)
+
+    return ld

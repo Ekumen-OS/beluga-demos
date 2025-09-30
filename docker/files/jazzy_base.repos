@@ -30,7 +30,7 @@ repositories:
   robotnik_common:
     type: git
     url: https://github.com/RobotnikAutomation/robotnik_common.git
-    version: 69ba228d3b7fe711c0b18ca415ef6e88e5ddc217
+    version: 0153704842c35f115da65c7404d6ce6392f9c817
   robotnik_interfaces:
     type: git
     url: https://github.com/RobotnikAutomation/robotnik_interfaces.git

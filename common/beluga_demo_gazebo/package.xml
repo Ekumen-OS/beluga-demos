@@ -13,6 +13,8 @@
   <depend>nav2_minimal_tb3_sim</depend>
   <depend>robotnik_description</depend>
   <depend>robotnik_gazebo_ignition</depend>
+  <depend>robotnik_common</depend>
+
   <depend>ros_gz_sim</depend>
 
   <depend>xacro</depend>

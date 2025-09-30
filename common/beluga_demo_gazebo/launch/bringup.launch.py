@@ -100,20 +100,20 @@ def generate_launch_description():
     spawn_kairos = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
-                get_package_share_directory("robotnik_gazebo_ignition"),
+                get_package_share_directory("beluga_demo_gazebo"),
                 "launch",
                 "spawn_kairos.launch.py",
             )
         ),
         launch_arguments={
-            "robot": "rbkairos",
-            "namespace": "kairos",
+            "robot_name": "rbkairos",
+            "robot_model": "rbkairos",
             "x": "0",
-            "y": "-2",
+            "y": "-1.8",
             "z": "0.01",
             "has_arm": "False",
         }.items(),
-        condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'kairos'"]))
+        condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'rbkairos'"]))
     )
 
     return LaunchDescription(
