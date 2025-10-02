@@ -28,10 +28,10 @@ def generate_launch_description():
     ])
 
     return LaunchDescription([
-        robot_description := Node(
+        Node(
             package="robot_state_publisher",
             executable="robot_state_publisher",
-            #name="robot_state_publisher",
+            name="robot_state_publisher",
             output="screen",
             parameters=[{
                 "robot_description": Command([
@@ -39,7 +39,7 @@ def generate_launch_description():
                     " ",
                     kairos_xacro_file,
                     " gazebo_ignition:=","True",
-                    " namespace:=","''",
+                    " namespace:=\"''\"",
                 ]),
                 "publish_frequency": 100.0,
                 "use_sim_time": True,

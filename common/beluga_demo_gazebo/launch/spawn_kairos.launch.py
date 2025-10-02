@@ -86,76 +86,76 @@ def generate_launch_description():
     )
 
     # --- Bridge config ---
-    # bridge_config = [
-    #     {
-    #         "ros_topic_name": "/clock",
-    #         "gz_topic_name": "/clock",
-    #         "ros_type_name": "rosgraph_msgs/msg/Clock",
-    #         "gz_type_name": "gz.msgs.Clock",
-    #         "direction": "GZ_TO_ROS",
-    #     },
-    #     {
-    #         "ros_topic_name": "/imu/data",
-    #         "gz_topic_name": "/imu/data",
-    #         "ros_type_name": "sensor_msgs/msg/Imu",
-    #         "gz_type_name": "ignition.msgs.IMU",
-    #         "direction": "GZ_TO_ROS",
-    #     },
-    #     {
-    #         "ros_topic_name": "/gps/fix",
-    #         "gz_topic_name": "/gps/data",
-    #         "ros_type_name": "sensor_msgs/msg/NavSatFix",
-    #         "gz_type_name": "ignition.msgs.NavSat",
-    #         "direction": "GZ_TO_ROS",
-    #     },
-    # ]
-    # with tempfile.NamedTemporaryFile(mode="w", delete=False) as tmp:
-    #     yaml.dump(bridge_config, tmp)
-    #     bridge_yaml = tmp.name
+    bridge_config = [
+        {
+            "ros_topic_name": "/clock",
+            "gz_topic_name": "/clock",
+            "ros_type_name": "rosgraph_msgs/msg/Clock",
+            "gz_type_name": "gz.msgs.Clock",
+            "direction": "GZ_TO_ROS",
+        },
+        {
+            "ros_topic_name": "/imu/data",
+            "gz_topic_name": "/imu/data",
+            "ros_type_name": "sensor_msgs/msg/Imu",
+            "gz_type_name": "ignition.msgs.IMU",
+            "direction": "GZ_TO_ROS",
+        },
+        {
+            "ros_topic_name": "/gps/fix",
+            "gz_topic_name": "/gps/data",
+            "ros_type_name": "sensor_msgs/msg/NavSatFix",
+            "gz_type_name": "ignition.msgs.NavSat",
+            "direction": "GZ_TO_ROS",
+        },
+    ]
+    with tempfile.NamedTemporaryFile(mode="w", delete=False) as tmp:
+        yaml.dump(bridge_config, tmp)
+        bridge_yaml = tmp.name
 
-    # bridge = Node(
-    #     package="ros_gz_bridge",
-    #     executable="parameter_bridge",
-    #     parameters=[{"config_file": bridge_yaml}],
-    #     output="screen",
-    # )
+    bridge = Node(
+        package="ros_gz_bridge",
+        executable="parameter_bridge",
+        parameters=[{"config_file": bridge_yaml}],
+        output="screen",
+    )
 
-    # # --- Controllers ---
-    # robotnik_control_yaml = os.path.join(
-    #     gazebo_pkg, "config", "profile", "rbkairos", "ros2_control.yaml"
-    # )
+    # --- Controllers ---
+    robotnik_control_yaml = os.path.join(
+        gazebo_pkg, "config", "profile", "rbkairos", "ros2_control.yaml"
+    )
 
-    # # Joint state broadcaster
-    # joint_state_broadcaster_spawner = Node(
-    #     package="controller_manager",
-    #     executable="spawner",
-    #     arguments=["joint_state_broadcaster"],
-    #     output="screen",
-    # )
+    # Joint state broadcaster
+    joint_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["joint_state_broadcaster"],
+        output="screen",
+    )
 
-    # # Base controller
-    # base_controller_spawner = Node(
-    #     package="controller_manager",
-    #     executable="spawner",
-    #     arguments=["robotnik_base_control", "--param-file", robotnik_control_yaml],
-    #     output="screen",
-    # )
+    # Base controller
+    base_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["robotnik_base_control", "--param-file", robotnik_control_yaml],
+        output="screen",
+    )
 
     # --- Env vars for Gazebo resources ---
-    # set_env_root = AppendEnvironmentVariable(
-    #     'GZ_SIM_RESOURCE_PATH',
-    #     str(Path(os.path.join(gazebo_pkg)).parent.resolve()))
+    set_env_root = AppendEnvironmentVariable(
+        'GZ_SIM_RESOURCE_PATH',
+        str(Path(os.path.join(gazebo_pkg)).parent.resolve()))
 
     # --- Build launch description ---
     ld = LaunchDescription()
     ld.add_action(declare_robot_name)
     ld.add_action(declare_robot_model)
     ld.add_action(declare_robot_xacro)
-    #ld.add_action(set_env_root)
+    ld.add_action(set_env_root)
     #ld.add_action(robot_description)
     ld.add_action(spawn_model)
-    #ld.add_action(bridge)
-    #ld.add_action(base_controller_spawner)
-    #ld.add_action(joint_state_broadcaster_spawner)
+    ld.add_action(bridge)
+    ld.add_action(base_controller_spawner)
+    ld.add_action(joint_state_broadcaster_spawner)
 
     return ld
