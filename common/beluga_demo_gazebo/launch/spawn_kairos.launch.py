@@ -30,7 +30,27 @@ from launch.substitutions import (
 from launch.substitutions.find_executable import FindExecutable
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+import tempfile
+import yaml
 
+def extract_controllers_from_yaml(yaml_path):
+    """
+    Returns a list of top-level controller names in a ros2_control YAML file.
+    Handles the Robotnik /**: prefix.
+    """
+    controllers = []
+    with open(yaml_path, 'r') as f:
+        content = f.read()
+        if content.startswith('---\n/**:'):
+            content = content[len('---\n/**:'):]
+        # Write to a temporary file for safe_load
+        with tempfile.SpooledTemporaryFile(mode='w+') as tmp:
+            tmp.write(content)
+            tmp.seek(0)
+            data = yaml.safe_load(tmp)
+    if data is not None:
+        controllers.extend(data.keys())
+    return controllers
 
 def generate_launch_description():
     # --- Paths ---
@@ -120,25 +140,29 @@ def generate_launch_description():
         output="screen",
     )
 
-    # --- Controllers ---
-    robotnik_control_yaml = os.path.join(
-        gazebo_pkg, "config", "profile", "rbkairos", "ros2_control.yaml"
+    # # --- Controllers ---
+    # robotnik_control_yaml = os.path.join(
+    #     gazebo_pkg, "config", "profile", "rbkairos", "ros2_control.yaml"
+    # )
+
+    mecanum_controller_params = os.path.join(
+    #    get_package_share_directory("beluga_demo_gazebo"), "config", "mecanum_controller_params.yaml"
+        get_package_share_directory("beluga_demo_description"), "launch", "include", "kairos_controller_params.yaml",
     )
 
-    # Joint state broadcaster
-    joint_state_broadcaster_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_state_broadcaster"],
-        output="screen",
-    )
+    # Extract controller names dynamically from the YAML
+    controllers_to_spawn = [
+        'joint_state_broadcaster',
+        'mecanum_drive_controller',
+        '--param-file', mecanum_controller_params,
+    ]
 
-    # Base controller
-    base_controller_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["robotnik_base_control", "--param-file", robotnik_control_yaml],
-        output="screen",
+    controller_spawner = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=controllers_to_spawn,
+        output='screen',
+        #parameters=[{'use_sim_time': True}],
     )
 
     # --- Env vars for Gazebo resources ---
@@ -152,10 +176,8 @@ def generate_launch_description():
     ld.add_action(declare_robot_model)
     ld.add_action(declare_robot_xacro)
     ld.add_action(set_env_root)
-    #ld.add_action(robot_description)
     ld.add_action(spawn_model)
     ld.add_action(bridge)
-    ld.add_action(base_controller_spawner)
-    ld.add_action(joint_state_broadcaster_spawner)
+    ld.add_action(controller_spawner)
 
     return ld

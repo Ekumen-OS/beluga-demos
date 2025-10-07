@@ -15,18 +15,16 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-from launch.substitutions import Command, PathJoinSubstitution
-from launch.substitutions.find_executable import FindExecutable
+import os
 
 def generate_launch_description():
-    # Path to Kairos xacro file
-    kairos_xacro_file = PathJoinSubstitution([
-        get_package_share_directory("robotnik_description"),
-        "robots",
-        "rbkairos",
-        "rbkairos.urdf.xacro"
-    ])
-
+    kairos_xacro_file = os.path.join(
+        get_package_share_directory("beluga_demo_description"),
+        "launch",
+        "include",
+        "kairos_custom.urdf.xacro"
+    )
+    
     return LaunchDescription([
         Node(
             package="robot_state_publisher",
@@ -34,13 +32,7 @@ def generate_launch_description():
             name="robot_state_publisher",
             output="screen",
             parameters=[{
-                "robot_description": Command([
-                    FindExecutable(name="xacro"),
-                    " ",
-                    kairos_xacro_file,
-                    " gazebo_ignition:=","True",
-                    " namespace:=\"''\"",
-                ]),
+                "robot_description": open(kairos_xacro_file).read(),
                 "publish_frequency": 100.0,
                 "use_sim_time": True,
             }],
