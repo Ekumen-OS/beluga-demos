@@ -162,6 +162,7 @@ def generate_launch_description():
         executable='spawner',
         arguments=controllers_to_spawn,
         output='screen',
+        namespace = "",
         #parameters=[{'use_sim_time': True}],
     )
 

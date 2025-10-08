@@ -14,8 +14,6 @@
   <depend>robotnik_description</depend>
   <depend>robotnik_gazebo_ignition</depend>
   <depend>robotnik_common</depend>
-  <depend>ros2_control</depend>
-  <depend>ros2_controllers</depend>
   <depend>mecanum_drive_controller</depend>
 
   <depend>ros_gz_sim</depend>
