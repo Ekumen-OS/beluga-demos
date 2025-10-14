@@ -140,11 +140,6 @@ def generate_launch_description():
         output="screen",
     )
 
-    # # --- Controllers ---
-    # robotnik_control_yaml = os.path.join(
-    #     gazebo_pkg, "config", "profile", "rbkairos", "ros2_control.yaml"
-    # )
-
     mecanum_controller_params = os.path.join(
     #    get_package_share_directory('beluga_demo_gazebo'), 'config', 'mecanum_controller_params.yaml'
         get_package_share_directory("beluga_demo_description"), "launch", "include", "kairos_controller_params.yaml",
