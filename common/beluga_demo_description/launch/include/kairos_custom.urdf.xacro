@@ -321,7 +321,7 @@
       <parameters>/home/developer/ws/src/beluga_demo/common/beluga_demo_description/config/kairos_controller_params.yaml</parameters>
       <ros>
         <namespace>/</namespace>
-      </ros>
+      </ros> 
     </plugin>
   </gazebo>
   <ros2_control name="IgnitionSystem" type="system">

@@ -141,9 +141,7 @@ def generate_launch_description():
     )
 
     mecanum_controller_params = os.path.join(
-    #    get_package_share_directory('beluga_demo_gazebo'), 'config', 'mecanum_controller_params.yaml'
-        get_package_share_directory("beluga_demo_description"), "launch", "include", "kairos_controller_params.yaml",
-    #    get_package_share_directory("beluga_demo_description"), "config", "kairos_controller_params.yaml",
+        get_package_share_directory("beluga_demo_gazebo"), "config", "mecanum_controller_params.yaml",
     )
 
     # Extract controller names dynamically from the YAML
