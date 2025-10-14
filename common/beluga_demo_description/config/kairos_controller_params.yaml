@@ -13,6 +13,7 @@
   mecanum_drive_controller:
     ros__parameters:
       publish_rate: 50
+      #cmd_vel_timeout: 2.0
 
       front_left_wheel_command_joint_name: "front_left_wheel_joint"
       rear_left_wheel_command_joint_name: "back_left_wheel_joint"
@@ -20,14 +21,17 @@
       rear_right_wheel_command_joint_name: "back_right_wheel_joint"
 
       # From the robotnik_desccription URDF:
-      wheel_separation:  0.5     # distance between left and right wheels (VERIFIED! = 2*wheel_offset_y)
-      wheel_radius:      0.127   # radius of wheels (VERIFIED!)
+      kinematics:
+        wheels_separation:  0.5     # distance between left and right wheels (VERIFIED! = 2*wheel_offset_y)
+        wheels_radius:      0.127   # radius of wheels (VERIFIED!)
+        sum_of_robot_center_projection_on_X_Y_axis: 1.0 # Added
 
       # Optional but useful:
       cmd_vel_timeout:   0.25
       use_stamped_vel:   false
       publish_rate:      50
       enable_odom_tf:    true
-      odom_frame_id:     odom
-      base_frame_id:     base_footprint
-
+      odom_frame_id:     "odom"
+      base_frame_id:     "base_footprint"
+      twist_covariance_diagonal: [0.0, 7.0, 14.0, 21.0, 28.0, 35.0]
+      pose_covariance_diagonal: [0.0, 6.0, 12.0, 18.0, 24.0, 30.0]

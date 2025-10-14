@@ -16,17 +16,53 @@
 
 
 from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, GroupAction
+from launch.conditions import IfCondition, UnlessCondition
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    return LaunchDescription(
-        [
-            Node(
-                package="teleop_twist_keyboard",
-                executable="teleop_twist_keyboard",
-                output="screen",
-                prefix="xterm -e",
-            ),
-        ]
+
+    robot_name_conf = LaunchConfiguration('robot_name')
+
+    robot_name_arg = DeclareLaunchArgument(
+        name='robot_name',
+        default_value='tb3',
+        description='Robot name',
+        choices=['tb3', 'rbkairos'],
     )
+
+    # Node for rbkairos (stamped + remapped)
+    teleop_node_rbkairos = Node(
+        package="teleop_twist_keyboard",
+        executable="teleop_twist_keyboard",
+        name="teleop_twist_keyboard_rbkairos",
+        parameters=[{"stamped": True}],
+        remappings=[('/cmd_vel', '/mecanum_drive_controller/reference')],
+        output="screen",
+        prefix="xterm -e",
+        condition=IfCondition(
+            PythonExpression(['"', robot_name_conf, '" == "rbkairos"'])
+        ),
+    )
+
+    # Node for tb3 (no stamped/remaps)
+    teleop_node_tb3 = Node(
+        package="teleop_twist_keyboard",
+        executable="teleop_twist_keyboard",
+        name="teleop_twist_keyboard_tb3",
+        output="screen",
+        prefix="xterm -e",
+        condition=IfCondition(
+            PythonExpression(['"', robot_name_conf, '" == "tb3"'])
+        ),
+    )
+
+    return LaunchDescription([
+        robot_name_arg,
+        GroupAction([
+            teleop_node_rbkairos,
+            teleop_node_tb3,
+        ]),
+    ])
