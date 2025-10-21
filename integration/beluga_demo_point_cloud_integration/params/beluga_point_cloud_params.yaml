@@ -21,7 +21,7 @@ amcl:
     # The name of the topic where the map is published by the map server.
     map_topic: map
     # The name of the topic where scans are being published.
-    scan_topic: scan
+    scan_topic: /front_laser/scan
     # The name of the topic where an initial pose can be published.
     # The particle filter will be reset using the provided pose with covariance.
     initial_pose_topic: initialpose
@@ -269,7 +269,7 @@ local_costmap:
         mark_threshold: 0
         observation_sources: scan
         scan:
-          topic: /scan
+          topic: /front_laser/scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -300,7 +300,7 @@ global_costmap:
         enabled: True
         observation_sources: scan
         scan:
-          topic: /scan
+          topic: /front_laser/scan
           max_obstacle_height: 2.0
           clearing: True
           marking: True

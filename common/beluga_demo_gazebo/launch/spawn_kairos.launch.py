@@ -33,25 +33,6 @@ from launch_ros.substitutions import FindPackageShare
 import tempfile
 import yaml
 
-def extract_controllers_from_yaml(yaml_path):
-    """
-    Returns a list of top-level controller names in a ros2_control YAML file.
-    Handles the Robotnik /**: prefix.
-    """
-    controllers = []
-    with open(yaml_path, 'r') as f:
-        content = f.read()
-        if content.startswith('---\n/**:'):
-            content = content[len('---\n/**:'):]
-        # Write to a temporary file for safe_load
-        with tempfile.SpooledTemporaryFile(mode='w+') as tmp:
-            tmp.write(content)
-            tmp.seek(0)
-            data = yaml.safe_load(tmp)
-    if data is not None:
-        controllers.extend(data.keys())
-    return controllers
-
 def generate_launch_description():
     # --- Paths ---
     gazebo_pkg = get_package_share_directory("robotnik_gazebo_ignition")
@@ -73,9 +54,11 @@ def generate_launch_description():
     declare_robot_name = DeclareLaunchArgument(
         "robot_name", default_value="rbkairos", description="Name of the robot"
     )
+
     declare_robot_model = DeclareLaunchArgument(
-        "robot_model", default_value="rbkairos", description="Robot variant"
+        "robot_model", default_value="rbkairos", description="Model of the robot"
     )
+    
     declare_robot_xacro = DeclareLaunchArgument(
         "robot_xacro",
         default_value=PathJoinSubstitution([
@@ -95,11 +78,6 @@ def generate_launch_description():
         arguments=[
             "-name", robot_name,
             "-topic", "/robot_description",
-            # '-string', Command([
-            #     FindExecutable(name="xacro"),
-            #     " ",  # Ensures separation between executable and file path
-            #     robot_xacro,
-            # ]),
             "-x", pose["x"], "-y", pose["y"], "-z", pose["z"],
             "-R", pose["R"], "-P", pose["P"], "-Y", pose["Y"],
         ],
@@ -114,18 +92,48 @@ def generate_launch_description():
             "gz_type_name": "gz.msgs.Clock",
             "direction": "GZ_TO_ROS",
         },
+        # gz topic published by Sensors plugin
+        {
+            "ros_topic_name": "/front_laser/scan",
+            "gz_topic_name": "/front_laser/scan",
+            "ros_type_name": "sensor_msgs/msg/LaserScan",
+            "gz_type_name": "gz.msgs.LaserScan",
+            "direction": "GZ_TO_ROS",
+        },
+        #gz topic published by Sensors plugin
+        {
+            "ros_topic_name": "/rear_laser/scan",
+            "gz_topic_name": "/rear_laser/scan",
+            "ros_type_name": "sensor_msgs/msg/LaserScan",
+            "gz_type_name": "gz.msgs.LaserScan",
+            "direction": "GZ_TO_ROS",
+        },
+        {
+            "ros_topic_name": "/camera/camera_info",
+            "gz_topic_name": "/front_camera_color/color/camera_info",
+            "ros_type_name": "sensor_msgs/msg/CameraInfo",
+            "gz_type_name": "gz.msgs.CameraInfo",
+            "direction": "GZ_TO_ROS",
+        },
+        {
+            "ros_topic_name": "/camera/image_raw",
+            "gz_topic_name": "/front_camera_color/color/image_raw",
+            "ros_type_name": "sensor_msgs/msg/Image",
+            "gz_type_name": "gz.msgs.Image",
+            "direction": "GZ_TO_ROS",
+        },
         {
             "ros_topic_name": "/imu/data",
             "gz_topic_name": "/imu/data",
             "ros_type_name": "sensor_msgs/msg/Imu",
-            "gz_type_name": "ignition.msgs.IMU",
+            "gz_type_name": "gz.msgs.IMU",
             "direction": "GZ_TO_ROS",
         },
         {
-            "ros_topic_name": "/gps/fix",
+            "ros_topic_name": "/gps/data",
             "gz_topic_name": "/gps/data",
             "ros_type_name": "sensor_msgs/msg/NavSatFix",
-            "gz_type_name": "ignition.msgs.NavSat",
+            "gz_type_name": "gz.msgs.NavSat",
             "direction": "GZ_TO_ROS",
         },
     ]
@@ -149,6 +157,7 @@ def generate_launch_description():
         'joint_state_broadcaster',
         'mecanum_drive_controller',
         '--param-file', mecanum_controller_params,
+        '--controller-ros-args','-r ~/odometry:=/odom -r ~/tf_odometry:=/tf',
     ]
 
     controller_spawner = Node(

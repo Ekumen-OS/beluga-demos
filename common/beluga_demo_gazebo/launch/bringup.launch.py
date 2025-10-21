@@ -107,11 +107,9 @@ def generate_launch_description():
         ),
         launch_arguments={
             "robot_name": "rbkairos",
-            "robot_model": "rbkairos",
-            "x": "0",
-            "y": "-1.8",
-            "z": "0.01",
-            "has_arm": "False",
+            "x_pose": "0",
+            "y_pose": "-1.8",
+            "z_pose": "0.01",
         }.items(),
         condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'rbkairos'"]))
     )

@@ -514,7 +514,8 @@
   <gazebo reference="front_laser_link">
     <sensor name="front_laser" type="gpu_lidar">
       <pose>0 0 0 0 0 0</pose>
-      <visualize>false</visualize>
+      <always_on>true</always_on>
+      <visualize>true</visualize>
       <update_rate>25.0</update_rate>
       <lidar>
         <scan>
@@ -540,6 +541,7 @@
       <gz_frame_id>front_laser_link</gz_frame_id>
     </sensor>
   </gazebo>
+  
   <joint name="rear_laser_base_joint" type="fixed">
     <origin rpy="0 -3.141592653589793 -0.7853981633974483" xyz="-0.2865 0.20894 0.2973"/>
     <parent link="base_link"/>

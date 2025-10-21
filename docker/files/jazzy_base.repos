@@ -35,4 +35,7 @@ repositories:
     type: git
     url: https://github.com/RobotnikAutomation/robotnik_interfaces.git
     version: e5e07b88740a033894aa45a26d7e556383838410
-  
+  ros-control/gz_ros2_control:
+    type: git
+    url: https://github.com/ros-controls/gz_ros2_control.git
+    version: 1.2.15

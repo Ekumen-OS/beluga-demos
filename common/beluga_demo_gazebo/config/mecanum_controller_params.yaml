@@ -8,8 +8,8 @@
 
       # Kinematic parameters from the URDF
       kinematics:
-        wheels_separation:  0.5     # distance between left and right wheels (VERIFIED! = 2*wheel_offset_y)
-        wheels_radius:      0.127   # radius of wheels (VERIFIED!)
+        wheels_separation:  0.47    # distance between left and right wheels (VERIFIED!)
+        wheels_radius:      0.11    # radius of wheels (VERIFIED!)
         sum_of_robot_center_projection_on_X_Y_axis: 1.0 # Added
 
       # Optional but useful:
