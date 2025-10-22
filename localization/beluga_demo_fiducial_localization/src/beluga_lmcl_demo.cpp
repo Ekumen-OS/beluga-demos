@@ -35,6 +35,7 @@
 #include <beluga/policies/policy.hpp>
 #include <beluga/sensor/data/landmark_map.hpp>
 
+#include <beluga_ros/messages.hpp>
 #include <beluga_ros/particle_cloud.hpp>
 #include <beluga_ros/tf2_sophus.hpp>
 

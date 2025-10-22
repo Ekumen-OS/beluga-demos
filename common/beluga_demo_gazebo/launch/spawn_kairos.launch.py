@@ -152,18 +152,27 @@ def generate_launch_description():
         get_package_share_directory("beluga_demo_gazebo"), "config", "mecanum_controller_params.yaml",
     )
 
-    # Extract controller names dynamically from the YAML
-    controllers_to_spawn = [
-        'joint_state_broadcaster',
-        'mecanum_drive_controller',
-        '--param-file', mecanum_controller_params,
-        '--controller-ros-args','-r ~/odometry:=/odom -r ~/tf_odometry:=/tf',
-    ]
-
-    controller_spawner = Node(
+    joint_state_broadcaster_spawner = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=controllers_to_spawn,
+        arguments=[
+            'joint_state_broadcaster',
+            '--switch-timeout', '10',
+            '--controller-manager-timeout', '10',
+        ],
+        output='screen',
+    )
+
+    mecanum_drive_controller_spawner = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=[
+            'mecanum_drive_controller',
+            '--switch-timeout', '10',
+            '--controller-manager-timeout', '10',
+            '--param-file', mecanum_controller_params,
+            '--controller-ros-args', '-r ~/odometry:=/odom -r ~/tf_odometry:=/tf',
+        ],
         output='screen',
     )
 
@@ -180,6 +189,7 @@ def generate_launch_description():
     ld.add_action(set_env_root)
     ld.add_action(spawn_model)
     ld.add_action(bridge)
-    ld.add_action(controller_spawner)
+    ld.add_action(joint_state_broadcaster_spawner)
+    ld.add_action(mecanum_drive_controller_spawner)
 
     return ld

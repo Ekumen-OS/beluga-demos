@@ -16,6 +16,13 @@
   <depend>nav2_map_server</depend>
   <depend>nav2_lifecycle_manager</depend>
 
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>laser_geometry</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_sensor_msgs</depend>
+  <depend>sensor_msgs_py</depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
