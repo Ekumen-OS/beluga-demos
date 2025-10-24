@@ -12,18 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution
-from launch_ros.actions import SetParameter
+from launch_ros.actions import Node, SetParameter
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
     return LaunchDescription(
         [
-            SetParameter(name="use_sim_time", value=True),
+            SetParameter(
+                name="use_sim_time",
+                value=True,
+            ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     PathJoinSubstitution(
@@ -36,14 +40,25 @@ def generate_launch_description():
                 ),
                 launch_arguments={
                     "world_name": "populated_ekumen_hq4.world",
-                    "robot_name": "rbkairos"
+                    "robot_name": "rbkairos",                    
                 }.items(),
+            ),
+            Node(
+                package="beluga_demo_lidar_localization",
+                executable="lidar_merge_node",
+                name="lidar_merge_node",
+                output="screen",
+                remappings = [
+                    ("scan1", "/front_laser/scan"),
+                    ("scan2", "/rear_laser/scan"),
+                    ("cloud", "/laser_cloud"),
+                ],
             ),
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
                     PathJoinSubstitution(
                         [
-                            FindPackageShare("beluga_demo_point_cloud_integration"),
+                            FindPackageShare("beluga_demo_lidar_localization"),
                             "launch",
                             "bringup.launch.py",
                         ]
@@ -51,7 +66,7 @@ def generate_launch_description():
                 ),
                 launch_arguments={
                     "map_name": "hq4_office",
-                    "params_file": "beluga_point_cloud_params.yaml",
+                    "amcl_params_file": "point_cloud_params.yaml",
                 }.items(),
             ),
         ]
