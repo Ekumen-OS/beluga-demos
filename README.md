@@ -18,6 +18,8 @@ docker run hello-world
 
 If you don't have Docker installed, you can find instructions on how to install it [here](https://docs.docker.com/get-docker/). Instructions for installing Docker on Ubuntu can be found [here](https://docs.docker.com/engine/install/ubuntu/).
 
+If you have Nvidia hardware, make sure you install the Nvidia Container Toolkit too, as described [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+
 ## Quick start
 
 #### Step 1: Clone the repository
@@ -36,6 +38,9 @@ cd beluga-demos
 ROSDISTRO=humble docker/run.sh  # ROS2 Humble
 ROSDISTRO=jazzy docker/run.sh   # ROS2 Jazzy
 ```
+
+> [!IMPORTANT]
+> When running on Nvidia hardware, use `docker/run.sh --nvidia` instead.
 
 #### Step 3: Build the demo software code
 

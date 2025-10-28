@@ -21,10 +21,10 @@ set -o errexit
 cd $(dirname "$(readlink -f "$0")")
 
 [[ ! -z "${WITHIN_DEV}" ]] && echo "Already in the development environment!" && exit 1
-HELP="Usage: $(basename $0) [-b|--build] [-p|--privileged]"
+HELP="Usage: $(basename $0) [-n|--nvidia] [-b|--build] [-p|--privileged]"
 
 set +o errexit
-VALID_ARGS=$(OPTERR=1 getopt -o bph --long build,privileged,help -- "$@")
+VALID_ARGS=$(OPTERR=1 getopt -o bpnh --long build,privileged,nvidia,help -- "$@")
 RET_CODE=$?
 set -o errexit
 
@@ -38,6 +38,7 @@ if [[ $RET_CODE -ne 0 ]]; then
 fi
 
 BUILD=false
+NVIDIA_RUNTIME=false
 PRIVILEGED_CONTAINER=true
 
 eval set -- "$VALID_ARGS"
@@ -49,6 +50,10 @@ while [[ "$1" != "" ]]; do
         ;;
     -u | --non-privileged)
         PRIVILEGED_CONTAINER=false
+        shift
+        ;;
+    -n | --nvidia)
+        NVIDIA_RUNTIME=true
         shift
         ;;
     -h | --help)
@@ -66,10 +71,15 @@ while [[ "$1" != "" ]]; do
     esac
 done
 
+TARGET=beluga-demo-dev
+if [[ "$NVIDIA_RUNTIME" = true ]]; then
+    TARGET=$TARGET-nvidia
+fi
+
 # Note: The `--build` flag was added to docker compose run after
 # https://github.com/docker/compose/releases/tag/v2.13.0.
 # We have this for convenience and compatibility with previous versions.
 # Otherwise, we could just forward the script arguments to the run verb.
-[[ "$BUILD" = true ]] && docker compose build beluga-demo-dev
+[[ "$BUILD" = true ]] && docker compose build $TARGET
 
-PRIVILEGED_CONTAINER=$PRIVILEGED_CONTAINER USERID=$(id -u) GROUPID=dialout docker compose run --rm beluga-demo-dev
+PRIVILEGED_CONTAINER=$PRIVILEGED_CONTAINER USERID=$(id -u) GROUPID=dialout docker compose run --rm $TARGET
