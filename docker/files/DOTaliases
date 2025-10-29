@@ -2,10 +2,6 @@ alias demo_build='cd ~/ws \
   && colcon build --symlink-install --packages-up-to-regex beluga_demo --cmake-args -DCMAKE_BUILD_TYPE=Release \
   && source install/setup.bash'
 
-alias demo_build_skipping='cd ~/ws \
-  && colcon build --symlink-install --packages-up-to-regex beluga_demo --packages-skip beluga_demo_amcl3_localization --cmake-args -DCMAKE_BUILD_TYPE=Release \
-  && source install/setup.bash'
-
 alias lidar_beam_model_hallway_demo='cd ~/ws \
   && source install/setup.bash \
   && ros2 launch beluga_demo_lidar_localization demo_hallway_beam_localization.launch.py'
