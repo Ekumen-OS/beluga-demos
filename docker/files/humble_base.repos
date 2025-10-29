@@ -10,7 +10,7 @@ repositories:
   gz_ekumen_worlds:
     type: git
     url: https://github.com/Ekumen-OS/gz_ekumen_worlds.git
-    version: c3ec2774cbb029979b09c0e7e6986e85d46e1e1d
+    version: c54b028d4a3a0607330d94db17a4699633afa7e5
   nav2_minimal_turtlebot_simulation:
     type: git
     url: https://github.com/ros-navigation/nav2_minimal_turtlebot_simulation.git
