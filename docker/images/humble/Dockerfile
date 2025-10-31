@@ -53,17 +53,6 @@ RUN git clone -b 2.6.1 https://github.com/ros-perception/perception_pcl.git \
   && cd .. \
   && apt-get update \
   && . /opt/ros/humble/setup.sh \
-  # Patch begins.................................................
-  # Clone rosdistro locally to avoid GitHub rawcontent throttling
-  && git clone https://github.com/ros/rosdistro.git -b master --depth 1 /home/$USER/rosdistro \
-  && mkdir -p /home/$USER/rosdistro/rosdep/sources.list.d \
-  && sed -i s#https://raw.githubusercontent.com/ros/rosdistro/master/#file:///home/$USER/rosdistro/# \
-        /home/$USER/rosdistro/rosdep/sources.list.d/20-default.list \
-  && sed -i "/fuerte/d" /home/$USER/rosdistro/rosdep/sources.list.d/20-default.list \
-  # Point rosdep to the local index
-  && export ROSDISTRO_INDEX_URL="file:///home/$USER/rosdistro/index-v4.yaml" \
-  && export ROSDEP_SOURCE_PATH=/home/$USER/rosdistro/rosdep/sources.list.d \
-  # Patch ends...................................................
   && rosdep update \
   && rosdep install -i -y --from-path src \
   && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
@@ -121,22 +110,9 @@ WORKDIR /tmp
 
 WORKDIR $USER_WS
 
-# Following lines are temporarily not working (see hacked way below)
-# RUN colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml \
-#   && colcon mixin update default
-# COPY --chown=$USER:$GROUP docker/files/colcon_defaults.yaml /home/$USER/.colcon/defaults.yaml
-
-# Hacked way to override the githubusercontent throttle issues
-RUN cd /home/$USER \
- && git clone https://github.com/ros/rosdistro.git -b master --depth 1 \
- && mkdir -p /home/$USER/rosdistro/rosdep/sources.list.d \
- && sed -i s#https://raw.githubusercontent.com/ros/rosdistro/master/#file:///home/$USER/rosdistro/# \
-    /home/$USER/rosdistro/rosdep/sources.list.d/20-default.list \
- && sed -i "/fuerte/d" /home/$USER/rosdistro/rosdep/sources.list.d/20-default.list
-ENV ROSDISTRO_INDEX_URL="file:///home/$USER/rosdistro/index-v4.yaml"
-ENV ROSDEP_SOURCE_PATH=/home/$USER/rosdistro/rosdep/sources.list.d
-RUN bash -c 'rosdep update'
-#----
+RUN colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml \
+  && colcon mixin update default
+COPY --chown=$USER:$GROUP docker/files/colcon_defaults.yaml /home/$USER/.colcon/defaults.yaml
 
 RUN mkdir -p /home/$USER/.ccache $USER_WS/src
 
