@@ -34,13 +34,8 @@ import tempfile
 import yaml
 
 def generate_launch_description():
-    # --- Paths ---
-    gazebo_pkg = get_package_share_directory("robotnik_gazebo_ignition")
 
-    # --- Arguments ---
     robot_name = LaunchConfiguration("robot_name")
-    robot_model = LaunchConfiguration("robot_model")
-    robot_xacro = LaunchConfiguration("robot_xacro")
 
     pose = {
         "x": LaunchConfiguration("x_pose", default="0.0"),
@@ -55,22 +50,7 @@ def generate_launch_description():
         "robot_name", default_value="rbkairos", description="Name of the robot"
     )
 
-    declare_robot_model = DeclareLaunchArgument(
-        "robot_model", default_value="rbkairos", description="Model of the robot"
-    )
-    
-    declare_robot_xacro = DeclareLaunchArgument(
-        "robot_xacro",
-        default_value=PathJoinSubstitution([
-            FindPackageShare("robotnik_description"),
-            "robots",
-            LaunchConfiguration("robot_name"),
-            [LaunchConfiguration("robot_model"), TextSubstitution(text=".urdf.xacro")],
-        ]),
-        description="Path to robot xacro file",
-    )
-
-    # --- Spawn in Gazebo ---
+    # Spawn Kairos robot in Gazebo
     spawn_model = Node(
         package="ros_gz_sim",
         executable="create",
@@ -83,7 +63,7 @@ def generate_launch_description():
         ],
     )
 
-    # --- Bridge config ---
+    # Bridge config
     bridge_config = [
         {
             "ros_topic_name": "/clock",
@@ -92,7 +72,6 @@ def generate_launch_description():
             "gz_type_name": "gz.msgs.Clock",
             "direction": "GZ_TO_ROS",
         },
-        # gz topic published by Sensors plugin
         {
             "ros_topic_name": "/front_laser/scan",
             "gz_topic_name": "/front_laser/scan",
@@ -100,7 +79,6 @@ def generate_launch_description():
             "gz_type_name": "gz.msgs.LaserScan",
             "direction": "GZ_TO_ROS",
         },
-        #gz topic published by Sensors plugin
         {
             "ros_topic_name": "/rear_laser/scan",
             "gz_topic_name": "/rear_laser/scan",
@@ -148,6 +126,7 @@ def generate_launch_description():
         output="screen",
     )
 
+    # Spawn robot controllers in Gazebo
     mecanum_controller_params = os.path.join(
         get_package_share_directory("beluga_demo_gazebo"), "config", "mecanum_controller_params.yaml",
     )
@@ -176,16 +155,14 @@ def generate_launch_description():
         output='screen',
     )
 
-    # --- Env vars for Gazebo resources ---
+    # Env var for Gazebo resources
     set_env_root = AppendEnvironmentVariable(
         'GZ_SIM_RESOURCE_PATH',
-        str(Path(os.path.join(gazebo_pkg)).parent.resolve()))
+        str(Path(os.path.join(get_package_share_directory("robotnik_gazebo_ignition"))).parent.resolve()))
 
-    # --- Build launch description ---
+    # Build launch description
     ld = LaunchDescription()
     ld.add_action(declare_robot_name)
-    ld.add_action(declare_robot_model)
-    ld.add_action(declare_robot_xacro)
     ld.add_action(set_env_root)
     ld.add_action(spawn_model)
     ld.add_action(bridge)
