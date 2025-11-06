@@ -23,7 +23,6 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-
     robot_name_conf = LaunchConfiguration('robot_name')
 
     robot_name_arg = DeclareLaunchArgument(
@@ -54,15 +53,17 @@ def generate_launch_description():
         name="teleop_twist_keyboard_tb3",
         output="screen",
         prefix="xterm -e",
-        condition=IfCondition(
-            PythonExpression(['"', robot_name_conf, '" == "tb3"'])
-        ),
+        condition=IfCondition(PythonExpression(['"', robot_name_conf, '" == "tb3"'])),
     )
 
-    return LaunchDescription([
-        robot_name_arg,
-        GroupAction([
-            teleop_node_rbkairos,
-            teleop_node_tb3,
-        ]),
-    ])
+    return LaunchDescription(
+        [
+            robot_name_arg,
+            GroupAction(
+                [
+                    teleop_node_rbkairos,
+                    teleop_node_tb3,
+                ]
+            ),
+        ]
+    )

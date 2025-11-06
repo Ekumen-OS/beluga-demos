@@ -14,7 +14,11 @@
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, TextSubstitution
+from launch.substitutions import (
+    LaunchConfiguration,
+    PathJoinSubstitution,
+    TextSubstitution,
+)
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
@@ -23,15 +27,19 @@ def generate_launch_description():
     robot_name = LaunchConfiguration("robot_name")
 
     declare_robot_name = DeclareLaunchArgument(
-        "robot_name",
-        default_value="tb3",
-        description="Robot to spawn (tb3 or kairos)"
+        "robot_name", default_value="tb3", description="Robot to spawn (tb3 or kairos)"
     )
 
     rviz_config_path = PathJoinSubstitution(
-        [FindPackageShare('beluga_demo_rviz2'),
-        'rviz',
-        [TextSubstitution(text="model_"), LaunchConfiguration("robot_name"), TextSubstitution(text=".rviz")]]
+        [
+            FindPackageShare('beluga_demo_rviz2'),
+            'rviz',
+            [
+                TextSubstitution(text="model_"),
+                LaunchConfiguration("robot_name"),
+                TextSubstitution(text=".rviz"),
+            ],
+        ]
     )
 
     return LaunchDescription(
@@ -45,30 +53,3 @@ def generate_launch_description():
             ),
         ]
     )
-
-# def generate_launch_description():
-#     robot_name = LaunchConfiguration("robot_name")
-
-#     declare_robot_name = DeclareLaunchArgument(
-#         "robot_name",
-#         default_value="tb3",
-#         description="Robot to spawn (tb3 or kairos)"
-#     )
-
-#     rviz_config_path = PathJoinSubstitution([
-#         FindPackageShare("beluga_demo_rviz2"),
-#         "rviz",
-#         TextSubstitution(text="model_"),
-#         robot_name,
-#         TextSubstitution(text=".rviz")
-#     ])
-
-#     rviz_node = Node(
-#         package="rviz2",
-#         executable="rviz2",
-#         output="screen",
-#         respawn=True,
-#         arguments=["-d", rviz_config_path],
-#     )
-
-#     return LaunchDescription([declare_robot_name, rviz_node])

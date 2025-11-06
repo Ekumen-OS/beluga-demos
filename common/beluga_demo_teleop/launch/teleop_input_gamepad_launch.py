@@ -88,9 +88,7 @@ def generate_launch_description():
         remappings={
             ('/joy', '/input/joystick'),
         },
-        condition=IfCondition(
-            PythonExpression(['"', robot_name_conf, '" == "tb3"'])
-        ),
+        condition=IfCondition(PythonExpression(['"', robot_name_conf, '" == "tb3"'])),
     )
 
     return LaunchDescription(

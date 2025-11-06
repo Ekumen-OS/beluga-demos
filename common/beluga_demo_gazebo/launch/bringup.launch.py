@@ -24,6 +24,7 @@ from launch.substitutions import LaunchConfiguration
 from launch.conditions import IfCondition
 from launch.substitutions import PythonExpression
 
+
 def generate_launch_description():
     world_paths = [
         os.path.join(get_package_share_directory("gz_ekumen_worlds"), "worlds"),
@@ -49,9 +50,7 @@ def generate_launch_description():
     robot_name_conf = LaunchConfiguration("robot_name")
 
     robot_name_arg = DeclareLaunchArgument(
-        name="robot_name",
-        default_value="tb3",
-        description="Robot to spawn"
+        name="robot_name", default_value="tb3", description="Robot to spawn"
     )
 
     append_tb3_gz_sim_resources = AppendEnvironmentVariable(
@@ -94,9 +93,9 @@ def generate_launch_description():
             ],
         ),
         launch_arguments=[("x_pose", "0"), ("y_pose", "-2"), ("z_pose", "0.01")],
-        condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'tb3'"]))
+        condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'tb3'"])),
     )
- 
+
     spawn_kairos = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -111,7 +110,9 @@ def generate_launch_description():
             "y_pose": "-1.8",
             "z_pose": "0.01",
         }.items(),
-        condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'rbkairos'"]))
+        condition=IfCondition(
+            PythonExpression(["'", robot_name_conf, "' == 'rbkairos'"])
+        ),
     )
 
     return LaunchDescription(

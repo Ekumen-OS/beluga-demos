@@ -40,7 +40,8 @@ class LidarMergeNode(Node):
 
         slop_seconds = self.declare_parameter('slop_seconds', 0.1).value
         self.ts = message_filters.ApproximateTimeSynchronizer(
-            [self.scan1_sub, self.scan2_sub], 10, slop_seconds)
+            [self.scan1_sub, self.scan2_sub], 10, slop_seconds
+        )
         self.ts.registerCallback(self.scan_callback)
 
         self.cloud_pub = self.create_publisher(PointCloud2, 'cloud', 10)
@@ -51,15 +52,21 @@ class LidarMergeNode(Node):
             cloud2 = self.projector.projectLaser(scan2)
 
             transform1 = self.tf_buffer.lookup_transform(
-                self.target_frame, scan1.header.frame_id, scan1.header.stamp)
+                self.target_frame, scan1.header.frame_id, scan1.header.stamp
+            )
             transformed_cloud1 = do_transform_cloud(cloud1, transform1)
 
             transform2 = self.tf_buffer.lookup_transform(
-                self.target_frame, scan2.header.frame_id, scan2.header.stamp)
+                self.target_frame, scan2.header.frame_id, scan2.header.stamp
+            )
             transformed_cloud2 = do_transform_cloud(cloud2, transform2)
 
-            points1 = pc2.read_points_numpy(transformed_cloud1, field_names=["x", "y", "z"])
-            points2 = pc2.read_points_numpy(transformed_cloud2, field_names=["x", "y", "z"])
+            points1 = pc2.read_points_numpy(
+                transformed_cloud1, field_names=["x", "y", "z"]
+            )
+            points2 = pc2.read_points_numpy(
+                transformed_cloud2, field_names=["x", "y", "z"]
+            )
 
             merged_points = np.concatenate((points1, points2), axis=0)
 
@@ -70,8 +77,13 @@ class LidarMergeNode(Node):
 
             self.cloud_pub.publish(merged_cloud)
 
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+        except (
+            tf2_ros.LookupException,
+            tf2_ros.ConnectivityException,
+            tf2_ros.ExtrapolationException,
+        ) as e:
             self.get_logger().warn(f'Could not transform scans: {e}')
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -81,6 +93,7 @@ def main(args=None):
     finally:
         node.destroy_node()
         rclpy.try_shutdown()
+
 
 if __name__ == '__main__':
     main()

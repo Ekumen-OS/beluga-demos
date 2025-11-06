@@ -230,8 +230,8 @@ public:
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(this);
 
     // Callback options
-    callback_group_ =
-        this->create_callback_group(rclcpp::CallbackGroupType::MutuallyExclusive);
+    callback_group_ = this->create_callback_group(
+        rclcpp::CallbackGroupType::MutuallyExclusive);
     rclcpp::SubscriptionOptions common_subscription_options;
     common_subscription_options.callback_group = callback_group_;
 

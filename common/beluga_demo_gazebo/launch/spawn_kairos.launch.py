@@ -33,8 +33,8 @@ from launch_ros.substitutions import FindPackageShare
 import tempfile
 import yaml
 
-def generate_launch_description():
 
+def generate_launch_description():
     robot_name = LaunchConfiguration("robot_name")
 
     pose = {
@@ -56,10 +56,22 @@ def generate_launch_description():
         executable="create",
         output="screen",
         arguments=[
-            "-name", robot_name,
-            "-topic", "/robot_description",
-            "-x", pose["x"], "-y", pose["y"], "-z", pose["z"],
-            "-R", pose["R"], "-P", pose["P"], "-Y", pose["Y"],
+            "-name",
+            robot_name,
+            "-topic",
+            "/robot_description",
+            "-x",
+            pose["x"],
+            "-y",
+            pose["y"],
+            "-z",
+            pose["z"],
+            "-R",
+            pose["R"],
+            "-P",
+            pose["P"],
+            "-Y",
+            pose["Y"],
         ],
     )
 
@@ -128,7 +140,9 @@ def generate_launch_description():
 
     # Spawn robot controllers in Gazebo
     mecanum_controller_params = os.path.join(
-        get_package_share_directory("beluga_demo_gazebo"), "config", "mecanum_controller_params.yaml",
+        get_package_share_directory("beluga_demo_gazebo"),
+        "config",
+        "mecanum_controller_params.yaml",
     )
 
     joint_state_broadcaster_spawner = Node(
@@ -136,8 +150,10 @@ def generate_launch_description():
         executable='spawner',
         arguments=[
             'joint_state_broadcaster',
-            '--switch-timeout', '10',
-            '--controller-manager-timeout', '10',
+            '--switch-timeout',
+            '10',
+            '--controller-manager-timeout',
+            '10',
         ],
         output='screen',
     )
@@ -147,10 +163,14 @@ def generate_launch_description():
         executable='spawner',
         arguments=[
             'mecanum_drive_controller',
-            '--switch-timeout', '10',
-            '--controller-manager-timeout', '10',
-            '--param-file', mecanum_controller_params,
-            '--controller-ros-args', '-r ~/odometry:=/odom -r ~/tf_odometry:=/tf',
+            '--switch-timeout',
+            '10',
+            '--controller-manager-timeout',
+            '10',
+            '--param-file',
+            mecanum_controller_params,
+            '--controller-ros-args',
+            '-r ~/odometry:=/odom -r ~/tf_odometry:=/tf',
         ],
         output='screen',
     )
@@ -158,7 +178,12 @@ def generate_launch_description():
     # Env var for Gazebo resources
     set_env_root = AppendEnvironmentVariable(
         'GZ_SIM_RESOURCE_PATH',
-        str(Path(os.path.join(get_package_share_directory("robotnik_gazebo_ignition"))).parent.resolve()))
+        str(
+            Path(
+                os.path.join(get_package_share_directory("robotnik_gazebo_ignition"))
+            ).parent.resolve()
+        ),
+    )
 
     # Build launch description
     ld = LaunchDescription()

@@ -40,7 +40,7 @@ def generate_launch_description():
                 ),
                 launch_arguments={
                     "world_name": "populated_ekumen_hq4.world",
-                    "robot_name": "rbkairos",                    
+                    "robot_name": "rbkairos",
                 }.items(),
             ),
             Node(
@@ -48,7 +48,7 @@ def generate_launch_description():
                 executable="lidar_merge_node",
                 name="lidar_merge_node",
                 output="screen",
-                remappings = [
+                remappings=[
                     ("scan1", "/front_laser/scan"),
                     ("scan2", "/rear_laser/scan"),
                     ("cloud", "/laser_cloud"),
