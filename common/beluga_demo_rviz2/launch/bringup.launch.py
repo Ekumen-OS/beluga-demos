@@ -24,8 +24,6 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    robot_name = LaunchConfiguration("robot_name")
-
     declare_robot_name = DeclareLaunchArgument(
         "robot_name", default_value="tb3", description="Robot to spawn (tb3 or kairos)"
     )

@@ -23,6 +23,7 @@ from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
 from launch.conditions import IfCondition
 from launch.substitutions import PythonExpression
+from launch.actions import LogInfo
 
 
 def generate_launch_description():
@@ -69,6 +70,7 @@ def generate_launch_description():
         "GZ_SIM_RESOURCE_PATH", os.pathsep.join(world_paths)
     )
 
+    # Launch gazebo sim
     gz_sim_nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
@@ -81,6 +83,7 @@ def generate_launch_description():
         ),
         launch_arguments=[("gz_args", ["-r ", world_name_conf])],
     )
+
     # Spawn TurtleBot3 if robot_name == "tb3"
     spawn_tb3 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -96,6 +99,7 @@ def generate_launch_description():
         condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'tb3'"])),
     )
 
+    # Spawn Kairos if robot_name == "rbkairos"
     spawn_kairos = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(
@@ -124,5 +128,6 @@ def generate_launch_description():
             gz_sim_nodes,
             spawn_tb3,
             spawn_kairos,
+            LogInfo(msg=["Robot name: ", robot_name_conf]),
         ]
     )
