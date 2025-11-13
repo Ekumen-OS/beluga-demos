@@ -23,13 +23,20 @@ services:
       - ..:/home/developer/ws/src/beluga_demo
       - beluga_demos_ccache:/home/developer/.ccache
       - /dev:/dev
+  beluga-demo-dev-nvidia:
+    extends:
+      service: beluga-demo-dev
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
     runtime: nvidia
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - capabilities: [gpu]
-    #           count: 1 # Reserves one GPU
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 volumes:
   beluga_demos_ccache:
   gazebo_models:

@@ -23,6 +23,7 @@
   <depend>beluga</depend>
   <depend>beluga_ros</depend>
 
+  <depend>apriltag_ros</depend>
   <depend>beluga_april_tag_adapter</depend>
   <depend>beluga_april_tag_adapter_msgs</depend>
   <depend>beluga_feature_map_server</depend>
