@@ -12,45 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# from launch import LaunchDescription
-# from launch_ros.actions import Node
-# from ament_index_python.packages import get_package_share_directory
-# from launch.substitutions import Command, PathJoinSubstitution
-# from launch.substitutions.find_executable import FindExecutable
-
-# def generate_launch_description():
-#     # Path to Kairos xacro file
-#     tb3_xacro_file = PathJoinSubstitution([
-#         get_package_share_directory("nav2_minimal_tb3_sim"),
-#         "urdf",
-#         "gz_waffle.sdf.xacro"
-#     ])
-
-#     return LaunchDescription([
-#         Node(
-#             package="robot_state_publisher",
-#             executable="robot_state_publisher",
-#             name="robot_state_publisher",
-#             output="screen",
-#             parameters=[{
-#                 "robot_description": Command([
-#                     FindExecutable(name="xacro"),
-#                     " ",
-#                     tb3_xacro_file,
-#                 ]),
-#                 #"publish_frequency": 100.0,
-#                 #"use_sim_time": True,
-#             }],
-#         ),
-#     ])
-
 import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-#from launch.substitutions import Command, FindExecutable, PathJoinSubstitution
-#from launch_ros.substitutions import FindPackageShare
-#from launch_ros.descriptions import ParameterValue
 
 def generate_launch_description():
     #Path to TurtleBot3 URDF (already expanded xacro in this package)
@@ -70,4 +35,3 @@ def generate_launch_description():
             ),
         ]
     )
-

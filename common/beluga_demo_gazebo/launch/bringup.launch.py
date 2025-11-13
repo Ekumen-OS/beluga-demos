@@ -90,7 +90,6 @@ def generate_launch_description():
             [
                 os.path.join(
                     get_package_share_directory("nav2_minimal_tb3_sim"),
-                    #get_package_share_directory("beluga_demo_gazebo"),
                     "launch",
                     "spawn_tb3.launch.py",
                 )
