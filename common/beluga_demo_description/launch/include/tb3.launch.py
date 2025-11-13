@@ -17,14 +17,15 @@ from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
 
+
 def generate_launch_description():
-    #Path to TurtleBot3 URDF (already expanded xacro in this package)
+    # Path to TurtleBot3 URDF (already expanded xacro in this package)
     turtlebot_urdf = os.path.join(
         get_package_share_directory("nav2_minimal_tb3_sim"),
         "urdf",
         "turtlebot3_waffle.urdf",
     )
-    
+
     return LaunchDescription(
         [
             Node(
