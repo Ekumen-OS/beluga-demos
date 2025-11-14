@@ -16,19 +16,28 @@
 
 from launch import LaunchDescription
 from launch_ros.actions import Node
+from launch.conditions import IfCondition
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 
 
 def generate_launch_description():
     gamepad_type_conf = LaunchConfiguration('gamepad_type')
+    robot_name_conf = LaunchConfiguration('robot_name')
 
     gamepad_type_arg = DeclareLaunchArgument(
         'gamepad_type',
         default_value='xbox',
         choices=['xbox'],
         description='Gamepad type',
+    )
+
+    robot_name_arg = DeclareLaunchArgument(
+        name='robot_name',
+        default_value='tb3',
+        description='Robot name',
+        choices=['tb3', 'rbkairos'],
     )
 
     package_dir = get_package_share_directory('beluga_demo_teleop')
@@ -55,7 +64,23 @@ def generate_launch_description():
         ],
     )
 
-    teleop_twist_node = Node(
+    # Node for rbkairos (stamped + remapped)
+    teleop_twist_node_kairos = Node(
+        package='teleop_twist_joy',
+        executable='teleop_node',
+        name='teleop_twist_joy_node',
+        parameters=[teleop_twist_joy_config_file],
+        remappings=[
+            ('/joy', '/input/joystick'),
+            ('/cmd_vel', '/mecanum_drive_controller/reference'),
+        ],
+        condition=IfCondition(
+            PythonExpression(['"', robot_name_conf, '" == "rbkairos"'])
+        ),
+    )
+
+    # Node for tb3 (no stamped/remaps)
+    teleop_twist_node_tb3 = Node(
         package='teleop_twist_joy',
         executable='teleop_node',
         name='teleop_twist_joy_node',
@@ -63,12 +88,14 @@ def generate_launch_description():
         remappings={
             ('/joy', '/input/joystick'),
         },
+        condition=IfCondition(PythonExpression(['"', robot_name_conf, '" == "tb3"'])),
     )
 
     return LaunchDescription(
         [
             gamepad_type_arg,
             gamepad_driver_node,
-            teleop_twist_node,
+            teleop_twist_node_tb3,
+            teleop_twist_node_kairos,
         ]
     )

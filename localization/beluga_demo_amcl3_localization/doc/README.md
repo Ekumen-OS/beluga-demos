@@ -15,7 +15,7 @@ Request the maps and bags from the team and store the maps under `beluga_demo/lo
 
 #### Local machine (Only Humble)
 
-If you want to run this example on your local machine and not in the provided docker image, you need to download and compile the [pcl_perception repo release 2.6.1](https://github.com/ros-perception/perception_pcl) by yourself. Because the filters provided for `humble` are not compiled as plugins. 
+If you want to run this example on your local machine and not in the provided docker image, you need to download and compile the [pcl_perception repo release 2.6.1](https://github.com/ros-perception/perception_pcl) by yourself. Because the filters provided for `humble` are not compiled as plugins.
 
 ## Quick start
 

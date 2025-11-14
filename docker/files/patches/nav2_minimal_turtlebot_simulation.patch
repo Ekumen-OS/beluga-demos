@@ -21,18 +21,13 @@ index 36a14d8..a62fa0d 100644
 +  gz_type_name: "gz.msgs.CameraInfo"
 +  direction: GZ_TO_ROS
 diff --git a/nav2_minimal_tb3_sim/urdf/gz_waffle.sdf.xacro b/nav2_minimal_tb3_sim/urdf/gz_waffle.sdf.xacro
-index af30b5e..cf37592 100644
+index b3eaac8..77b4518 100644
 --- a/nav2_minimal_tb3_sim/urdf/gz_waffle.sdf.xacro
 +++ b/nav2_minimal_tb3_sim/urdf/gz_waffle.sdf.xacro
-@@ -3,6 +3,16 @@
+@@ -3,6 +3,11 @@
      <xacro:arg name="namespace" default=""/>
  
      <model name="turtlebot3_waffle"> 
-+      <plugin
-+        filename="gz-sim-sensors-system"
-+        name="gz::sim::systems::Sensors">
-+        <render_engine>ogre2</render_engine>
-+      </plugin>
 +      <plugin
 +        filename="gz-sim-imu-system"
 +        name="gz::sim::systems::Imu">
@@ -41,7 +36,7 @@ index af30b5e..cf37592 100644
        <pose>0.0 0.0 0.0 0.0 0.0 0.0</pose>
  
        <link name="base_footprint"/>
-@@ -375,12 +385,43 @@
+@@ -375,12 +380,43 @@
  
          <pose>0.069 -0.047 0.107 0 0 0</pose>
  

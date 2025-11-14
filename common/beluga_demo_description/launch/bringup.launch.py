@@ -1,4 +1,4 @@
-# Copyright 2024 Ekumen, Inc.
+# Copyright 2025 Ekumen, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,33 +12,41 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 from launch import LaunchDescription
-from launch_ros.actions import Node
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.substitutions import (
+    LaunchConfiguration,
+    PathJoinSubstitution,
+    TextSubstitution,
+)
+from launch.launch_description_sources import PythonLaunchDescriptionSource
 from ament_index_python.packages import get_package_share_directory
-from launch.substitutions import Command
-
-import os
 
 
 def generate_launch_description():
-    urdf_file_name = "turtlebot3_waffle.urdf"
-
-    urdf_path = os.path.join(
-        get_package_share_directory("nav2_minimal_tb3_sim"), "urdf", urdf_file_name
-    )
+    beluga_demo_pkg = get_package_share_directory("beluga_demo_description")
 
     return LaunchDescription(
         [
-            Node(
-                package="robot_state_publisher",
-                executable="robot_state_publisher",
-                output="screen",
-                parameters=[
-                    {
-                        "robot_description": Command(["xacro ", urdf_path]),
-                    }
-                ],
+            DeclareLaunchArgument(
+                name="robot_name",
+                default_value="tb3",
+                description="Robot to spawn (tb3 or kairos)",
+            ),
+            IncludeLaunchDescription(
+                PythonLaunchDescriptionSource(
+                    PathJoinSubstitution(
+                        [
+                            beluga_demo_pkg,
+                            "launch",
+                            "include",
+                            [
+                                LaunchConfiguration("robot_name"),
+                                TextSubstitution(text=".launch.py"),
+                            ],
+                        ]
+                    )
+                )
             ),
         ]
     )

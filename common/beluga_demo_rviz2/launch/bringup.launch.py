@@ -13,14 +13,31 @@
 # limitations under the License.
 
 from launch import LaunchDescription
-from launch.substitutions import PathJoinSubstitution
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import (
+    LaunchConfiguration,
+    PathJoinSubstitution,
+    TextSubstitution,
+)
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+    declare_robot_name = DeclareLaunchArgument(
+        "robot_name", default_value="tb3", description="Robot to spawn (tb3 or kairos)"
+    )
+
     rviz_config_path = PathJoinSubstitution(
-        [FindPackageShare('beluga_demo_rviz2'), 'rviz', 'model.rviz']
+        [
+            FindPackageShare('beluga_demo_rviz2'),
+            'rviz',
+            [
+                TextSubstitution(text="model_"),
+                LaunchConfiguration("robot_name"),
+                TextSubstitution(text=".rviz"),
+            ],
+        ]
     )
 
     return LaunchDescription(

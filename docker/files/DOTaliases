@@ -18,6 +18,10 @@ alias lidar_likelihood_model_office_demo='cd ~/ws \
   && source install/setup.bash \
   && ros2 launch beluga_demo_lidar_localization demo_office_likelihood_localization.launch.py'
 
+alias point_cloud_office_demo='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_lidar_localization demo_office_point_cloud_localization.launch.py'
+
 alias apriltags_localization_demo='cd ~/ws \
   && source install/setup.bash \
   && ros2 launch beluga_demo_fiducial_localization demo_apriltags_based_localization.launch.py'

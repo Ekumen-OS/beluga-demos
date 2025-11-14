@@ -21,6 +21,9 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch.conditions import IfCondition
+from launch.substitutions import PythonExpression
+from launch.actions import LogInfo
 
 
 def generate_launch_description():
@@ -45,6 +48,12 @@ def generate_launch_description():
         choices=available_worlds,
     )
 
+    robot_name_conf = LaunchConfiguration("robot_name")
+
+    robot_name_arg = DeclareLaunchArgument(
+        name="robot_name", default_value="tb3", description="Robot to spawn"
+    )
+
     append_tb3_gz_sim_resources = AppendEnvironmentVariable(
         "GZ_SIM_RESOURCE_PATH",
         os.pathsep.join(
@@ -61,6 +70,7 @@ def generate_launch_description():
         "GZ_SIM_RESOURCE_PATH", os.pathsep.join(world_paths)
     )
 
+    # Launch gazebo sim
     gz_sim_nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
@@ -74,7 +84,8 @@ def generate_launch_description():
         launch_arguments=[("gz_args", ["-r ", world_name_conf])],
     )
 
-    spawn_command = IncludeLaunchDescription(
+    # Spawn TurtleBot3 if robot_name == "tb3"
+    spawn_tb3 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             [
                 os.path.join(
@@ -85,14 +96,38 @@ def generate_launch_description():
             ],
         ),
         launch_arguments=[("x_pose", "0"), ("y_pose", "-2"), ("z_pose", "0.01")],
+        condition=IfCondition(PythonExpression(["'", robot_name_conf, "' == 'tb3'"])),
+    )
+
+    # Spawn Kairos if robot_name == "rbkairos"
+    spawn_kairos = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory("beluga_demo_gazebo"),
+                "launch",
+                "spawn_kairos.launch.py",
+            )
+        ),
+        launch_arguments={
+            "robot_name": "rbkairos",
+            "x_pose": "0",
+            "y_pose": "-1.8",
+            "z_pose": "0.01",
+        }.items(),
+        condition=IfCondition(
+            PythonExpression(["'", robot_name_conf, "' == 'rbkairos'"])
+        ),
     )
 
     return LaunchDescription(
         [
             world_name_arg,
+            robot_name_arg,
             append_gz_worlds,
             append_tb3_gz_sim_resources,
             gz_sim_nodes,
-            spawn_command,
+            spawn_tb3,
+            spawn_kairos,
+            LogInfo(msg=["Robot name: ", robot_name_conf]),
         ]
     )
