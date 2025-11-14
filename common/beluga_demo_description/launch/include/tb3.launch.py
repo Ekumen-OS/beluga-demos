@@ -32,7 +32,12 @@ def generate_launch_description():
                 package="robot_state_publisher",
                 executable="robot_state_publisher",
                 output="screen",
-                parameters=[{"robot_description": open(turtlebot_urdf).read()}],
+                parameters=[
+                    {
+                        "robot_description": open(turtlebot_urdf).read(),
+                        "use_sim_time": True,
+                    }
+                ],
             ),
         ]
     )

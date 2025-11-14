@@ -22,7 +22,6 @@ from launch.substitutions import (
     EnvironmentVariable,
 )
 from launch_ros.descriptions import ParameterValue
-from launch.actions import LogInfo
 
 
 def generate_launch_description():
@@ -66,12 +65,11 @@ def generate_launch_description():
         ]
     )
 
-    # 3️⃣ Wrap xacro robot description in ParameterValue so launch knows it’s a string parameter
+    # Wrap xacro robot description in ParameterValue so launch knows it’s a string parameter
     robot_description_str = ParameterValue(robot_description_content, value_type=str)
 
     return LaunchDescription(
         [
-            # LogInfo(msg=["Expanded robot description:\n", robot_description_content]),
             Node(
                 package="robot_state_publisher",
                 executable="robot_state_publisher",
@@ -80,7 +78,6 @@ def generate_launch_description():
                 parameters=[
                     {
                         "robot_description": robot_description_str,
-                        "publish_frequency": 100.0,
                         "use_sim_time": True,
                     }
                 ],
