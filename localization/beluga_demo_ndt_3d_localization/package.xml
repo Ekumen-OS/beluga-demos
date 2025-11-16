@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>beluga_demo_ndt_3d_localization</name>
+  <version>2.0.0</version>
+  <description>Demos of Beluga NDT AMCL based localization indoors.</description>
+  <maintainer email="glpuga@ekumenlabs.com">Gerardo Puga</maintainer>
+  <license>Apache License 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>beluga_example</depend>
+  <depend>beluga_demo_gazebo</depend>
+
+  <depend>gonbuki_bringup_simulation_stack</depend>
+
+  <depend>teleop_twist_keyboard</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
