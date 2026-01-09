@@ -1,0 +1,52 @@
+frame_id: map
+features:
+  - position: [-4, -4, 1]
+    category: 0
+  - position: [-4, -2, 1]
+    category: 0
+  - position: [-4, 0, 1]
+    category: 0
+  - position: [-4, 2, 1]
+    category: 0
+  - position: [-4, 4, 1]
+    category: 0
+  - position: [-2, -4, 1]
+    category: 0
+  - position: [-2, -2, 1]
+    category: 0
+  - position: [-2, 0, 1]
+    category: 0
+  - position: [-2, 2, 1]
+    category: 0
+  - position: [-2, 4, 1]
+    category: 0
+  - position: [0, -4, 1]
+    category: 0
+  - position: [0, -2, 1]
+    category: 0
+  - position: [0, 0, 1]
+    category: 0
+  - position: [0, 2, 1]
+    category: 0
+  - position: [0, 4, 1]
+    category: 0
+  - position: [2, -4, 1]
+    category: 0
+  - position: [2, -2, 1]
+    category: 0
+  - position: [2, 0, 1]
+    category: 0
+  - position: [2, 2, 1]
+    category: 0
+  - position: [2, 4, 1]
+    category: 0
+  - position: [4, -4, 1]
+    category: 0
+  - position: [4, -2, 1]
+    category: 0
+  - position: [4, 0, 1]
+    category: 0
+  - position: [4, 2, 1]
+    category: 0
+  - position: [4, 4, 1]
+    category: 0

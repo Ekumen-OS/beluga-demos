@@ -48,6 +48,7 @@ def generate_launch_description():
                 output='screen',
                 respawn=True,
                 arguments=['-d', rviz_config_path],
+                ros_arguments=['--log-level', 'rviz:=WARN'],
             ),
         ]
     )

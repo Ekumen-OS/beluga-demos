@@ -26,6 +26,10 @@ alias apriltags_localization_demo='cd ~/ws \
   && source install/setup.bash \
   && ros2 launch beluga_demo_fiducial_localization demo_apriltags_based_localization.launch.py'
 
+alias ml_localization_demo='cd ~/ws \
+  && source install/setup.bash \
+  && ros2 launch beluga_demo_ml_localization demo_encoding_based_localization.launch.py'
+
 alias light_beacons_localization_demo='cd ~/ws \
   && source install/setup.bash \
   && ros2 launch beluga_demo_bearing_localization demo_light_beacons_based_localization.launch.py'
