@@ -76,12 +76,41 @@ RUN apt-get update \
     mc \
     lsb-release \
     tmux \
+    libopencv-dev \
   && rm -rf /var/lib/apt/lists/*
 
 ARG GZ_VERSION="harmonic"
 RUN curl https://packages.osrfoundation.org/gazebo.gpg --output /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
   && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" > /etc/apt/sources.list.d/gazebo-stable.list \
   && apt-get update && apt-get install --no-install-recommends -y $(if [[ "${GZ_VERSION}" > "fortress" ]]; then echo gz; else echo ignition; fi)-${GZ_VERSION}
+
+#
+# Install CUDA Toolkit
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gnupg2 curl ca-certificates && \
+    curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub | apt-key add - && \
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /" > /etc/apt/sources.list.d/cuda.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends cuda-toolkit-12-1 && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV CUDA_TOOLKIT_ROOT_DIR=/usr/local/cuda-12.1
+ENV LD_LIBRARY_PATH=/usr/local/cuda-12.1/lib64:${LD_LIBRARY_PATH}
+ENV PATH=/usr/local/cuda-12.1/bin:${PATH}
+
+#
+# Install LibTorch
+RUN apt-get update && apt-get install -y --no-install-recommends unzip \
+    && cd /opt \
+    && curl -L -o libtorch.zip https://download.pytorch.org/libtorch/cu121/libtorch-cxx11-abi-shared-with-deps-2.1.0%2Bcu121.zip \
+    && unzip libtorch.zip \
+    && rm libtorch.zip \
+    && apt-get purge -y --auto-remove unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+
+ENV LD_LIBRARY_PATH=/opt/libtorch/lib:${LD_LIBRARY_PATH}
+ENV CMAKE_PREFIX_PATH=/opt/libtorch:${CMAKE_PREFIX_PATH}
 
 RUN pip install pre-commit==2.20.0
 
